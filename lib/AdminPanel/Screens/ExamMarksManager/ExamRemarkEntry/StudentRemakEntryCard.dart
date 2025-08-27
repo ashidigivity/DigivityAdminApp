@@ -1,4 +1,5 @@
 
+import 'package:digivity_admin_app/AdminPanel/Components/PopupNetworkImage.dart';
 import 'package:digivity_admin_app/AdminPanel/Models/MarksManagerModel/ExamRemarkListModel.dart';
 import 'package:digivity_admin_app/Components/CustomDropdown.dart';
 import 'package:digivity_admin_app/Components/InputField.dart';
@@ -59,11 +60,8 @@ class _StudentRemakEntryCardState extends State<StudentRemakEntryCard> {
           // Profile
         Row(
           children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.grey.shade200,
-              backgroundImage: NetworkImage(widget.profileImg),
-            ),
+            PopupNetworkImage(imageUrl: widget.profileImg),
+
             const SizedBox(width: 5),
 
             // Info

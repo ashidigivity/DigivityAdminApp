@@ -1,4 +1,5 @@
 import 'package:digivity_admin_app/AdminPanel/Models/Studdent/UpdateFieldList.dart';
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/BackgrounWeapper.dart';
 import 'package:digivity_admin_app/Components/CardContainer.dart';
 import 'package:digivity_admin_app/Components/CourseComponent.dart';
@@ -14,13 +15,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class FieldUpdateStudentListSearch extends StatefulWidget{
+class FieldUpdateStudentListSearch extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return _FieldUpdateStudentListSearch();
   }
 }
-class _FieldUpdateStudentListSearch extends State<FieldUpdateStudentListSearch>{
+
+class _FieldUpdateStudentListSearch
+    extends State<FieldUpdateStudentListSearch> {
   List<UpdateFieldList>? fieldListdata = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -39,114 +42,127 @@ class _FieldUpdateStudentListSearch extends State<FieldUpdateStudentListSearch>{
     });
   }
 
-  void _fetchfieldlist() async{
+  void _fetchfieldlist() async {
     showLoaderDialog(context);
-    final response =await StudentsData().getFieldsForUpdate();
-    setState(() {
-      fieldListdata = response;
-     });
-    hideLoaderDialog(context);
+    try {
+      final response = await StudentsData().getFieldsForUpdate();
+      setState(() {
+        fieldListdata = response;
+      });
+    } catch (e) {
+      showBottomMessage(context, "${e}", true);
+    }
+    finally {
+      hideLoaderDialog(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(preferredSize: Size.fromHeight(kToolbarHeight), child: SimpleAppBar(titleText: 'Student Field Updation', routeName: 'back')),
-      body: BackgroundWrapper(child: SingleChildScrollView(child: Column(
-        children: [
-          CardContainer(child: Form(
-              key: _formKey,
-              child: Column(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SimpleAppBar(
+          titleText: 'Student Field Updation',
+          routeName: 'back',
+        ),
+      ),
+      body: BackgroundWrapper(
+        child: SingleChildScrollView(
+          child: Column(
             children: [
-              CourseComponent(
-                onChanged: (value){
-                  selectedCourseId=value;
-                  setState(() {
+              CardContainer(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      CourseComponent(
+                        onChanged: (value) {
+                          selectedCourseId = value;
+                          setState(() {});
+                        },
+                        validator: (selectedCourseId) {
+                          if (selectedCourseId == null ||
+                              selectedCourseId.isEmpty) {
+                            return "Please select a course";
+                          }
+                          return null;
+                        },
+                      ),
 
-                  });
-                },
-                validator: (selectedCourseId) {
-                  if (selectedCourseId == null || selectedCourseId.isEmpty) {
-                    return "Please select a course";
-                  }
-                  return null;
-                },
-
+                      SizedBox(height: 20),
+                      ShortByDropdown(
+                        label: 'Sort By',
+                        onChanged: (value) {
+                          shortByMethod = value;
+                          setState(() {});
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      Studentsortby(
+                        lable: 'Sort By Type',
+                        onChanged: (value) {
+                          orderByMethod = value;
+                          setState(() {});
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      Statusdropdown(
+                        label: 'Status',
+                        onChange: (value) {
+                          selectedStatus = value;
+                          setState(() {});
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      CustomDropdown(
+                        items: fieldListdata!.map((item) {
+                          return {
+                            'id': item.fieldId,
+                            'fieldName': item.fieldName,
+                          };
+                        }).toList(),
+                        displayKey: 'fieldName',
+                        valueKey: 'id',
+                        onChanged: (value) {
+                          selectedField = value;
+                          setState(() {});
+                        },
+                        validator: (selectField) {
+                          if (selectField == null) {
+                            return "Please Select First Field";
+                          }
+                        },
+                        hint: 'Select Field Name',
+                      ),
+                    ],
+                  ),
+                ),
               ),
-
-              SizedBox(height: 20,),
-              ShortByDropdown(
-                label : 'Sort By',
-                onChanged: (value){
-                  shortByMethod=value;
-                  setState(() {
-
-                  });
-                },
-              ),
-              SizedBox(height: 20,),
-              Studentsortby(
-                lable: 'Sort By Type',
-                onChanged: (value){
-                  orderByMethod=value;
-                  setState(() {
-
-                  });
-                },
-              ),
-              SizedBox(height: 20,),
-              Statusdropdown(
-                label : 'Status',
-                onChange: (value){
-                  selectedStatus=value;
-                  setState(() {
-
-                  });
-                },
-              ),
-              SizedBox(height: 20,),
-              CustomDropdown(
-                items: fieldListdata!.map((item) {
-                  return {
-                    'id': item.fieldId,
-                    'fieldName': item.fieldName,
-                  };
-                }).toList(),
-                displayKey: 'fieldName',
-                valueKey: 'id',
-                onChanged: (value) {
-                  selectedField=value;
-                  setState(() {
-
-                  });
-                },
-                validator: (selectField){
-                  if(selectField==null){
-                    return "Please Select First Field";
-                  }
-                },
-                hint: 'Select Field Name',
-              )
             ],
-          )))
-        ],
-      ),)),
+          ),
+        ),
+      ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 30,vertical: 30),
-        child: CustomBlueButton(text: 'Update Date', icon: Icons.save, onPressed: (){
-          if(_formKey.currentState!.validate()){
-            context.pushNamed(
+        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+        child: CustomBlueButton(
+          text: 'Update Date',
+          icon: Icons.save,
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              context.pushNamed(
                 'student-field-update-list',
                 extra: {
                   'selectedCourseId': selectedCourseId,
                   'shortByMethod': shortByMethod,
                   'orderByMethod': orderByMethod,
                   'selectedStatus': selectedStatus,
-                  'selectedField': selectedField
-                }
-            );
+                  'selectedField': selectedField,
+                },
+              );
             }
-        }),
+          },
+        ),
       ),
     );
   }

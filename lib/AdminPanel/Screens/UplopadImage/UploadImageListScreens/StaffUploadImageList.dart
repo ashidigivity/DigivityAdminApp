@@ -16,7 +16,7 @@ import 'package:provider/provider.dart';
 class StaffUploadImageList extends StatefulWidget {
   final Map<String, dynamic>? formData;
 
-  const StaffUploadImageList({Key? key,this.formData}) : super(key: key);
+  const StaffUploadImageList({Key? key, this.formData}) : super(key: key);
 
   @override
   State<StaffUploadImageList> createState() => _StaffUploadImageList();
@@ -34,7 +34,10 @@ class _StaffUploadImageList extends State<StaffUploadImageList> {
     _staffSearchController.addListener(_filterStaffList);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final staffs = Provider.of<StaffDataProvider>(context, listen: false).staffs;
+      final staffs = Provider.of<StaffDataProvider>(
+        context,
+        listen: false,
+      ).staffs;
       _updateStaffList(staffs);
     });
   }
@@ -90,10 +93,7 @@ class _StaffUploadImageList extends State<StaffUploadImageList> {
       backgroundColor: Colors.transparent,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: SimpleAppBar(
-          titleText: "Upload Staff Image",
-          routeName: 'back',
-        ),
+        child: SimpleAppBar(titleText: "Upload Staff Image", routeName: 'back'),
       ),
       body: BackgroundWrapper(
         child: SafeArea(
@@ -110,174 +110,275 @@ class _StaffUploadImageList extends State<StaffUploadImageList> {
                 Expanded(
                   child: _filteredList.isNotEmpty
                       ? ListView.separated(
-                    itemCount: _filteredList.length,
-                    separatorBuilder: (context, index) =>
-                        Divider(color: Colors.grey.shade300, height: 1),
-                    itemBuilder: (context, index) {
-                      final staff = _filteredList[index];
+                          itemCount: _filteredList.length,
+                          separatorBuilder: (context, index) =>
+                              Divider(color: Colors.grey.shade300, height: 1),
+                          itemBuilder: (context, index) {
+                            final staff = _filteredList[index];
 
-                      return Container(
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                        decoration: BoxDecoration(
-                          color: index % 2 == 0
-                              ? const Color(0xFFDBF3E2)
-                              : const Color(0xFFE2E6EF),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            PopupNetworkImage(imageUrl: staff['profile_img']
-                            ,radius: 30,),
-
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                            return Container(
+                              margin: const EdgeInsets.symmetric(vertical: 10),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: index % 2 == 0
+                                    ? const Color(0xFFDBF3E2)
+                                    : const Color(0xFFE2E6EF),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
                                 children: [
-                                  Text(
-                                    "Staff No.: ${staff['staff_no'] ?? '-'} | Dept: ${staff['department'] ?? 'N/A'}",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.grey.shade800,
+                                  PopupNetworkImage(
+                                    imageUrl: staff['profile_img'],
+                                    radius: 30,
+                                  ),
+
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Staff No.: ${staff['staff_no'] ?? '-'} | Dept: ${staff['department'] ?? 'N/A'}",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.grey.shade800,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          "${staff['full_name'] ?? ''} (${staff['profession'] ?? ''})",
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          "Father: ${staff['father_name'] ?? ''}",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.grey.shade700,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    "${staff['full_name'] ?? ''} (${staff['profession'] ?? ''})",
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
+                                  Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      color: const Color(
+                                        0xFF514197,
+                                      ).withOpacity(0.1),
+                                      shape: BoxShape.circle,
                                     ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    "Father: ${staff['father_name'] ?? ''}",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey.shade700,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        showImagePickerBottomSheet(
+                                          context: context,
+                                          condidatename:
+                                              "${staff['full_name'] ?? ''} (${staff['profession'] ?? ''})",
+                                          onCameraTap: () async {
+                                            final isGranted =
+                                                await PermissionService.requestCameraPermission();
+                                            if (!isGranted) {
+                                              if (!mounted) return;
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    "Camera access denied. Please enable it in settings.",
+                                                  ),
+                                                ),
+                                              );
+                                              return;
+                                            }
+                                            if (isGranted) {
+                                              showLoaderDialog(context);
+                                              try {
+                                                final imageHandler =
+                                                    ImageHandler();
+                                                await imageHandler
+                                                    .pickAndResizeImage(
+                                                      source:
+                                                          ImageSource.camera,
+                                                    );
+
+                                                if (imageHandler
+                                                        .resizedImageFile !=
+                                                    null) {
+                                                  final response =
+                                                      await imageHandler
+                                                          .uploadResizedImage(
+                                                            'staff',
+                                                            staff['staff_id'],
+                                                          );
+
+                                                  if (response['result'] == 1) {
+                                                    final provider =
+                                                        Provider.of<
+                                                          StaffDataProvider
+                                                        >(
+                                                          context,
+                                                          listen: false,
+                                                        );
+                                                    await provider.fetchStaffs(
+                                                      bodyData:
+                                                          widget.formData ?? {},
+                                                    );
+                                                    _updateStaffList(
+                                                      provider.staffs,
+                                                    );
+                                                    showBottomMessage(
+                                                      context,
+                                                      response['message'],
+                                                      false,
+                                                    );
+                                                  } else {
+                                                    showBottomMessage(
+                                                      context,
+                                                      response['message'],
+                                                      true,
+                                                    );
+                                                  }
+                                                } else {
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        "No image selected",
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              } catch (e) {
+                                                print(
+                                                  "Bug Occured During The Upload Image Of THe Staff ${e}",
+                                                );
+                                                showBottomMessage(
+                                                  context,
+                                                  "${e}",
+                                                  true,
+                                                );
+                                              } finally {
+                                                hideLoaderDialog(context);
+                                              }
+                                            }
+                                          },
+                                          onGalleryTap: () async {
+                                            final isGranted =
+                                                await PermissionService.requestGalleryPermission();
+                                            if (!isGranted) {
+                                              if (!mounted) return;
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    "Gallery access denied. Please enable it in settings.",
+                                                  ),
+                                                ),
+                                              );
+                                              return;
+                                            }
+                                            showLoaderDialog(context);
+                                            try {
+                                              final imageHandler =
+                                                  ImageHandler();
+                                              await imageHandler
+                                                  .pickAndResizeImageFromGalery(
+                                                    source: ImageSource.gallery,
+                                                  );
+
+                                              if (imageHandler
+                                                      .resizedImageFile !=
+                                                  null) {
+                                                if (!mounted) return;
+
+                                                final response =
+                                                    await imageHandler
+                                                        .uploadResizedImage(
+                                                          'staff',
+                                                          staff['staff_id'],
+                                                        );
+
+                                                if (!mounted)
+                                                  return; // <- check
+                                                final provider =
+                                                    Provider.of<
+                                                      StaffDataProvider
+                                                    >(context, listen: false);
+
+                                                if (response['result'] == 1) {
+                                                  await provider.fetchStaffs(
+                                                    bodyData:
+                                                        widget.formData ?? {},
+                                                  );
+                                                  if (!mounted) return;
+                                                  _updateStaffList(
+                                                    provider.staffs,
+                                                  );
+
+                                                  showBottomMessage(
+                                                    context,
+                                                    response['message'],
+                                                    false,
+                                                  );
+                                                } else {
+                                                  if (!mounted)
+                                                    return; // <- check
+
+                                                  showBottomMessage(
+                                                    context,
+                                                    response['message'],
+                                                    true,
+                                                  );
+                                                }
+                                              } else {
+                                                if (!mounted)
+                                                  return; // <- check
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      "⚠️ No image selected from gallery",
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            } catch (e) {
+                                              print(
+                                                "Bug Occured During The Upload Image Of THe Staff ${e}",
+                                              );
+                                              showBottomMessage(
+                                                context,
+                                                "${e}",
+                                                true,
+                                              );
+                                            } finally {
+                                              hideLoaderDialog(context);
+                                            }
+                                          },
+                                        );
+                                      },
+                                      icon: const Icon(
+                                        Icons.camera_alt_outlined,
+                                        color: Colors.green,
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF514197).withOpacity(0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: IconButton(
-                                onPressed: () {
-                                  showImagePickerBottomSheet(
-                                    context: context,
-                                    condidatename:
-                                    "${staff['full_name'] ?? ''} (${staff['profession'] ?? ''})",
-                                    onCameraTap: () async {
-                                      final isGranted =await PermissionService.requestCameraPermission();
-                                      if(isGranted) {
-                                        final imageHandler = ImageHandler();
-                                        await imageHandler.pickAndResizeImage(
-                                            source: ImageSource.camera);
-
-                                        if (imageHandler.resizedImageFile !=
-                                            null) {
-                                          showLoaderDialog(context);
-
-                                          final response = await imageHandler
-                                              .uploadResizedImage(
-                                              'staff', staff['staff_id']);
-
-                                          if (response['result'] == 1) {
-                                            final provider = Provider.of<
-                                                StaffDataProvider>(context,
-                                                listen: false);
-                                            await provider.fetchStaffs(
-                                                bodyData: widget.formData ??
-                                                    {});
-                                            _updateStaffList(provider.staffs);
-                                            hideLoaderDialog(context);
-                                            showBottomMessage(
-                                                context, response['message'],
-                                                false);
-
-                                          } else {
-                                            hideLoaderDialog(context);
-                                            showBottomMessage(
-                                                context, response['message'],
-                                                true);
-                                          }
-
-                                          hideLoaderDialog(context);
-                                        } else {
-                                          ScaffoldMessenger
-                                              .of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                                content: Text(
-                                                    "⚠️ No image selected")),
-                                          );
-                                        }
-                                      }
-                                    },
-                                    onGalleryTap: () async {
-                                      final isGranted =await PermissionService.requestGalleryPermission();
-                                      if(isGranted) {
-                                        final imageHandler = ImageHandler();
-                                        await imageHandler
-                                            .pickAndResizeImageFromGalery(
-                                            source: ImageSource.gallery);
-                                        if (imageHandler.resizedImageFile !=
-                                            null) {
-                                          showLoaderDialog(context);
-
-                                          final response = await imageHandler
-                                              .uploadResizedImage(
-                                              'staff', staff['staff_id']);
-                                          final provider = Provider.of<
-                                              StaffDataProvider>(
-                                              context,
-                                              listen: false);
-                                          hideLoaderDialog(context);
-
-                                          if (response['result'] == 1) {
-                                            await provider.fetchStaffs(
-                                                bodyData: widget.formData ??
-                                                    {});
-                                            _updateStaffList(provider.staffs);
-                                            hideLoaderDialog(context);
-                                            showBottomMessage(
-                                                context, response['message'],
-                                                false);
-                                          } else {
-                                            hideLoaderDialog(context);
-                                            showBottomMessage(
-                                                context, response['message'],
-                                                true);
-                                          }
-                                        } else {
-                                          ScaffoldMessenger
-                                              .of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                                content: Text(
-                                                    "⚠️ No image selected from gallery")),
-                                          );
-                                        }
-                                      }
-                                    },
-                                  );
-                                },
-                                icon: const Icon(Icons.camera_alt_outlined,
-                                    color: Colors.green),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  )
+                            );
+                          },
+                        )
                       : const Center(child: Text("No staff found")),
                 ),
               ],

@@ -1,6 +1,6 @@
-
 import 'package:digivity_admin_app/AdminPanel/Components/ImportFeeHeads.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/FinanceReports/FinanceReportScreen/FeereportHtmlshowScreen.dart';
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/BackgrounWeapper.dart';
 import 'package:digivity_admin_app/Components/CardContainer.dart';
 import 'package:digivity_admin_app/Components/CourseComponent.dart';
@@ -14,26 +14,25 @@ import 'package:digivity_admin_app/helpers/FinanceHelperFunction.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class ClassCourseWiseFeeDefaulterReport extends StatefulWidget{
-
+class ClassCourseWiseFeeDefaulterReport extends StatefulWidget {
   @override
   State<ClassCourseWiseFeeDefaulterReport> createState() {
     return _ClassCourseWiseFeeDefaulterReport();
   }
 }
 
-class _ClassCourseWiseFeeDefaulterReport extends State<ClassCourseWiseFeeDefaulterReport>{
+class _ClassCourseWiseFeeDefaulterReport
+    extends State<ClassCourseWiseFeeDefaulterReport> {
+  final items = [
+    {'id': '', 'value': 'Please Select Option'},
+    {'id': 'yes', 'value': 'Yes'},
+    {'id': 'no', 'value': 'No'},
+  ];
 
-  final items =[
-    {'id':'','value':'Please Select Option'},
-    {'id':'yes','value':'Yes'},
-    {'id':'no','value':'No'},
-    ];
-
-  final showresults =[
-    {'id':'','value':'Please Select Option'},
-    {'id':'greater_than','value':'Greater Than'},
-    {'id':'less_than','value':'Less Than'},
+  final showresults = [
+    {'id': '', 'value': 'Please Select Option'},
+    {'id': 'greater_than', 'value': 'Greater Than'},
+    {'id': 'less_than', 'value': 'Less Than'},
   ];
 
   TextEditingController _fromdate = TextEditingController();
@@ -44,8 +43,6 @@ class _ClassCourseWiseFeeDefaulterReport extends State<ClassCourseWiseFeeDefault
   String? feehead;
   String? selectedBalanceOption;
   String? selectedResult;
-
-
 
   void submitForm() async {
     showLoaderDialog(context);
@@ -63,10 +60,11 @@ class _ClassCourseWiseFeeDefaulterReport extends State<ClassCourseWiseFeeDefault
 
     try {
       String? htmlData = await FinanceHelperFunction().apifeecollectionreport(
-          'class-course-section-wise-fee-defaulter-report', formdata);
-      hideLoaderDialog(context);
-
+        'class-course-section-wise-fee-defaulter-report',
+        formdata,
+      );
       if (htmlData != null && htmlData.isNotEmpty) {
+        hideLoaderDialog(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -77,84 +75,106 @@ class _ClassCourseWiseFeeDefaulterReport extends State<ClassCourseWiseFeeDefault
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("No report data found.")),
-        );
+        hideLoaderDialog(context);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("No report data found.")));
       }
     } catch (e) {
       print("SubmitForm Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong.")),
-      );
+
+      hideLoaderDialog(context);
+      showBottomMessage(context, "${e}", true);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(preferredSize: Size.fromHeight(kToolbarHeight), child: SimpleAppBar(titleText: 'Class/Course Wise Fee Defaulter Report', routeName: 'back')),
-      body: BackgroundWrapper(child:
-      Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          CardContainer(
-            child: Column(
-              children: [
-                DatePickerField(
-                  label: 'Fee Month',
-                  controller: _fromdate,
-                ),
-                SizedBox(height: 20,),
-              CustomDropdown(items: items, displayKey: 'value', valueKey: 'id', onChanged: (value){
-                selectedBalanceOption=value;
-                setState(() {
-
-                });
-              }, hint: 'Zero Bal. Show In List'),
-                SizedBox(height: 20,),
-                CourseComponent(
-                  onChanged: (value){
-                    course_id=value;
-                    setState(() {
-
-                    });
-                  },
-                ),
-                SizedBox(height: 20,),
-                CustomDropdown(items: showresults, displayKey: 'value', valueKey: 'id', onChanged: (value){
-                  selectedResult=value;
-                  setState(() {
-
-                  });
-                }, hint: 'Result'),
-                SizedBox(height: 20,),
-                CustomTextField(label: 'Result Value', hintText: '0', controller: _resultController),
-                SizedBox(height: 20,),
-                ImportFeeHeads(
-                    onChanged: (value){
-                    feehead=value;
-                    setState(() {
-                    });
-                },
-                ),
-                SizedBox(height: 20,),
-                CustomTextField(label: 'Student Name', hintText: 'Enter Student Name', controller: _studentname),
-                SizedBox(height: 20,),
-                CustomTextField(label: 'A/C Ledger No.', hintText: 'Enter Student Name', controller: _acladger),
-                SizedBox(height: 20,),
-                CustomBlueButton(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SimpleAppBar(
+          titleText: 'Class/Course Wise Fee Defaulter Report',
+          routeName: 'back',
+        ),
+      ),
+      body: BackgroundWrapper(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            CardContainer(
+              child: Column(
+                children: [
+                  DatePickerField(label: 'Fee Month', controller: _fromdate),
+                  SizedBox(height: 20),
+                  CustomDropdown(
+                    items: items,
+                    displayKey: 'value',
+                    valueKey: 'id',
+                    onChanged: (value) {
+                      selectedBalanceOption = value;
+                      setState(() {});
+                    },
+                    hint: 'Zero Bal. Show In List',
+                  ),
+                  SizedBox(height: 20),
+                  CourseComponent(
+                    onChanged: (value) {
+                      course_id = value;
+                      setState(() {});
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  CustomDropdown(
+                    items: showresults,
+                    displayKey: 'value',
+                    valueKey: 'id',
+                    onChanged: (value) {
+                      selectedResult = value;
+                      setState(() {});
+                    },
+                    hint: 'Result',
+                  ),
+                  SizedBox(height: 20),
+                  CustomTextField(
+                    label: 'Result Value',
+                    hintText: '0',
+                    controller: _resultController,
+                  ),
+                  SizedBox(height: 20),
+                  ImportFeeHeads(
+                    onChanged: (value) {
+                      feehead = value;
+                      setState(() {});
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  CustomTextField(
+                    label: 'Student Name',
+                    hintText: 'Enter Student Name',
+                    controller: _studentname,
+                  ),
+                  SizedBox(height: 20),
+                  CustomTextField(
+                    label: 'A/C Ledger No.',
+                    hintText: 'Enter Student Name',
+                    controller: _acladger,
+                  ),
+                  SizedBox(height: 20),
+                  CustomBlueButton(
                     width: double.infinity,
-                    text: 'Get Result', icon: Icons.arrow_forward, onPressed: () async{
-                  submitForm();
-                })
-
-              ],
+                    text: 'Get Result',
+                    icon: Icons.arrow_forward,
+                    onPressed: () async {
+                      submitForm();
+                    },
+                  ),
+                ],
+              ),
             ),
-          )
-        ],)
+          ],
+        ),
       ),
     );
   }
 }
-

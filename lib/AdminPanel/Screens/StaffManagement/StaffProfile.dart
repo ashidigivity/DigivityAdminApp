@@ -30,7 +30,11 @@ class _Staffprofile extends State<Staffprofile> {
   Future<void> _studentData() async {
     if (widget.staffId != null) {
       setState(() => _isLoading = true);
-      staff = await StaffApis().staffProfile(widget.staffId);
+      try {
+        staff = await StaffApis().staffProfile(widget.staffId);
+      }catch(e){
+        print("${e}");
+      }
       setState(() => _isLoading = false);
     } else {
       print("Staff ID is null");

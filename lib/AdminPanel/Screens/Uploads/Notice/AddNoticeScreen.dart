@@ -32,8 +32,10 @@ class AddNoticeScreen extends StatefulWidget {
 
 class _AddNoticeScreen extends State<AddNoticeScreen> {
   final _formKey = GlobalKey<FormState>();
-  final GlobalKey<NotifyBySectionState> notifyKey = GlobalKey<NotifyBySectionState>();
-  final GlobalKey<DynamicUrlInputListState> dynamicurls = GlobalKey<DynamicUrlInputListState>();
+  final GlobalKey<NotifyBySectionState> notifyKey =
+  GlobalKey<NotifyBySectionState>();
+  final GlobalKey<DynamicUrlInputListState> dynamicurls =
+  GlobalKey<DynamicUrlInputListState>();
   TextEditingController _noticeNo = TextEditingController();
   TextEditingController _noticeTitleController = TextEditingController();
   TextEditingController _noticeDescriptionController = TextEditingController();
@@ -54,7 +56,7 @@ class _AddNoticeScreen extends State<AddNoticeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:  PreferredSize(
+      appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: SimpleAppBar(titleText: 'Upload Notice', routeName: 'back'),
       ),
@@ -66,20 +68,37 @@ class _AddNoticeScreen extends State<AddNoticeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomTextField(label: 'Notice No', hintText: 'Enter Notice Number', controller: _noticeNo),
-                const SizedBox(height: 16),
-
-                DatePickerField(label: 'Notice Date', controller: _noticeDate),
-                const SizedBox(height: 16),
-
-                Timepickerfield(
-                  label: 'Notice Time',
-                  controller: _noticeTime,
+                CustomTextField(
+                  label: 'Notice No',
+                  hintText: 'Enter Notice Number',
+                  controller: _noticeNo,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please Enter Notice Number First";
+                    }
+                    return null;
+                  },
                 ),
+                const SizedBox(height: 16),
+
+                DatePickerField(
+                  label: 'Notice Date',
+                  controller: _noticeDate,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please Enter Notice Date First";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                Timepickerfield(label: 'Notice Time', controller: _noticeTime),
                 const SizedBox(height: 20),
                 AssignmentTypeSelector(
-                    label:'Notice Type',
-                    selectedType: _selectedType),
+                  label: 'Notice Type',
+                  selectedType: _selectedType,
+                ),
                 const SizedBox(height: 20),
 
                 MultiselectCourse(
@@ -88,6 +107,12 @@ class _AddNoticeScreen extends State<AddNoticeScreen> {
                     setState(() {
                       selectedCourses = courses;
                     });
+                  },
+                  validator: (courses) {
+                    if (courses == null || courses.isEmpty) {
+                      return "Please Select Course First";
+                    }
+                    return null;
                   },
                 ),
                 const SizedBox(height: 16),
@@ -105,6 +130,12 @@ class _AddNoticeScreen extends State<AddNoticeScreen> {
                   label: 'Notice Title',
                   hintText: 'Enter Homework Title',
                   controller: _noticeTitleController,
+                  validator: (courses) {
+                    if (courses == null || courses.isEmpty) {
+                      return "Please Enter Notice Title First";
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
 
@@ -113,17 +144,21 @@ class _AddNoticeScreen extends State<AddNoticeScreen> {
                   label: 'Notice Description',
                   hintText: 'Enter Description',
                   controller: _noticeDescriptionController,
+                  validator: (courses) {
+                    if (courses == null || courses.isEmpty) {
+                      return "Please Enter Notice Description";
+                    }
+                    return null;
+                  },
                 ),
 
                 const SizedBox(height: 16),
 
                 MultiSelectStaff(
                   initialValues: selectedstaffs,
-                  onChanged: (value){
-                    selectedstaffs=value;
-                    setState(() {
-
-                    });
+                  onChanged: (value) {
+                    selectedstaffs = value;
+                    setState(() {});
                   },
                 ),
 
@@ -134,27 +169,27 @@ class _AddNoticeScreen extends State<AddNoticeScreen> {
                     showDocumentPickerBottomSheet(
                       context: context,
                       title: "Upload File",
-                      onCameraTap: () => FilePickerHelper.pickFromCamera((file) {
-                        setState(() => selectedFiles.add(file));
-                      }),
-                      onGalleryTap: () => FilePickerHelper.pickFromGallery((file) {
-                        setState(() => selectedFiles.add(file));
-                      }),
-                      onPickDocument: () => FilePickerHelper.pickDocuments((files) {
-                        setState(() => selectedFiles.addAll(files));
-                      }),
+                      onCameraTap: () =>
+                          FilePickerHelper.pickFromCamera((file) {
+                            setState(() => selectedFiles.add(file));
+                          }),
+                      onGalleryTap: () =>
+                          FilePickerHelper.pickFromGallery((file) {
+                            setState(() => selectedFiles.add(file));
+                          }),
+                      onPickDocument: () =>
+                          FilePickerHelper.pickDocuments((files) {
+                            setState(() => selectedFiles.addAll(files));
+                          }),
                     );
                   },
                   selectedFiles: selectedFiles,
                   onRemoveFile: (index) {
                     setState(() => selectedFiles.removeAt(index));
                   },
-                )
-,
-                const SizedBox(height: 20),
-                DynamicUrlInputList(
-                  key: dynamicurls,
                 ),
+                const SizedBox(height: 20),
+                DynamicUrlInputList(key: dynamicurls),
                 const SizedBox(height: 20),
                 NotifyBySection(key: notifyKey),
               ],
@@ -171,36 +206,47 @@ class _AddNoticeScreen extends State<AddNoticeScreen> {
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
               showLoaderDialog(context);
+              try {
+                final notifyData =
+                    notifyKey.currentState?.getSelectedNotifyValues() ?? {};
+                final dynamicurlslink =
+                    dynamicurls.currentState?.getUrlLinks() ?? {};
+                final dataInsert = {
+                  'notice_no': _noticeNo.text,
+                  'course_id': selectedCourses.join('~'),
+                  'student_type': selectedAdmissionTypes.join('@'),
+                  'notice_title': _noticeTitleController.text,
+                  'notice': _noticeDescriptionController.text,
+                  'notice_date': _noticeDate.text,
+                  'notice_time': _noticeTime.text,
+                  'notice_type': _selectedType.name,
+                  'authorize_by': selectedstaffs.join('@'),
+                  'status': 'yes',
+                  'show_date_time': null,
+                  'end_date_time': null,
+                  'designation_id': null,
+                  'staff_type': null,
+                  'url_link': dynamicurlslink,
+                  ...notifyData,
+                };
 
-              final notifyData = notifyKey.currentState?.getSelectedNotifyValues() ?? {};
-              final dynamicurlslink = dynamicurls.currentState?.getUrlLinks() ?? {};
-              final dataInsert = {
-                'notice_no': _noticeNo.text,
-                'course_id': selectedCourses.join('~'),
-                'student_type': selectedAdmissionTypes.join(  '@'),
-                'notice_title': _noticeTitleController.text,
-                'notice': _noticeDescriptionController.text,
-                'notice_date': _noticeDate.text,
-                'notice_time':_noticeTime.text,
-                'notice_type': _selectedType.name,
-                'authorize_by':selectedstaffs.join('@'),
-                'status':'yes',
-                'show_date_time': null,
-                'end_date_time': null,
-                'designation_id': null,
-                'staff_type': null,
-                'url_link': dynamicurlslink,
-                ...notifyData,
-              };
-
-              final response = await UploadHomeWorksEtc().uploadData('notice', dataInsert, selectedFiles);
-              hideLoaderDialog(context);
-
-              if (response['result'] == 1) {
-                resetForm();
-                showBottomMessage(context, response['message'], false);
-              } else {
-                showBottomMessage(context, response['message'], true);
+                final response = await UploadHomeWorksEtc().uploadData(
+                  'notice',
+                  dataInsert,
+                  selectedFiles,
+                );
+                if (response['result'] == 1) {
+                  resetForm();
+                  showBottomMessage(context, response['message'], false);
+                } else {
+                  showBottomMessage(context, response['message'], true);
+                }
+              } catch(e){
+                print("Bug Occured During The Upload Assignment ${e}");
+                showBottomMessage(context, "${e}", true);
+              }
+              finally{
+                hideLoaderDialog(context);
               }
             }
           },
@@ -216,7 +262,7 @@ class _AddNoticeScreen extends State<AddNoticeScreen> {
       _noticeTitleController.clear();
       _noticeDescriptionController.clear();
 
-      selectedCourses = [];             // ← Replace with new empty list
+      selectedCourses = []; // ← Replace with new empty list
       selectedAdmissionTypes = [];
       selectedstaffs = [];
       selectedFiles = [];
@@ -225,5 +271,4 @@ class _AddNoticeScreen extends State<AddNoticeScreen> {
     dynamicurls.currentState?.resetUrls();
     notifyKey.currentState?.resetNotifySelection();
   }
-
 }

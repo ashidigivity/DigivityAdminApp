@@ -3,6 +3,7 @@ import 'package:digivity_admin_app/AdminPanel/Components/ImportFeeHeads.dart';
 import 'package:digivity_admin_app/AdminPanel/Components/ImportPaymode.dart';
 import 'package:digivity_admin_app/AdminPanel/Components/ImportReceiptStatus.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/FinanceReports/FinanceReportScreen/FeereportHtmlshowScreen.dart';
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/BackgrounWeapper.dart';
 import 'package:digivity_admin_app/Components/CardContainer.dart';
 import 'package:digivity_admin_app/Components/CourseComponent.dart';
@@ -41,8 +42,8 @@ class _FeeHeadWiseCollectionReport extends State<FeeHeadWiseCollectionReport>{
 
     try {
       String? htmlData = await FinanceHelperFunction().apifeecollectionreport('feehead-wise-collection-report',formdata);
-      hideLoaderDialog(context);
       if (htmlData != null && htmlData.isNotEmpty) {
+        hideLoaderDialog(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -53,15 +54,12 @@ class _FeeHeadWiseCollectionReport extends State<FeeHeadWiseCollectionReport>{
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("No report data found.")),
-        );
+        hideLoaderDialog(context);
+        showBottomMessage(context, "No report data found", true);
       }
     } catch (e) {
-      print("SubmitForm Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong.")),
-      );
+      hideLoaderDialog(context);
+      showBottomMessage(context, "${e}", true);
     }
   }
 

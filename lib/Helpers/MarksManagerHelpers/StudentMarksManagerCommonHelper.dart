@@ -27,34 +27,38 @@ class StudentMarksManagerCommonHelper {
     }
 
     final url = "api/MobileApp/teacher/$userId/StudentExamMarksEntry";
+    try {
+      final response = await getApiService.getRequestData(url, token!);
+      if (response['result'] == 1 && response['success'] != null) {
+        final data = response['success'][0];
+        final classList = data['classlist'] as List;
+        final examTermList = data['examtermlist'] as List;
+        final courseList = classList
+            .map((e) => CourseModel.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+        final examTermListdata = examTermList
+            .map((e) => Examtermmodel.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
 
-    final response = await getApiService.getRequestData(url, token!);
-
-    if (response['result'] == 1 && response['success'] != null) {
-      final data = response['success'][0];
-      final classList = data['classlist'] as List;
-      final examTermList = data['examtermlist'] as List;
-      final courseList = classList
-          .map((e) => CourseModel.fromJson(Map<String, dynamic>.from(e)))
-          .toList();
-      final examTermListdata = examTermList
-          .map((e) => Examtermmodel.fromJson(Map<String, dynamic>.from(e)))
-          .toList();
-
-      return {'courseList': courseList, 'examTermList': examTermListdata};
-    } else {
-      return {
-        'status': false,
-        'courseList': [],
-        'examTermList': [],
-        'message': response['message'] ?? 'Failed to fetch marks manager data.',
-      };
+        return {'courseList': courseList, 'examTermList': examTermListdata};
+      } else {
+        return {
+          'status': false,
+          'courseList': [],
+          'examTermList': [],
+          'message':
+              response['message'] ?? 'Failed to fetch marks manager data.',
+        };
+      }
+    } catch (e) {
+      print("${e}");
+      return {};
     }
   }
 
   Future<List<Map<String, dynamic>>> getExamDynamicData(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null || token == null) {
       await init(); // Ensure userId and token are initialized
     }
@@ -81,7 +85,7 @@ class StudentMarksManagerCommonHelper {
           } else if (bodydata['getdata'] == 'examassessmentlist' &&
               successData['examassessmentlist'] is List) {
             final List<dynamic> examTypeList =
-            successData['examassessmentlist'];
+                successData['examassessmentlist'];
             return examTypeList.map<Map<String, dynamic>>((e) {
               if (e is Map<String, dynamic>) {
                 return {'id': e['key'], 'name': e['value']};
@@ -110,8 +114,8 @@ class StudentMarksManagerCommonHelper {
   }
 
   Future<StudentMarksResponse?> apistudentlistmarksentry(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null && token == null) {
       await init();
     }
@@ -142,8 +146,8 @@ class StudentMarksManagerCommonHelper {
 
   //   Store Student Marks FUnction
   Future<Map<String, dynamic>> storeStudentMarks(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null || token == null) {
       await init(); // Ensure userId and token are initialized
     }
@@ -161,12 +165,10 @@ class StudentMarksManagerCommonHelper {
     }
   }
 
-
-
   /// Api For the Student Remark Entry
   Future<List<StudentRemarkEntry>?> apistudentlistremarksentry(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null && token == null) {
       await init();
     }
@@ -186,9 +188,10 @@ class StudentMarksManagerCommonHelper {
         final successData = response['success'][0];
 
         if (successData['studentlist'] is List) {
-          final List<StudentRemarkEntry> students = (successData['studentlist'] as List)
-              .map((e) => StudentRemarkEntry.fromJson(e))
-              .toList();
+          final List<StudentRemarkEntry> students =
+              (successData['studentlist'] as List)
+                  .map((e) => StudentRemarkEntry.fromJson(e))
+                  .toList();
 
           return students;
         }
@@ -199,7 +202,6 @@ class StudentMarksManagerCommonHelper {
       return null;
     }
   }
-
 
   /// API for getting the ExamRemarks List
   Future<List<ExamRemarkList>> getExamRemarks() async {
@@ -215,9 +217,10 @@ class StudentMarksManagerCommonHelper {
           (response['success'] as List).isNotEmpty) {
         final successData = response['success'][0];
         if (successData['remarklist'] is List) {
-          final List<ExamRemarkList> examremarksList = (successData['remarklist'] as List)
-              .map((e) => ExamRemarkList.fromJson(e))
-              .toList();
+          final List<ExamRemarkList> examremarksList =
+              (successData['remarklist'] as List)
+                  .map((e) => ExamRemarkList.fromJson(e))
+                  .toList();
           return examremarksList;
         }
       }
@@ -228,12 +231,10 @@ class StudentMarksManagerCommonHelper {
     }
   }
 
-
-
   /// api for the store studetn exam remarks
   Future<Map<String, dynamic>> storeStudentRemarks(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null || token == null) {
       await init(); // Ensure userId and token are initialized
     }
@@ -250,6 +251,4 @@ class StudentMarksManagerCommonHelper {
       };
     }
   }
-
-
 }

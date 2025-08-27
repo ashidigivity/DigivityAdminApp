@@ -23,7 +23,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-
 class Addcircularscreen extends StatefulWidget {
   const Addcircularscreen({super.key});
 
@@ -33,13 +32,16 @@ class Addcircularscreen extends StatefulWidget {
 
 class _Addcircularscreen extends State<Addcircularscreen> {
   final _formKey = GlobalKey<FormState>();
-  final GlobalKey<NotifyBySectionState> notifyKey = GlobalKey<NotifyBySectionState>();
-  final GlobalKey<DynamicUrlInputListState> dynamicurls = GlobalKey<DynamicUrlInputListState>();
+  final GlobalKey<NotifyBySectionState> notifyKey =
+  GlobalKey<NotifyBySectionState>();
+  final GlobalKey<DynamicUrlInputListState> dynamicurls =
+  GlobalKey<DynamicUrlInputListState>();
   TextEditingController _circularNo = TextEditingController();
   TextEditingController _circularTitleController = TextEditingController();
-  TextEditingController _circularDescriptionController = TextEditingController();
+  TextEditingController _circularDescriptionController =
+  TextEditingController();
   TextEditingController _circularDate = TextEditingController();
-  TextEditingController _circularTime=TextEditingController();
+  TextEditingController _circularTime = TextEditingController();
   TextEditingController _circularShowDateTime = TextEditingController();
   TextEditingController _circularShowEndDateTime = TextEditingController();
   List<String> selectedCourses = [];
@@ -57,7 +59,7 @@ class _Addcircularscreen extends State<Addcircularscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:  PreferredSize(
+      appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: SimpleAppBar(titleText: 'Upload Circular', routeName: 'back'),
       ),
@@ -69,12 +71,31 @@ class _Addcircularscreen extends State<Addcircularscreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomTextField(label: 'Circular No', hintText: 'Enter Circular Number', controller: _circularNo),
+                CustomTextField(
+                  label: 'Circular No',
+                  hintText: 'Enter Circular Number',
+                  controller: _circularNo,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please Enter Circular Number First";
+                    }
+                    return null;
+                  },
+                ),
                 const SizedBox(height: 16),
 
-                DatePickerField(label: 'Circular Date', controller: _circularDate),
+                DatePickerField(
+                  label: 'Circular Date',
+                  controller: _circularDate,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please Enter Circular Date First";
+                    }
+                    return null;
+                  },
+                ),
                 const SizedBox(height: 20),
-                Timepickerfield(controller: _circularTime,),
+                Timepickerfield(controller: _circularTime),
                 const SizedBox(height: 20),
                 AssignmentTypeSelector(
                   label: 'Circular Type',
@@ -96,6 +117,12 @@ class _Addcircularscreen extends State<Addcircularscreen> {
                       selectedCourses = courses;
                     });
                   },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please Select Course First";
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
 
@@ -112,6 +139,12 @@ class _Addcircularscreen extends State<Addcircularscreen> {
                   label: 'Circular Title',
                   hintText: 'Enter Circular Title',
                   controller: _circularTitleController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please Enter Circular Title First";
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
 
@@ -120,22 +153,29 @@ class _Addcircularscreen extends State<Addcircularscreen> {
                   label: 'Circular Description',
                   hintText: 'Enter Circular Description',
                   controller: _circularDescriptionController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please Enter Circular Description First";
+                    }
+                    return null;
+                  },
                 ),
 
                 const SizedBox(height: 16),
                 MultiSelectStaff(
                   initialValues: selectedstafss,
-                  onChanged: (value){
-                    selectedstafss=value;
-                    setState(() {
-
-                    });
+                  onChanged: (value) {
+                    selectedstafss = value;
+                    setState(() {});
                   },
                 ),
 
                 const SizedBox(height: 16),
 
-                DatePickerField(label: 'Circular Show Date', controller: _circularShowDateTime),
+                DatePickerField(
+                  label: 'Circular Show Date',
+                  controller: _circularShowDateTime,
+                ),
                 const SizedBox(height: 16),
 
                 DatePickerField(
@@ -148,21 +188,24 @@ class _Addcircularscreen extends State<Addcircularscreen> {
                     showDocumentPickerBottomSheet(
                       context: context,
                       title: "Upload File",
-                      onCameraTap: () => FilePickerHelper.pickFromCamera((file) {
-                        setState(() {
-                          selectedFiles.add(file);
-                        });
-                      }),
-                      onGalleryTap: () => FilePickerHelper.pickFromGallery((file) {
-                        setState(() {
-                          selectedFiles.add(file);
-                        });
-                      }),
-                      onPickDocument: () => FilePickerHelper.pickDocuments((files) {
-                        setState(() {
-                          selectedFiles.addAll(files);
-                        });
-                      }),
+                      onCameraTap: () =>
+                          FilePickerHelper.pickFromCamera((file) {
+                            setState(() {
+                              selectedFiles.add(file);
+                            });
+                          }),
+                      onGalleryTap: () =>
+                          FilePickerHelper.pickFromGallery((file) {
+                            setState(() {
+                              selectedFiles.add(file);
+                            });
+                          }),
+                      onPickDocument: () =>
+                          FilePickerHelper.pickDocuments((files) {
+                            setState(() {
+                              selectedFiles.addAll(files);
+                            });
+                          }),
                     );
                   },
                   selectedFiles: selectedFiles,
@@ -174,9 +217,7 @@ class _Addcircularscreen extends State<Addcircularscreen> {
                 ),
 
                 const SizedBox(height: 20),
-                DynamicUrlInputList(
-                  key: dynamicurls,
-                ),
+                DynamicUrlInputList(key: dynamicurls),
                 const SizedBox(height: 20),
                 NotifyBySection(key: notifyKey),
               ],
@@ -191,36 +232,47 @@ class _Addcircularscreen extends State<Addcircularscreen> {
           text: 'Save',
           icon: Icons.save,
           onPressed: () async {
-            showLoaderDialog(context);
             if (_formKey.currentState!.validate()) {
-              final notifyData = notifyKey.currentState?.getSelectedNotifyValues() ?? {};
-              final dynamicurlslink = dynamicurls.currentState?.getUrlLinks() ?? {};
-              final dataInsert = {
-                'circular_no': _circularNo.text,
-                'course_id': selectedCourses.join('~'),
-                'student_type': selectedAdmissionTypes.join('@'),
-                'circular_title': _circularTitleController.text,
-                'circular_time':_circularTime.text,
-                'circular': _circularDescriptionController.text,
-                'circular_date': _circularDate.text,
-                'circular_type': _selectedType.name,
-                'authorize_by':selectedstafss.join('@'),
-                'staff_type':'null',
-                'status':'yes',
-                'show_date': _circularShowDateTime.text,
-                'end_date': _circularShowEndDateTime.text,
-                'url_link': dynamicurlslink,
-                ...notifyData,
-              };
+              showLoaderDialog(context);
+              try {
+                final notifyData =
+                    notifyKey.currentState?.getSelectedNotifyValues() ?? {};
+                final dynamicurlslink =
+                    dynamicurls.currentState?.getUrlLinks() ?? {};
+                final dataInsert = {
+                  'circular_no': _circularNo.text,
+                  'course_id': selectedCourses.join('~'),
+                  'student_type': selectedAdmissionTypes.join('@'),
+                  'circular_title': _circularTitleController.text,
+                  'circular_time': _circularTime.text,
+                  'circular': _circularDescriptionController.text,
+                  'circular_date': _circularDate.text,
+                  'circular_type': _selectedType.name,
+                  'authorize_by': selectedstafss.join('@'),
+                  'staff_type': 'null',
+                  'status': 'yes',
+                  'show_date': _circularShowDateTime.text,
+                  'end_date': _circularShowEndDateTime.text,
+                  'url_link': dynamicurlslink,
+                  ...notifyData,
+                };
 
-              final response = await UploadHomeWorksEtc().uploadData('circular', dataInsert, selectedFiles);
-              hideLoaderDialog(context);
-
-              if (response['result'] == 1) {
-                resetForm();
-                showBottomMessage(context, response['message'], false);
-              } else {
-                showBottomMessage(context, response['message'], true);
+                final response = await UploadHomeWorksEtc().uploadData(
+                  'circular',
+                  dataInsert,
+                  selectedFiles,
+                );
+                if (response['result'] == 1) {
+                  resetForm();
+                  showBottomMessage(context, response['message'], false);
+                } else {
+                  showBottomMessage(context, response['message'], true);
+                }
+              } catch (e) {
+                print("Bug Occurred During The Submission of Circular ${e}");
+                showBottomMessage(context, "${e}", true);
+              } finally {
+                hideLoaderDialog(context);
               }
             }
           },
@@ -228,6 +280,7 @@ class _Addcircularscreen extends State<Addcircularscreen> {
       ),
     );
   }
+
   void resetForm() {
     setState(() {
       _circularNo.clear();
@@ -236,12 +289,12 @@ class _Addcircularscreen extends State<Addcircularscreen> {
       _circularDescriptionController.clear();
       _circularShowDateTime.clear();
       _circularShowEndDateTime.clear();
-      selectedCourses = [];             // ← Replace with new empty list
+      selectedCourses = []; // ← Replace with new empty list
       selectedAdmissionTypes = [];
       selectedFiles = [];
-      selectedstafss=[];
+      selectedstafss = [];
     });
-    _selectedType=AssignmentType.student;
+    _selectedType = AssignmentType.student;
     dynamicurls.currentState?.resetUrls();
     notifyKey.currentState?.resetNotifySelection();
   }

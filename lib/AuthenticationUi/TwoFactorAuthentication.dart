@@ -43,7 +43,7 @@ class _TwoFactorAuth extends State<TwoFactorAuthentication>{
             child:  Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('assets/images/logos/two_factor_auth.png',
+                  Image.asset('assets/logos/two_factor_auth.png',
                     width: 300,
                   ),
                   Text('2 FA Authentication',style: TextStyle(fontWeight: AppFontWeights.bold,fontSize: AppFontSizes.xLarge),),

@@ -43,7 +43,7 @@ class StudentDocumentUplodedModel {
     return StudentDocumentUplodedModel(
       dbId: json['db_id'] ?? 0,
       studentId: json['student_id'] ?? 0,
-      srNo: json['sr_no'],
+      srNo: json['sr_no'] ?? '',
       admissionDate: json['admission_date'] ?? '',
       admissionNo: json['admission_no'] ?? '',
       studentName: json['student_name'] ?? '',

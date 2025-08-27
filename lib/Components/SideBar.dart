@@ -42,9 +42,13 @@ class _SidebarState extends State<Sidebar> {
     return Drawer(
       child: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: uiTheme.appBarColor?? Colors.blue),
+              decoration: BoxDecoration(
+                color: uiTheme.appBarColor ?? Colors.blue,
+                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(50),bottomRight: Radius.circular(50))
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -54,7 +58,9 @@ class _SidebarState extends State<Sidebar> {
                       const UserProfileImage(radius: 30),
                       const SizedBox(height: 10),
                       Text(
-                        username.isNotEmpty ? username.toUpperCase() : 'HELLO, USER!',
+                        username.isNotEmpty
+                            ? username.toUpperCase()
+                            : 'HELLO, USER!',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -65,105 +71,135 @@ class _SidebarState extends State<Sidebar> {
                       ),
                       Text(
                         role.isNotEmpty ? role.toUpperCase() : 'N/A',
-                        style: const TextStyle(color: Colors.white, fontSize: 16),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
-
-            // Home
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home', style: TextStyle(fontWeight: FontWeight.bold)),
-              onTap: () => context.goNamed('dashboard'),
+            CustomCardSidebar(
+              cardWidget: ListTile(
+                leading: const Icon(Icons.home),
+                title: const Text(
+                  'Home',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onTap: () => context.goNamed('dashboard'),
+              ),
             ),
 
             // Profile
-            ListTile(
-              leading: IconBg.buildSidebarIcon(
-                Icons.person,
-                bgColor: const Color(0xFFE3F2FD),
-                iconColor: Colors.lightBlue,
+            CustomCardSidebar(
+              cardWidget: ListTile(
+                leading: IconBg.buildSidebarIcon(
+                  Icons.person,
+                  bgColor: const Color(0xFFE3F2FD),
+                  iconColor: Colors.lightBlue,
+                ),
+                title: const Text(
+                  'Profile',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onTap: () => context.goNamed('profile'),
               ),
-              title: const Text('Profile', style: TextStyle(fontWeight: FontWeight.bold)),
-              onTap: () => context.goNamed('profile'),
             ),
-
             // Academic and financial Session
-            ListTile(
-              leading: IconBg.buildSidebarIcon(
-                Icons.school,
-                bgColor: const Color(0xFFE3F2FD),
-                iconColor: Colors.lightBlue,
+            CustomCardSidebar(
+              cardWidget: ListTile(
+                leading: IconBg.buildSidebarIcon(
+                  Icons.school,
+                  bgColor: const Color(0xFFE3F2FD),
+                  iconColor: Colors.lightBlue,
+                ),
+                title: const Text(
+                  'Academic Session',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onTap: () => context.goNamed('sessions'),
               ),
-              title: const Text('Academic Session', style: TextStyle(fontWeight: FontWeight.bold)),
-              onTap: () => context.goNamed('sessions'),
             ),
 
             // 2FA Authentication
-            ListTile(
-              leading: IconBg.buildSidebarIcon(
-                Icons.mobile_friendly,
-                bgColor: const Color(0xFFC8E6C9),
-                iconColor: Colors.green,
+            CustomCardSidebar(
+              cardWidget: ListTile(
+                leading: IconBg.buildSidebarIcon(
+                  Icons.mobile_friendly,
+                  bgColor: const Color(0xFFC8E6C9),
+                  iconColor: Colors.green,
+                ),
+                title: const Text(
+                  '2 FA Authentication',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onTap: () {
+                  context.goNamed('tow-factor-auth');
+                },
               ),
-              title: const Text('2 FA Authentication', style: TextStyle(fontWeight: FontWeight.bold)),
-              onTap: () {
-                context.goNamed('tow-factor-auth');
-              },
             ),
 
             // Change Password
-            ListTile(
-              leading: IconBg.buildSidebarIcon(
-                Icons.password,
-                bgColor: const Color(0xFFD1C4E9),
-                iconColor: Colors.deepPurple,
+            CustomCardSidebar(
+              cardWidget: ListTile(
+                leading: IconBg.buildSidebarIcon(
+                  Icons.password,
+                  bgColor: const Color(0xFFD1C4E9),
+                  iconColor: Colors.deepPurple,
+                ),
+                title: const Text(
+                  'Change Password',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onTap: () {},
               ),
-              title: const Text('Change Password', style: TextStyle(fontWeight: FontWeight.bold)),
-              onTap: () {},
             ),
 
             // Logout
-            ListTile(
-              leading: IconBg.buildSidebarIcon(
-                Icons.logout,
-                bgColor: const Color(0xFFFDECEA),
-                iconColor: Colors.red,
-              ),
-              title: const Text('Logout', style: TextStyle(fontWeight: FontWeight.bold)),
-              onTap: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Confirm Logout'),
-                    content: const Text('Are you sure you want to logout?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Logout'),
-                      ),
-                    ],
-                  ),
-                );
+            CustomCardSidebar(
+              cardWidget: ListTile(
+                leading: IconBg.buildSidebarIcon(
+                  Icons.logout,
+                  bgColor: const Color(0xFFFDECEA),
+                  iconColor: Colors.red,
+                ),
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onTap: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Confirm Logout'),
+                      content: const Text('Are you sure you want to logout?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('Logout'),
+                        ),
+                      ],
+                    ),
+                  );
 
-                if (confirm == true) {
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.clear();
+                  if (confirm == true) {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.clear();
 
-                  if (context.mounted) {
-                    context.goNamed('splash');
+                    if (context.mounted) {
+                      context.goNamed('splash');
+                    }
                   }
-                }
-              },
+                },
+              ),
             ),
           ],
         ),
@@ -172,3 +208,15 @@ class _SidebarState extends State<Sidebar> {
   }
 }
 
+class CustomCardSidebar extends StatelessWidget {
+  final Widget cardWidget;
+  const CustomCardSidebar({super.key, required this.cardWidget});
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0.1, // like box-shadow
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      child: cardWidget,
+    );
+  }
+}

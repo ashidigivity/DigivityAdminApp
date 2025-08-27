@@ -1,5 +1,5 @@
-
 import 'package:digivity_admin_app/AdminPanel/Screens/FinanceReports/FinanceReportScreen/FeereportHtmlshowScreen.dart';
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/BackgrounWeapper.dart';
 import 'package:digivity_admin_app/Components/CardContainer.dart';
 import 'package:digivity_admin_app/Components/CourseComponent.dart';
@@ -11,20 +11,17 @@ import 'package:digivity_admin_app/helpers/FinanceHelperFunction.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class ClassWiseConsolidateReport extends StatefulWidget{
-
+class ClassWiseConsolidateReport extends StatefulWidget {
   @override
   State<ClassWiseConsolidateReport> createState() {
     return _ClassWiseConsolidateReport();
   }
 }
 
-class _ClassWiseConsolidateReport extends State<ClassWiseConsolidateReport>{
-
+class _ClassWiseConsolidateReport extends State<ClassWiseConsolidateReport> {
   TextEditingController _fromdate = TextEditingController();
   TextEditingController _todate = TextEditingController();
   String? course_id;
-
 
   void submitForm() async {
     showLoaderDialog(context);
@@ -35,9 +32,12 @@ class _ClassWiseConsolidateReport extends State<ClassWiseConsolidateReport>{
     };
 
     try {
-      String? htmlData = await FinanceHelperFunction().apifeecollectionreport('class-course-wise-consolidate-report',formdata);
-      hideLoaderDialog(context);
+      String? htmlData = await FinanceHelperFunction().apifeecollectionreport(
+        'class-course-wise-consolidate-report',
+        formdata,
+      );
       if (htmlData != null && htmlData.isNotEmpty) {
+        hideLoaderDialog(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -48,61 +48,59 @@ class _ClassWiseConsolidateReport extends State<ClassWiseConsolidateReport>{
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("No report data found.")),
-        );
+
+        hideLoaderDialog(context);
+        showBottomMessage(context, "No report data found", true);
       }
     } catch (e) {
-      print("SubmitForm Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong.")),
-      );
+
+      hideLoaderDialog(context);
+      showBottomMessage(context, "${e}", true);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(preferredSize: Size.fromHeight(kToolbarHeight), child: SimpleAppBar(titleText: 'Class/Course Wise Consolidate Report', routeName: 'back')),
-      body: BackgroundWrapper(child:
-      Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          CardContainer(
-            child: Column(
-              children: [
-                DatePickerField(
-                  label: 'From Date',
-                  controller: _fromdate,
-                ),
-                SizedBox(height: 20,),
-                DatePickerField(
-                  label: 'To Date',
-                  controller: _todate,
-                ),
-                SizedBox(height: 20,),
-                CourseComponent(
-                  onChanged: (value){
-                    course_id=value;
-                    setState(() {
-
-                    });
-                  },
-                ),
-                SizedBox(height: 20,),
-                CustomBlueButton(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SimpleAppBar(
+          titleText: 'Class/Course Wise Consolidate Report',
+          routeName: 'back',
+        ),
+      ),
+      body: BackgroundWrapper(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            CardContainer(
+              child: Column(
+                children: [
+                  DatePickerField(label: 'From Date', controller: _fromdate),
+                  SizedBox(height: 20),
+                  DatePickerField(label: 'To Date', controller: _todate),
+                  SizedBox(height: 20),
+                  CourseComponent(
+                    onChanged: (value) {
+                      course_id = value;
+                      setState(() {});
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  CustomBlueButton(
                     width: double.infinity,
-                    text: 'Get Result', icon: Icons.arrow_forward, onPressed: () async{
-                  submitForm();
-                })
-
-              ],
+                    text: 'Get Result',
+                    icon: Icons.arrow_forward,
+                    onPressed: () async {
+                      submitForm();
+                    },
+                  ),
+                ],
+              ),
             ),
-          )
-        ],)
+          ],
+        ),
       ),
     );
   }
 }
-

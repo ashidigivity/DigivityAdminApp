@@ -1,5 +1,6 @@
 import 'package:digivity_admin_app/AdminPanel/Components/PopupNetworkImage.dart';
 import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
+import 'package:digivity_admin_app/Components/CustomConfirmationDialog.dart';
 import 'package:digivity_admin_app/Components/Loader.dart';
 import 'package:digivity_admin_app/helpers/launchAnyUrl.dart';
 import 'package:flutter/material.dart';
@@ -224,15 +225,24 @@ class ShowNoticeDetailsSheet extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () async {
                         if (onDelete != null) {
-                          showLoaderDialog(context);
-                          final response = await onDelete!();
-                          hideLoaderDialog(context);
-                          Navigator.pop(context);
-                          showBottomMessage(
-                            context,
-                            response['message'],
-                            response['result'] != 1,
+                          bool confirmed = await showCustomConfirmationDialog(
+                            context: context,
+                            title: "Alert ?",
+                            message: "Are you sure you want to delete this Notice?",
+                            confirmText: "Yes",
+                            cancelText: "No",
                           );
+                          if (confirmed) {
+                            showLoaderDialog(context);
+                            final response = await onDelete!();
+                            hideLoaderDialog(context);
+                            Navigator.pop(context);
+                            showBottomMessage(
+                              context,
+                              response['message'],
+                              response['result'] != 1,
+                            );
+                          }
                         }
                       },
                       icon: const Icon(Icons.delete, color: Colors.white, size: 11),

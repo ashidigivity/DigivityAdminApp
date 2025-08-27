@@ -1,5 +1,6 @@
 
 import 'package:digivity_admin_app/AdminPanel/Screens/FinanceReports/FinanceReportScreen/FeereportHtmlshowScreen.dart';
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/BackgrounWeapper.dart';
 import 'package:digivity_admin_app/Components/CardContainer.dart';
 import 'package:digivity_admin_app/Components/CustomBlueButton.dart';
@@ -33,8 +34,8 @@ class _MonthelyFeeCollection extends State<MonthelyFeeCollection>{
 
     try {
       String? htmlData = await FinanceHelperFunction().apifeecollectionreport('monthly-fee-collection-report',formdata);
-      hideLoaderDialog(context);
       if (htmlData != null && htmlData.isNotEmpty) {
+        hideLoaderDialog(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -45,15 +46,12 @@ class _MonthelyFeeCollection extends State<MonthelyFeeCollection>{
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("No report data found.")),
-        );
+        hideLoaderDialog(context);
+        showBottomMessage(context, "No report data found", true);
       }
     } catch (e) {
-      print("SubmitForm Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong.")),
-      );
+      hideLoaderDialog(context);
+      showBottomMessage(context, "${e}", true);
     }
 
 

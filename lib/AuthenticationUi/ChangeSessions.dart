@@ -44,8 +44,12 @@ class _ChangeSessions extends State<ChangeSessions>{
   }
 
   Future<void> _loadSessions() async {
+    if (!mounted) return;
     showLoaderDialog(context);
+
     sessionsList = await CustomFunctions().getSessionsList();
+
+    if (!mounted) return;
     hideLoaderDialog(context);
 
     final academicData = sessionsList.firstWhere(
@@ -70,13 +74,12 @@ class _ChangeSessions extends State<ChangeSessions>{
       orElse: () => {'value': null},
     );
 
+    if (!mounted) return;
     setState(() {
       academicSessions = academicSessionsData;
       financialSessions = financialSessionsData;
       activeAcademicSession = activeAcademic['value'];
       activeFinancialSession = activeFinancial['value'];
-
-      // These ensure the dropdowns show the pre-selected items
       selectedAcademicSession = activeAcademicSession;
       selectedFinancialSession = activeFinancialSession;
     });
@@ -97,7 +100,7 @@ class _ChangeSessions extends State<ChangeSessions>{
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/images/logos/academic_session.avif',
+              Image.asset('assets/logos/academic_session.avif',
                 width: 300,
               ),
               SizedBox(height:60),

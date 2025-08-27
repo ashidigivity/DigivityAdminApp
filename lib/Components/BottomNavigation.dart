@@ -29,7 +29,6 @@ class CustomBottomNavBar extends StatelessWidget {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
@@ -44,7 +43,7 @@ class CustomBottomNavBar extends StatelessWidget {
       onTap: (index) => _onTap(context, index),
 
       selectedItemColor: uiTheme.appbarIconColor ?? Colors.black,
-      unselectedItemColor: Colors.black,
+      unselectedItemColor:uiTheme.appbarIconColor ?? Colors.white,
 
       // Optional: More styling control
       selectedLabelStyle: TextStyle(
@@ -52,25 +51,33 @@ class CustomBottomNavBar extends StatelessWidget {
         fontWeight: FontWeight.bold,
       ),
       unselectedLabelStyle: TextStyle(
-        color: uiTheme.appbarIconColor ?? Colors.black,
+        color: uiTheme.appbarIconColor ?? Colors.white,
+        fontWeight: FontWeight.w400
       ),
 
       items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home, color: uiTheme.appbarIconColor ?? Colors.black),
+          icon: Icon(
+            Icons.home,
+            color: uiTheme.appbarIconColor ?? Colors.black,
+          ),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person, color: uiTheme.appbarIconColor ?? Colors.black),
+          icon: Icon(
+            Icons.person,
+            color: uiTheme.appbarIconColor ?? Colors.black,
+          ),
           label: 'Profile',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.menu, color: uiTheme.appbarIconColor ?? Colors.black),
+          icon: Icon(
+            Icons.menu,
+            color: uiTheme.appbarIconColor ?? Colors.black,
+          ),
           label: 'Menus',
         ),
       ],
     );
-
-
   }
 }

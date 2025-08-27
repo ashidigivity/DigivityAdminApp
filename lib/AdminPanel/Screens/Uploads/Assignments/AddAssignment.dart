@@ -39,11 +39,13 @@ class _Addassignment extends State<Addassignment> {
   AddStaffModel? staffformdata;
   final _formkye = GlobalKey<FormState>();
   final GlobalKey<NotifyBySectionState> notifyKey =
-      GlobalKey<NotifyBySectionState>();
-  final GlobalKey<DynamicUrlInputListState> urlKey = GlobalKey<DynamicUrlInputListState>();
+  GlobalKey<NotifyBySectionState>();
+  final GlobalKey<DynamicUrlInputListState> urlKey =
+  GlobalKey<DynamicUrlInputListState>();
   bool isSubmissionEnabled = false;
   TextEditingController _assingmentTitle = TextEditingController();
-  TextEditingController _assignmentDescriptionController = TextEditingController();
+  TextEditingController _assignmentDescriptionController =
+  TextEditingController();
   TextEditingController _hw_date = TextEditingController();
   TextEditingController _to_date = TextEditingController();
   TextEditingController _assignmentMaxMarks = TextEditingController();
@@ -93,13 +95,19 @@ class _Addassignment extends State<Addassignment> {
                     courseId = value;
                     setState(() {});
                   },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please Select Course First";
+                    }
+                    return null;
+                  },
                   onSubjectListChanged: (List<SubjectModel> subjects) {
                     setState(() {
                       subjectList = subjects;
                     });
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
                 CustomDropdown(
                   items: subjectList,
@@ -108,6 +116,12 @@ class _Addassignment extends State<Addassignment> {
                   hint: 'Subject',
                   onChanged: (value) {
                     _selectedSubjectId = value;
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return "Please Select Subject First";
+                    }
+                    return null;
                   },
                   itemMapper: (item) => {
                     'id': item.id,
@@ -124,6 +138,12 @@ class _Addassignment extends State<Addassignment> {
                   label: 'Assignment Title',
                   hintText: 'Enter Assignment Title..',
                   controller: _assingmentTitle,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please Assignment Title First";
+                    }
+                    return null;
+                  },
                 ),
 
                 const SizedBox(height: 16),
@@ -132,6 +152,12 @@ class _Addassignment extends State<Addassignment> {
                   label: 'Assignment Description',
                   hintText: 'Enter Assignment Description..',
                   controller: _assignmentDescriptionController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please Assignment Description First";
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 24),
 
@@ -154,21 +180,24 @@ class _Addassignment extends State<Addassignment> {
                     showDocumentPickerBottomSheet(
                       context: context,
                       title: "Upload File",
-                      onCameraTap: () => FilePickerHelper.pickFromCamera((file) {
-                        setState(() {
-                          selectedFiles.add(file);
-                        });
-                      }),
-                      onGalleryTap: () => FilePickerHelper.pickFromGallery((file) {
-                        setState(() {
-                          selectedFiles.add(file);
-                        });
-                      }),
-                      onPickDocument: () => FilePickerHelper.pickDocuments((files) {
-                        setState(() {
-                          selectedFiles.addAll(files);
-                        });
-                      }),
+                      onCameraTap: () =>
+                          FilePickerHelper.pickFromCamera((file) {
+                            setState(() {
+                              selectedFiles.add(file);
+                            });
+                          }),
+                      onGalleryTap: () =>
+                          FilePickerHelper.pickFromGallery((file) {
+                            setState(() {
+                              selectedFiles.add(file);
+                            });
+                          }),
+                      onPickDocument: () =>
+                          FilePickerHelper.pickDocuments((files) {
+                            setState(() {
+                              selectedFiles.addAll(files);
+                            });
+                          }),
                     );
                   },
                   selectedFiles: selectedFiles,
@@ -178,8 +207,6 @@ class _Addassignment extends State<Addassignment> {
                     });
                   },
                 ),
-
-
 
                 const SizedBox(height: 20),
                 NotifyBySection(key: notifyKey),
@@ -195,34 +222,39 @@ class _Addassignment extends State<Addassignment> {
           text: 'Save',
           icon: Icons.save,
           onPressed: () async {
-            showLoaderDialog(context);
-
             if (_formkye.currentState!.validate()) {
-              final notifyData =
-                  notifyKey.currentState?.getSelectedNotifyValues() ?? {};
-              final datainsert = {
-                'type':_selectedType.name,
-                'course_id': courseId,
-                'subject_id': _selectedSubjectId,
-                'assignment_title': _assingmentTitle.text,
-                'assignment': _assignmentDescriptionController.text,
-                'assignment_date':_hw_date.text,
-                'submitted_date':_to_date.text,
-                'status': 'yes',
-                ...notifyData,
-              };
+              showLoaderDialog(context);
+              try {
+                final notifyData =
+                    notifyKey.currentState?.getSelectedNotifyValues() ?? {};
+                final datainsert = {
+                  'type': _selectedType.name,
+                  'course_id': courseId,
+                  'subject_id': _selectedSubjectId,
+                  'assignment_title': _assingmentTitle.text,
+                  'assignment': _assignmentDescriptionController.text,
+                  'assignment_date': _hw_date.text,
+                  'submitted_date': _to_date.text,
+                  'status': 'yes',
+                  ...notifyData,
+                };
 
-              final response = await UploadHomeWorksEtc().uploadData(
-                'assignment',
-                datainsert,
-                selectedFiles,
-              );
-              hideLoaderDialog(context);
-              if (response['result'] == 1) {
-                resetForm();
-                showBottomMessage(context, response['message'], false);
-              } else {
-                showBottomMessage(context, response['message'], true);
+                final response = await UploadHomeWorksEtc().uploadData(
+                  'assignment',
+                  datainsert,
+                  selectedFiles,
+                );
+                if (response['result'] == 1) {
+                  resetForm();
+                  showBottomMessage(context, response['message'], false);
+                } else {
+                  showBottomMessage(context, response['message'], true);
+                }
+              } catch (e) {
+                print("Bug Occured During The Upload Assignment ${e}");
+                showBottomMessage(context, "${e}", true);
+              } finally {
+                hideLoaderDialog(context);
               }
             }
           },
@@ -241,8 +273,8 @@ class _Addassignment extends State<Addassignment> {
       _assignmentMaxMarks.clear();
       _hw_date.clear();
       _to_date.clear();
-      isSubmissionEnabled=false;
-      _selectedType=AssignmentType.student;
+      isSubmissionEnabled = false;
+      _selectedType = AssignmentType.student;
     });
     // Reset the Notify Section
     notifyKey.currentState?.resetNotifySelection();

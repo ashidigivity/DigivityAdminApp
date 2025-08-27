@@ -46,10 +46,19 @@ class _Studentremarkentry extends State<Studentremarkentry> {
 
     commonRemarkController = TextEditingController();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await getStudentList(); // Wait for studentList first
-      if (widget.remarkEntryMode == 'dropdown') {
-        await getExamRemarkList();
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+      try {
+        await getStudentList();
+        if (widget.remarkEntryMode == 'dropdown') {
+          await getExamRemarkList();
+        }
+      }
+      catch(e){
+        print("${e}");
+        showBottomMessage(context, "${e}", true);
+      }
+      finally{
+        hideLoaderDialog(context);
       }
 
       // When common remark changes, update all student remark fields

@@ -1,6 +1,7 @@
 import 'package:digivity_admin_app/AdminPanel/Components/PopupNetworkImage.dart';
 import 'package:digivity_admin_app/AdminPanel/MobileThemsColors/theme_provider.dart';
 import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
+import 'package:digivity_admin_app/Components/CustomConfirmationDialog.dart';
 import 'package:digivity_admin_app/Components/Loader.dart';
 import 'package:digivity_admin_app/helpers/launchAnyUrl.dart';
 import 'package:flutter/material.dart';
@@ -235,15 +236,26 @@ class ShowAssignmentDetailSheet extends StatelessWidget {
                       child: ElevatedButton.icon(
                         onPressed: () async {
                           if (onDelete != null) {
-                            showLoaderDialog(context);
-                            final response= await onDelete!();
-                            hideLoaderDialog(context);
-                            if (response['result'] == 1) {
-                              Navigator.pop(context);
-                              showBottomMessage(context, response['message'], false);
-                            } else {
-                              showBottomMessage(context, response['message'], true); // shows error instead of crashing
-                            }// Call deleteAndRefresh() from parent
+                            bool confirmed = await showCustomConfirmationDialog(
+                              context: context,
+                              title: "Alert ?",
+                              message: "Are you sure you want to delete this Assignment?",
+                              confirmText: "Yes",
+                              cancelText: "No",
+                            );
+                            if (confirmed) {
+                              showLoaderDialog(context);
+                              final response = await onDelete!();
+                              hideLoaderDialog(context);
+                              if (response['result'] == 1) {
+                                Navigator.pop(context);
+                                showBottomMessage(
+                                    context, response['message'], false);
+                              } else {
+                                showBottomMessage(context, response['message'],
+                                    true); // shows error instead of crashing
+                              } // Call deleteAndRefresh() from parent
+                            }
                           }
                         },
                         icon: const Icon(Icons.delete,color: Colors.white,size: 11,),

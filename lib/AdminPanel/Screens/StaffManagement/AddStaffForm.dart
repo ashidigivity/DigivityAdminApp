@@ -14,7 +14,6 @@ import 'package:digivity_admin_app/Components/Loader.dart';
 import 'package:digivity_admin_app/Components/SimpleAppBar.dart';
 import 'package:flutter/material.dart';
 
-
 class AddStaffForm extends StatefulWidget {
   @override
   State<AddStaffForm> createState() => _AddStaffForm();
@@ -90,12 +89,10 @@ class _AddStaffForm extends State<AddStaffForm> {
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:PreferredSize(
+      appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: SimpleAppBar(titleText: "Add New Student", routeName: 'back'),
       ),
@@ -116,12 +113,20 @@ class _AddStaffForm extends State<AddStaffForm> {
                           label: 'Employee No',
                           hintText: 'Enter Employee No..',
                           controller: _employeeno,
-                          validator: (value) => value == null || value.isEmpty ? "Please enter the Emp No" : null,
+                          validator: (value) => value == null || value.isEmpty
+                              ? "Please enter the Emp No"
+                              : null,
                         ),
                         const SizedBox(height: 20),
-                        DatePickerField(controller: _joiningdate, label: 'Joining Date'),
+                        DatePickerField(
+                          controller: _joiningdate,
+                          label: 'Joining Date',
+                        ),
                         const SizedBox(height: 20),
-                        DatePickerField(controller: _retiredate, label: 'Retire Date'),
+                        DatePickerField(
+                          controller: _retiredate,
+                          label: 'Retire Date',
+                        ),
                         const SizedBox(height: 20),
                         buildDropdown(
                           items: staffformdata?.professiontype,
@@ -129,11 +134,9 @@ class _AddStaffForm extends State<AddStaffForm> {
                           valueKey: 'id',
                           hint: 'Profession Type',
                           error: 'Please select the Profession Type',
-                          onChange: (value){
+                          onChange: (value) {
                             selectedProfessionTypeId = value;
-                            setState(() {
-
-                            });
+                            setState(() {});
                           },
                         ),
                         const SizedBox(height: 20),
@@ -143,11 +146,9 @@ class _AddStaffForm extends State<AddStaffForm> {
                           valueKey: 'id',
                           hint: 'Staff Type',
                           error: 'Please select Staff Type',
-                          onChange: (value){
+                          onChange: (value) {
                             selectedStaffTypeId = value;
-                            setState(() {
-
-                            });
+                            setState(() {});
                           },
                         ),
                         const SizedBox(height: 20),
@@ -157,12 +158,10 @@ class _AddStaffForm extends State<AddStaffForm> {
                           valueKey: 'id',
                           hint: 'Department Type',
                           error: 'Please select Department Type',
-                          onChange: (value){
+                          onChange: (value) {
                             selectedDepartmentId = value;
-                            setState(() {
-
-                            });
-                          }
+                            setState(() {});
+                          },
                         ),
                         const SizedBox(height: 20),
                         buildDropdown(
@@ -171,11 +170,9 @@ class _AddStaffForm extends State<AddStaffForm> {
                           valueKey: 'id',
                           hint: 'Designation Type',
                           error: 'Please select Designation Type',
-                          onChange: (value){
+                          onChange: (value) {
                             selectedDesignationId = value;
-                            setState(() {
-
-                            });
+                            setState(() {});
                           },
                         ),
                       ],
@@ -194,26 +191,24 @@ class _AddStaffForm extends State<AddStaffForm> {
                           error: 'Please select Title',
                           onChange: (value) {
                             selectedTitleId = value;
-                            setState(() {
-
-                            });
-                          }
+                            setState(() {});
+                          },
                         ),
                         const SizedBox(height: 20),
                         CustomTextField(
                           label: 'Staff Name',
                           hintText: 'Enter Staff Name',
                           controller: _staffname,
-                          validator: (value) => value == null || value.isEmpty ? "Please enter Staff Name" : null,
+                          validator: (value) => value == null || value.isEmpty
+                              ? "Please enter Staff Name"
+                              : null,
                         ),
                         const SizedBox(height: 20),
                         Genderdropdown(
                           value: selectedGender,
                           onChanged: (value) {
                             selectedGender = value;
-setState(() {
-
-});
+                            setState(() {});
                           },
                           validator: (value) {
                             final val = value as String?;
@@ -222,13 +217,18 @@ setState(() {
                         ),
 
                         const SizedBox(height: 20),
-                        DatePickerField(controller: _dob, label: 'Date Of Birth'),
+                        DatePickerField(
+                          controller: _dob,
+                          label: 'Date Of Birth',
+                        ),
                         const SizedBox(height: 20),
                         CustomTextField(
                           label: 'Father Name',
                           hintText: 'Enter Staff Father Name',
                           controller: _fathername,
-                          validator: (value) => value == null || value.isEmpty ? "Please enter Father Name" : null,
+                          validator: (value) => value == null || value.isEmpty
+                              ? "Please enter Father Name"
+                              : null,
                         ),
                         const SizedBox(height: 20),
                         buildDropdown(
@@ -239,9 +239,7 @@ setState(() {
                           error: 'Please select Marital Status',
                           onChange: (value) {
                             selectedMaritalStatusId = value;
-                          setState(() {
-
-                          });
+                            setState(() {});
                           },
                         ),
                       ],
@@ -252,21 +250,44 @@ setState(() {
                     title: 'Contact Information',
                     child: Column(
                       children: [
-                        CustomTextField(label: 'Spouse Name', hintText: 'Enter Spouse Name', controller: _spousename),
+                        CustomTextField(
+                          label: 'Spouse Name',
+                          hintText: 'Enter Spouse Name',
+                          controller: _spousename,
+                        ),
                         const SizedBox(height: 20),
                         CustomTextField(
-                            validator: (value) => value == null || value.isEmpty ? "Please enter the Contact No" : null,
-                            label: 'Contact No', hintText: 'Enter Contact No', controller: _contactno),
+                          validator: (value) => value == null || value.isEmpty
+                              ? "Please enter the Contact No"
+                              : null,
+                          label: 'Contact No',
+                          hintText: 'Enter Contact No',
+                          controller: _contactno,
+                        ),
                         const SizedBox(height: 20),
                         CustomTextField(
-                            validator: (value) => value == null || value.isEmpty ? "Please enter the Aadhaar No" : null,
-                            label: 'Aadhaar No', hintText: 'Enter Aadhaar No', controller: _aadhaarno),
-                        const SizedBox(height: 20),
-                        CustomTextField(label: 'Pan No', hintText: 'Enter Pan No', controller: _panno),
+                          validator: (value) => value == null || value.isEmpty
+                              ? "Please enter the Aadhaar No"
+                              : null,
+                          label: 'Aadhaar No',
+                          hintText: 'Enter Aadhaar No',
+                          controller: _aadhaarno,
+                        ),
                         const SizedBox(height: 20),
                         CustomTextField(
-                            validator: (value) => value == null || value.isEmpty ? "Please enter the Address " : null,
-                            label: 'Address', hintText: 'Enter Address', controller: _address),
+                          label: 'Pan No',
+                          hintText: 'Enter Pan No',
+                          controller: _panno,
+                        ),
+                        const SizedBox(height: 20),
+                        CustomTextField(
+                          validator: (value) => value == null || value.isEmpty
+                              ? "Please enter the Address "
+                              : null,
+                          label: 'Address',
+                          hintText: 'Enter Address',
+                          controller: _address,
+                        ),
                       ],
                     ),
                   ),
@@ -275,11 +296,23 @@ setState(() {
                     title: 'Account Information',
                     child: Column(
                       children: [
-                        CustomTextField(label: 'Account No', hintText: 'Enter Account No', controller: _accountno),
+                        CustomTextField(
+                          label: 'Account No',
+                          hintText: 'Enter Account No',
+                          controller: _accountno,
+                        ),
                         const SizedBox(height: 20),
-                        CustomTextField(label: 'IFSC Code', hintText: 'Enter IFSC Code', controller: _ifsccode),
+                        CustomTextField(
+                          label: 'IFSC Code',
+                          hintText: 'Enter IFSC Code',
+                          controller: _ifsccode,
+                        ),
                         const SizedBox(height: 20),
-                        CustomTextField(label: 'Bank Name', hintText: 'Enter Bank Name', controller: _bankname),
+                        CustomTextField(
+                          label: 'Bank Name',
+                          hintText: 'Enter Bank Name',
+                          controller: _bankname,
+                        ),
                       ],
                     ),
                   ),
@@ -296,7 +329,7 @@ setState(() {
           icon: Icons.save,
           onPressed: () {
             if (_formKey.currentState?.validate() ?? false) {
-              submitForm();// Submit form logic
+              submitForm();
             }
           },
         ),
@@ -313,7 +346,9 @@ setState(() {
     required Function(dynamic) onChange,
   }) {
     return CustomDropdown(
-      items: items?.map((e) => {valueKey: e.id, displayKey: e.value}).toList() ?? [],
+      items:
+          items?.map((e) => {valueKey: e.id, displayKey: e.value}).toList() ??
+          [],
       displayKey: displayKey,
       valueKey: valueKey,
       hint: hint,
@@ -321,6 +356,7 @@ setState(() {
       onChanged: onChange,
     );
   }
+
   void resetForm() {
     // Clear all text controllers
     _employeeno.clear();
@@ -351,13 +387,12 @@ setState(() {
     setState(() {});
   }
 
-
   void submitForm() async {
     if (_formKey.currentState?.validate() ?? false) {
       // Safely split staff name
 
       final formData = {
-        "emp_no":_employeeno.text.toString() ?? '',
+        "emp_no": _employeeno.text.toString() ?? '',
         'joining_date': _joiningdate.text.toString() ?? '',
         'date_of_retire': _retiredate.text.toString() ?? '',
         'staff_no': _employeeno.text.toString() ?? '',
@@ -380,29 +415,22 @@ setState(() {
         'ifsc_code': _ifsccode.text.toString() ?? '',
         'bank_name': _bankname.text.toString() ?? '',
       };
-
       showLoaderDialog(context);
-
       try {
         final response = await StaffApis().submitStaffData(formData);
         resetForm();
-        hideLoaderDialog(context);
         if (response['result'] == 1) {
           showBottomMessage(context, response['message'], false);
         } else {
           showBottomMessage(context, response['message'], true);
         }
       } catch (e) {
-        hideLoaderDialog(context);
         showBottomMessage(context, "Something went wrong: $e", true);
+      } finally {
+        hideLoaderDialog(context);
       }
     } else {
       showBottomMessage(context, 'Please fill all required fields', true);
     }
   }
-
-
 }
-
-
-

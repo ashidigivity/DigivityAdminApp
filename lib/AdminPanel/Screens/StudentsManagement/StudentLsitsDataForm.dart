@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/BackgrounWeapper.dart';
 import 'package:digivity_admin_app/Components/CardContainer.dart';
 import 'package:digivity_admin_app/Components/CourseComponent.dart';
@@ -25,10 +26,10 @@ class StudentListsDataForm extends StatefulWidget {
 class _StudentListsDataFormState extends State<StudentListsDataForm> {
   final _formKey = GlobalKey<FormState>();
 
-  String? selectedCourseId;     // Required
-  String? selectedSortBy;       // Required
-  String? selectedStudentSort;  // Optional
-  String? selectedStatus;       // Optional
+  String? selectedCourseId; // Required
+  String? selectedSortBy; // Required
+  String? selectedStudentSort; // Optional
+  String? selectedStatus; // Optional
 
   @override
   Widget build(BuildContext context) {
@@ -37,53 +38,57 @@ class _StudentListsDataFormState extends State<StudentListsDataForm> {
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: SimpleAppBar(
           titleText: "Search Student List",
-            routeName: 'dashboard'
+          routeName: 'back',
         ),
       ),
       body: BackgroundWrapper(
-        child: CardContainer(
-          height: 450,
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  // COURSE SELECTOR
-                  CourseComponent(
-                    initialValue: '',
-                    onChanged: (val) {
-                      selectedCourseId = val;
-                    },
-                  ),
-                  const SizedBox(height: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            CardContainer(
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // COURSE SELECTOR
+                      CourseComponent(
+                        initialValue: '',
+                        onChanged: (val) {
+                          selectedCourseId = val;
+                        },
+                      ),
+                      const SizedBox(height: 20),
 
-                  // SORT FIELD
-                  ShortByDropdown(
-                    onChanged: (value) {
-                      selectedSortBy = value;
-                    },
-                  ),
+                      // SORT FIELD
+                      ShortByDropdown(
+                        onChanged: (value) {
+                          selectedSortBy = value;
+                        },
+                      ),
 
-                  const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                  // OPTIONAL: STUDENT-SPECIFIC SORTING
-                  Studentsortby(
-                    onChanged: (value) {
-                      selectedStudentSort = value;
-                    },
-                  ),
-                  const SizedBox(height: 20),
+                      // OPTIONAL: STUDENT-SPECIFIC SORTING
+                      Studentsortby(
+                        onChanged: (value) {
+                          selectedStudentSort = value;
+                        },
+                      ),
+                      const SizedBox(height: 20),
 
-                  // OPTIONAL: STATUS FILTER
-                  Statusdropdown(
-                    onChange: (value) {
-                      selectedStatus = value;
-                    },
+                      // OPTIONAL: STATUS FILTER
+                      Statusdropdown(
+                        onChange: (value) {
+                          selectedStatus = value;
+                        },
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ),
       bottomNavigationBar: Padding(
@@ -94,17 +99,24 @@ class _StudentListsDataFormState extends State<StudentListsDataForm> {
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
               showLoaderDialog(context);
+              try {
+                await Provider.of<StudentDataProvider>(
+                  context,
+                  listen: false,
+                ).fetchStudents(
+                  courseId: selectedCourseId!,
+                  sortByMethod: selectedSortBy!,
+                  orderByMethod: selectedStudentSort ?? 'asc',
+                  selectedStatus: selectedStatus ?? 'active',
+                );
 
-              await Provider.of<StudentDataProvider>(context, listen: false)
-                  .fetchStudents(
-                courseId: selectedCourseId!,
-                sortByMethod: selectedSortBy!,
-                orderByMethod: selectedStudentSort ?? 'asc',
-                selectedStatus: selectedStatus ?? 'active',
-              );
-
-              hideLoaderDialog(context);
-              context.pushNamed('student-search');
+                hideLoaderDialog(context);
+                context.pushNamed('student-search');
+              } catch (e) {
+                showBottomMessage(context, "${e}", true);
+              } finally {
+                hideLoaderDialog(context);
+              }
             }
           },
         ),

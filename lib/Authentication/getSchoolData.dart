@@ -4,6 +4,7 @@ import 'dart:convert';
 Future<dynamic> getSchoolData(String code) async {
 
   final url = Uri.parse('https://clients.erpcare.in/school/$code/search');
+  print(url);
 
   try {
     final response = await http.get(url);

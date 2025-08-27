@@ -15,11 +15,9 @@ import 'package:digivity_admin_app/Components/SimpleAppBar.dart';
 
 import 'package:flutter/material.dart';
 
-
 class UpdateStaffProfile extends StatefulWidget {
-
   final String? staffId;
-  UpdateStaffProfile({ required this.staffId});
+  UpdateStaffProfile({required this.staffId});
 
   @override
   State<UpdateStaffProfile> createState() => _UpdateStaffProfile();
@@ -53,26 +51,28 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
   String? selectedMaritalStatusId;
   String? selectedGender;
 
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      showLoaderDialog(context, message: "Fetching data...");
-      await getData();          // Load dropdowns
-      await getStudentData();
+      showLoaderDialog(context);
+      try {
+        await getData();
+        await getStudentData();
+      } catch (e) {
+        print("${e}");
+      } finally {
+        hideLoaderDialog(context);
+      }
     });
   }
-
 
   Future<void> getData() async {
     final staffdata = await Addstaffformdata().getStaffFormData();
     setState(() {
       staffformdata = staffdata;
     });
-    hideLoaderDialog(context);
   }
-
 
   Future<void> getStudentData() async {
     try {
@@ -106,12 +106,10 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
         });
       }
     } catch (e) {
-      hideLoaderDialog(context);
       print("Error fetching student data: $e");
       showBottomMessage(context, "Failed to load student data.", true);
     }
   }
-
 
   @override
   void dispose() {
@@ -132,19 +130,20 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: SimpleAppBar(titleText: "Update Staff Profile", routeName: 'back'),
+        child: SimpleAppBar(
+          titleText: "Update Staff Profile",
+          routeName: 'back',
+        ),
       ),
       body: BackgroundWrapper(
         child: CardContainer(
-          padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-          margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: SingleChildScrollView(
             child: Form(
               key: _formKey,
@@ -158,18 +157,26 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
                           label: 'Employee No',
                           hintText: 'Enter Employee No..',
                           controller: _employeeno,
-                          validator: (value) => value == null || value.isEmpty ? "Please enter the Emp No" : null,
+                          validator: (value) => value == null || value.isEmpty
+                              ? "Please enter the Emp No"
+                              : null,
                         ),
                         const SizedBox(height: 20),
-                        DatePickerField(controller: _joiningdate, label: 'Joining Date'),
+                        DatePickerField(
+                          controller: _joiningdate,
+                          label: 'Joining Date',
+                        ),
                         const SizedBox(height: 20),
-                        DatePickerField(controller: _retiredate, label: 'Retire Date'),
+                        DatePickerField(
+                          controller: _retiredate,
+                          label: 'Retire Date',
+                        ),
                         const SizedBox(height: 20),
                         buildDropdown(
                           items: staffformdata?.professiontype,
                           displayKey: 'value',
                           valueKey: 'id',
-                          selectedValue:selectedProfessionTypeId,
+                          selectedValue: selectedProfessionTypeId,
                           hint: 'Profession Type',
                           error: 'Please select the Profession Type',
                           onChange: (value) {
@@ -183,7 +190,7 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
                           displayKey: 'value',
                           valueKey: 'id',
                           hint: 'Staff Type',
-                          selectedValue:selectedStaffTypeId,
+                          selectedValue: selectedStaffTypeId,
                           error: 'Please select Staff Type',
                           onChange: (value) {
                             selectedStaffTypeId = value;
@@ -196,7 +203,7 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
                           displayKey: 'value',
                           valueKey: 'id',
                           hint: 'Department Type',
-                          selectedValue:selectedDepartmentId,
+                          selectedValue: selectedDepartmentId,
                           error: 'Please select Department Type',
                           onChange: (value) {
                             selectedDepartmentId = value;
@@ -208,7 +215,7 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
                           items: staffformdata?.designation,
                           displayKey: 'value',
                           valueKey: 'id',
-                          selectedValue:selectedDesignationId,
+                          selectedValue: selectedDesignationId,
                           hint: 'Designation Type',
                           error: 'Please select Designation Type',
                           onChange: (value) {
@@ -229,7 +236,7 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
                           displayKey: 'value',
                           valueKey: 'id',
                           hint: 'Title',
-                          selectedValue:selectedTitleId,
+                          selectedValue: selectedTitleId,
                           error: 'Please select Title',
                           onChange: (value) {
                             selectedTitleId = value;
@@ -241,7 +248,9 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
                           label: 'Staff Name',
                           hintText: 'Enter Staff Name',
                           controller: _staffname,
-                          validator: (value) => value == null || value.isEmpty ? "Please enter Staff Name" : null,
+                          validator: (value) => value == null || value.isEmpty
+                              ? "Please enter Staff Name"
+                              : null,
                         ),
                         const SizedBox(height: 20),
                         Genderdropdown(
@@ -256,13 +265,18 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
                           },
                         ),
                         const SizedBox(height: 20),
-                        DatePickerField(controller: _dob, label: 'Date Of Birth'),
+                        DatePickerField(
+                          controller: _dob,
+                          label: 'Date Of Birth',
+                        ),
                         const SizedBox(height: 20),
                         CustomTextField(
                           label: 'Father Name',
                           hintText: 'Enter Staff Father Name',
                           controller: _fathername,
-                          validator: (value) => value == null || value.isEmpty ? "Please enter Father Name" : null,
+                          validator: (value) => value == null || value.isEmpty
+                              ? "Please enter Father Name"
+                              : null,
                         ),
                         const SizedBox(height: 20),
                         buildDropdown(
@@ -270,7 +284,7 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
                           displayKey: 'value',
                           valueKey: 'id',
                           hint: 'Marital Status',
-                          selectedValue:selectedMaritalStatusId,
+                          selectedValue: selectedMaritalStatusId,
                           error: 'Please select Marital Status',
                           onChange: (value) {
                             selectedMaritalStatusId = value;
@@ -285,10 +299,16 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
                     title: 'Contact Information',
                     child: Column(
                       children: [
-                        CustomTextField(label: 'Spouse Name', hintText: 'Enter Spouse Name', controller: _spousename),
+                        CustomTextField(
+                          label: 'Spouse Name',
+                          hintText: 'Enter Spouse Name',
+                          controller: _spousename,
+                        ),
                         const SizedBox(height: 20),
                         CustomTextField(
-                          validator: (value) => value == null || value.isEmpty ? "Please enter the Contact No" : null,
+                          validator: (value) => value == null || value.isEmpty
+                              ? "Please enter the Contact No"
+                              : null,
                           label: 'Contact No',
                           hintText: 'Enter Contact No',
                           controller: _contactno,
@@ -300,7 +320,11 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
                           controller: _aadhaarno,
                         ),
                         const SizedBox(height: 20),
-                        CustomTextField(label: 'Pan No', hintText: 'Enter Pan No', controller: _panno),
+                        CustomTextField(
+                          label: 'Pan No',
+                          hintText: 'Enter Pan No',
+                          controller: _panno,
+                        ),
                         const SizedBox(height: 20),
                         CustomTextField(
                           label: 'Address',
@@ -315,11 +339,23 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
                     title: 'Account Information',
                     child: Column(
                       children: [
-                        CustomTextField(label: 'Account No', hintText: 'Enter Account No', controller: _accountno),
+                        CustomTextField(
+                          label: 'Account No',
+                          hintText: 'Enter Account No',
+                          controller: _accountno,
+                        ),
                         const SizedBox(height: 20),
-                        CustomTextField(label: 'IFSC Code', hintText: 'Enter IFSC Code', controller: _ifsccode),
+                        CustomTextField(
+                          label: 'IFSC Code',
+                          hintText: 'Enter IFSC Code',
+                          controller: _ifsccode,
+                        ),
                         const SizedBox(height: 20),
-                        CustomTextField(label: 'Bank Name', hintText: 'Enter Bank Name', controller: _bankname),
+                        CustomTextField(
+                          label: 'Bank Name',
+                          hintText: 'Enter Bank Name',
+                          controller: _bankname,
+                        ),
                       ],
                     ),
                   ),
@@ -344,7 +380,6 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
     );
   }
 
-
   Widget buildDropdown({
     required List<dynamic>? items,
     required String displayKey,
@@ -355,7 +390,9 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
     dynamic selectedValue, // Add this
   }) {
     return CustomDropdown(
-      items: items?.map((e) => {valueKey: e.id, displayKey: e.value}).toList() ?? [],
+      items:
+          items?.map((e) => {valueKey: e.id, displayKey: e.value}).toList() ??
+          [],
       displayKey: displayKey,
       valueKey: valueKey,
       hint: hint,
@@ -365,15 +402,12 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
     );
   }
 
-
-
-
   void submitForm() async {
     if (_formKey.currentState?.validate() ?? false) {
       // Safely split staff name
 
       final formData = {
-        "emp_no":_employeeno.text.toString() ?? '',
+        "emp_no": _employeeno.text.toString() ?? '',
         'joining_date': _joiningdate.text.toString() ?? '',
         'date_of_retire': _retiredate.text.toString() ?? '',
         'staff_no': _employeeno.text.toString() ?? '',
@@ -400,7 +434,10 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
       showLoaderDialog(context);
 
       try {
-        final response = await StaffApis().updateStaffRecord(widget.staffId,formData);
+        final response = await StaffApis().updateStaffRecord(
+          widget.staffId,
+          formData,
+        );
         hideLoaderDialog(context);
         if (response['result'] == 1) {
           showBottomMessage(context, response['message'], false);
@@ -415,9 +452,4 @@ class _UpdateStaffProfile extends State<UpdateStaffProfile> {
       showBottomMessage(context, 'Please fill all required fields', true);
     }
   }
-
-
 }
-
-
-

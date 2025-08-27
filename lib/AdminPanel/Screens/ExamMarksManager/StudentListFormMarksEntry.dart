@@ -49,36 +49,42 @@ class _StudentListFormMarksEntry extends State<StudentListFormMarksEntry> {
   List<AttendanceStatusModel> attendanceStatusList = [];
   @override
   void initState() {
-    super.initState(); // Always call this first
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getStudentList();
     });
   }
 
   Future<void> getStudentList() async {
-    final bodydata = {
-      "course_section_id": widget.courseId,
-      "exam_term_id": widget.examtermId,
-      "exam_type_id": widget.examtypeId,
-      "exam_assessment_id": widget.assessmentId,
-      "subject_id": widget.SubjectId,
-    };
+    showLoaderDialog(context);
+    try {
+      final bodydata = {
+        "course_section_id": widget.courseId,
+        "exam_term_id": widget.examtermId,
+        "exam_type_id": widget.examtypeId,
+        "exam_assessment_id": widget.assessmentId,
+        "subject_id": widget.SubjectId,
+      };
 
-    final response = await StudentMarksManagerCommonHelper()
-        .apistudentlistmarksentry(bodydata);
-
-    if (response != null) {
-      setState(() {
-        studentList = response.studentList;
-        gradeList = response.gradeList;
-        attendanceStatusList = response.attendanceStatus;
-
-        // Initialize controllers
-        for (var student in studentList) {
-          marksControllers[student.studentId.toString()] =
-              TextEditingController(text: student.marks.toString() ?? '');
-        }
-      });
+      final response = await StudentMarksManagerCommonHelper()
+          .apistudentlistmarksentry(bodydata);
+      if (response != null) {
+        setState(() {
+          studentList = response.studentList;
+          gradeList = response.gradeList;
+          attendanceStatusList = response.attendanceStatus;
+          // Initialize controllers
+          for (var student in studentList) {
+            marksControllers[student.studentId.toString()] =
+                TextEditingController(text: student.marks.toString() ?? '');
+          }
+        });
+      }
+    } catch (e) {
+      print("${e}");
+      showBottomMessage(context, "${e}", true);
+    } finally {
+      hideLoaderDialog(context);
     }
   }
 

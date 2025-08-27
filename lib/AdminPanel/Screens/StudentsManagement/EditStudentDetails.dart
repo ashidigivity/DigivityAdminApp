@@ -75,20 +75,27 @@ class _EditStudentDetails extends State<EditStudentDetails> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      showLoaderDialog(context, message: "Fetching data...");
       getData();
-
     });
   }
 
   Future<void> getData() async {
-    final studentadddata = await AddStudentFormData().getStudentFormData();
-    if (studentadddata != null) {
-      setState(() {
-        studentformdata = studentadddata;
-        _AdmissionController.text = studentadddata.admissionNo;
-      });
-      await getStudentData();
+    showLoaderDialog(context);
+    try {
+      final studentadddata = await AddStudentFormData().getStudentFormData();
+      if (studentadddata != null) {
+        setState(() {
+          studentformdata = studentadddata;
+          _AdmissionController.text = studentadddata.admissionNo;
+        });
+        await getStudentData();
+        hideLoaderDialog(context);
+      }
+    }catch(e){
+    print("${e}");
+    showBottomMessage(context, "${e}", true);
+    }
+    finally{
       hideLoaderDialog(context);
     }
   }

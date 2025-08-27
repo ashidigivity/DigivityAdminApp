@@ -97,15 +97,14 @@ class _ClasswiseStudentDocumentUplodedList extends State<ClasswiseStudentDocumen
                   itemBuilder: (context, index) {
                     final student = _filteredStudents[index];
                     return StudentDocumentItem(
-                      name: student.studentName,
+                      name: student.studentName ?? '',
                       StudentId:student.studentId,
-                      course: student.course,
-                      admissionNo: student.admissionNo,
-                      parentName: 'Father :  ${student.fatherName}',
-                      imageUrl: student.profileImg,
+                      course: student.course ?? '',
+                      admissionNo: student.admissionNo ?? '',
+                      parentName: 'Father :  ${student.fatherName}' ?? '',
+                      imageUrl: student.profileImg ?? '',
                       uploadedDocs: student.totalUploadedDoc,
-                      notUploadedDocs:
-                      student.totalDoc - student.totalUploadedDoc,
+                      notUploadedDocs: student.totalDoc - student.totalUploadedDoc,
                       motherName: student.motherName,
                     );
                   },
@@ -195,13 +194,13 @@ class StudentDocumentItem extends StatelessWidget {
                    context.pushNamed(
                      'student-document-upload',
                      extra: {
-                       'studentName': name,
-                       'course': course,
-                       'studentId': StudentId,
-                       'admissionNo': admissionNo,
-                       'fatherName': parentName,
-                       'motherName': motherName,
-                       'imageUrl': imageUrl
+                       'studentName': name ?? '',
+                       'course': course ?? '',
+                       'studentId': StudentId ?? '',
+                       'admissionNo': admissionNo ?? '',
+                       'fatherName': parentName ?? '',
+                       'motherName': motherName ?? '',
+                       'imageUrl': imageUrl ?? ''
                      },
                    );
                  },

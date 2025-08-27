@@ -6,9 +6,13 @@ import 'package:digivity_admin_app/Providers/StaffDataProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void StaffAcountUpdate(BuildContext context, int staffId, int staffstatus, Function(List<StaffModel>) onUpdateList) {
-
-  TextEditingController _remarController =TextEditingController();
+void StaffAcountUpdate(
+  BuildContext context,
+  int staffId,
+  int staffstatus,
+  Function(List<StaffModel>) onUpdateList,
+) {
+  TextEditingController _remarController = TextEditingController();
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -36,39 +40,45 @@ void StaffAcountUpdate(BuildContext context, int staffId, int staffstatus, Funct
         actions: [
           ElevatedButton.icon(
             onPressed: () {
-              Navigator.pop(context);// Your logic here
+              Navigator.pop(context); // Your logic here
             },
             icon: Icon(Icons.cancel, color: Colors.white),
             label: Text("NO"),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey,   // Button background color
-              foregroundColor: Colors.white,   // Text & icon color
+              backgroundColor: Colors.grey, // Button background color
+              foregroundColor: Colors.white, // Text & icon color
             ),
           ),
           ElevatedButton.icon(
             onPressed: () async {
               showLoaderDialog(context);
+              try {
+                final result = await StaffApis().updateStaffAcount(
+                  staffId,
+                  staffstatus,
+                  _remarController.text.trim(),
+                );
 
-              final result = await StaffApis().updateStaffAcount(
-                staffId,
-                staffstatus,
-                _remarController.text.trim(),
-              );
-              hideLoaderDialog(context);
-              if (result != null && result['result'] == 1) {
-                final provider = Provider.of<StaffDataProvider>(context, listen: false);
-                provider.removeStaffById(staffId.toString());
+                if (result != null && result['result'] == 1) {
+                  final provider = Provider.of<StaffDataProvider>(
+                    context,
+                    listen: false,
+                  );
+                  provider.removeStaffById(staffId.toString());
 
+                  onUpdateList(provider.staffs);
 
-                onUpdateList(provider.staffs);
+                  _remarController.clear();
 
-                _remarController.clear();
-
-                showBottomMessage(context, result['message'], false);
-
-                Navigator.pop(context);
-              } else {
-                showBottomMessage(context, result['message'], true);
+                  showBottomMessage(context, result['message'], false);
+                  Navigator.pop(context);
+                } else {
+                  showBottomMessage(context, result['message'], true);
+                }
+              } catch (e) {
+                showBottomMessage(context, "${e}", true);
+              } finally {
+                hideLoaderDialog(context);
               }
             },
             icon: Icon(Icons.check, color: Colors.white),
@@ -78,7 +88,6 @@ void StaffAcountUpdate(BuildContext context, int staffId, int staffstatus, Funct
               foregroundColor: Colors.white,
             ),
           ),
-
         ],
       );
     },

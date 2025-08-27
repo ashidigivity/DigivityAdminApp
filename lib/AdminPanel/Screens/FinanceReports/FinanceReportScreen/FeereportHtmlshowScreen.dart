@@ -48,10 +48,7 @@ class _FeereportHtmlshowScreen extends State<FeereportHtmlshowScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: SimpleAppBar(
-          titleText: widget.appbartext,
-          routeName: "back",
-        ),
+        child: SimpleAppBar(titleText: widget.appbartext, routeName: "back"),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

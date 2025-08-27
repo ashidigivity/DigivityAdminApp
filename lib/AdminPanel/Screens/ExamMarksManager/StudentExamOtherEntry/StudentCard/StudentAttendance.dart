@@ -1,3 +1,4 @@
+import 'package:digivity_admin_app/AdminPanel/Components/PopupNetworkImage.dart';
 import 'package:digivity_admin_app/AdminPanel/Models/MarksManagerModel/AttendanceStatusModel.dart';
 import 'package:digivity_admin_app/AdminPanel/Models/MarksManagerModel/GradeModel.dart';
 import 'package:digivity_admin_app/Components/InputField.dart';
@@ -39,11 +40,7 @@ class StudentAttendance extends StatelessWidget {
       child: Row(
         children: [
           // Profile
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: Colors.grey.shade200,
-            backgroundImage: NetworkImage(profileImg),
-          ),
+          PopupNetworkImage(imageUrl:profileImg),
           const SizedBox(width: 10),
 
           // Info

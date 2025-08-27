@@ -32,10 +32,8 @@ class _AppBarComponentState extends State<AppBarComponent> {
   }
 
   Future<void> getUserData() async{
-    showLoaderDialog(context);
     logo = await SharedPrefHelper.getPreferenceValue('profile_image');
     username = await SharedPrefHelper.getPreferenceValue('name');
-    hideLoaderDialog(context);
     setState(() {
     });
   }

@@ -1,6 +1,8 @@
 import 'package:digivity_admin_app/AdminPanel/Components/PopupNetworkImage.dart';
 import 'package:digivity_admin_app/AdminPanel/Models/StaffModels/StaffModel.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StaffManagement/StaffListBottomSheet.dart';
+import 'package:digivity_admin_app/AuthenticationUi/Loader.dart';
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/BackgrounWeapper.dart';
 import 'package:digivity_admin_app/Components/InputField.dart';
 import 'package:digivity_admin_app/Components/SimpleAppBar.dart';
@@ -9,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class StaffListScreen extends StatefulWidget {
-
   const StaffListScreen({Key? key}) : super(key: key);
 
   @override
@@ -26,10 +27,16 @@ class _StaffListScreen extends State<StaffListScreen> {
   void initState() {
     super.initState();
     _staffSearchController.addListener(_filterStaffList);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async{
-      final staffs =  Provider.of<StaffDataProvider>(context, listen: false).staffs;
-      _updateStaffList(staffs);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final staffs = Provider.of<StaffDataProvider>(
+          context,
+          listen: false,
+        ).staffs;
+        _updateStaffList(staffs);
+      } catch (e) {
+        showBottomMessage(context, "${e}", true);
+      }
     });
   }
 
@@ -54,8 +61,8 @@ class _StaffListScreen extends State<StaffListScreen> {
         'father_name': staff.fatherName ?? '',
         'address': staff.address ?? '',
         'staff_no': staff.staffNo ?? '',
-        'status':staff.status,
-        'staff_id':staff.dbId
+        'status': staff.status,
+        'staff_id': staff.dbId,
       };
     }).toList();
   }
@@ -85,10 +92,7 @@ class _StaffListScreen extends State<StaffListScreen> {
       backgroundColor: Colors.transparent,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: SimpleAppBar(
-          titleText: "Search Staff List",
-          routeName: 'back',
-        ),
+        child: SimpleAppBar(titleText: "Search Staff List", routeName: 'back'),
       ),
       body: BackgroundWrapper(
         child: SafeArea(
@@ -110,65 +114,91 @@ class _StaffListScreen extends State<StaffListScreen> {
                       final filtered = _staffSearchController.text.isEmpty
                           ? updatedList
                           : updatedList.where((staff) {
-                        final query = _staffSearchController.text.toLowerCase();
-                        return (staff['full_name']?.toLowerCase().contains(query) ?? false) ||
-                            (staff['staff_no']?.toLowerCase().contains(query) ?? false) ||
-                            (staff['contact_no']?.toLowerCase().contains(query) ?? false) ||
-                            (staff['address']?.toLowerCase().contains(query) ?? false);
-                      }).toList();
+                              final query = _staffSearchController.text
+                                  .toLowerCase();
+                              return (staff['full_name']
+                                          ?.toLowerCase()
+                                          .contains(query) ??
+                                      false) ||
+                                  (staff['staff_no']?.toLowerCase().contains(
+                                        query,
+                                      ) ??
+                                      false) ||
+                                  (staff['contact_no']?.toLowerCase().contains(
+                                        query,
+                                      ) ??
+                                      false) ||
+                                  (staff['address']?.toLowerCase().contains(
+                                        query,
+                                      ) ??
+                                      false);
+                            }).toList();
 
                       return filtered.isNotEmpty
                           ? ListView.builder(
-                        itemCount: filtered.length,
-                        itemBuilder: (context, index) {
-                          final staff = filtered[index];
-                          final bgColor = index % 2 == 0
-                              ? const Color(0xFFDBF3E2)
-                              : const Color(0xFFE0E7FF);
+                              itemCount: filtered.length,
+                              itemBuilder: (context, index) {
+                                final staff = filtered[index];
+                                final bgColor = index % 2 == 0
+                                    ? const Color(0xFFDBF3E2)
+                                    : const Color(0xFFE0E7FF);
 
-                          return Card(
-                            color: bgColor,
-                            margin: const EdgeInsets.symmetric(vertical: 6),
-                            child: ListTile(
-                              onTap: () {
-                                showStaffListBottomSheet(
-                                  context,
-                                  staff['staff_id'],
-                                  staff['full_name'] ?? 'Unknown',
-                                  staff['staff_no'].toString(),
-                                  staff['contact_no'].toString(),
-                                  staff['status'],
-                                  (updatedList) => _updateStaffList(updatedList),
+                                return Card(
+                                  color: bgColor,
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 6,
+                                  ),
+                                  child: ListTile(
+                                    onTap: () {
+                                      showStaffListBottomSheet(
+                                        context,
+                                        staff['staff_id'],
+                                        staff['full_name'] ?? 'Unknown',
+                                        staff['staff_no'].toString(),
+                                        staff['contact_no'].toString(),
+                                        staff['status'],
+                                        (updatedList) =>
+                                            _updateStaffList(updatedList),
+                                      );
+                                    },
+                                    leading: PopupNetworkImage(
+                                      imageUrl: staff['profile_img'],
+                                      radius: 30,
+                                    ),
+                                    title: Text(
+                                      staff['full_name'] ?? '',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text("Staff Id: ${staff['staff_id']}"),
+                                        Text(
+                                          "Profession: ${staff['profession']}",
+                                        ),
+                                        Text(
+                                          "Designation: ${staff['designation']}",
+                                        ),
+                                        Text(
+                                          "Department: ${staff['department']}",
+                                        ),
+                                        Text("Mobile: ${staff['contact_no']}"),
+                                        Text("Father: ${staff['father_name']}"),
+                                        Text("Address: ${staff['address']}"),
+                                        Text("Status: ${staff['status']}"),
+                                      ],
+                                    ),
+                                  ),
                                 );
                               },
-                              leading: PopupNetworkImage(imageUrl: staff['profile_img'],
-                              radius: 30,),
-                              title: Text(
-                                staff['full_name'] ?? '',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Staff Id: ${staff['staff_id']}"),
-                                  Text("Profession: ${staff['profession']}"),
-                                  Text("Designation: ${staff['designation']}"),
-                                  Text("Department: ${staff['department']}"),
-                                  Text("Mobile: ${staff['contact_no']}"),
-                                  Text("Father: ${staff['father_name']}"),
-                                  Text("Address: ${staff['address']}"),
-                                  Text("Status: ${staff['status']}")
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      )
+                            )
                           : const Center(child: Text("No staff found"));
                     },
                   ),
                 ),
-
               ],
             ),
           ),
@@ -176,6 +206,4 @@ class _StaffListScreen extends State<StaffListScreen> {
       ),
     );
   }
-
 }
-

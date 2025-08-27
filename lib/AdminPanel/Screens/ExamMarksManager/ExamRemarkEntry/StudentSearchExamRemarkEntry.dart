@@ -77,7 +77,6 @@ class _StudentSearchExamRemarkEntry extends State<StudentSearchExamRemarkEntry>{
               },
             ),
             SizedBox(height: 20),
-
             ExamTermDropdown(
              onExamTermSelected: (examTermId,examTerm) async {
                setState(() {

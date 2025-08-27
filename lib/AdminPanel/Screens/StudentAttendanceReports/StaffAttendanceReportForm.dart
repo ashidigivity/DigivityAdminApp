@@ -1,4 +1,5 @@
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentAttendanceReports/AttendanceReportHtmlShowScreen.dart';
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/BackgrounWeapper.dart';
 import 'package:digivity_admin_app/Components/CustomBlueButton.dart';
 import 'package:digivity_admin_app/Components/DatePickerField.dart';
@@ -28,8 +29,8 @@ class _StaffAttendanceReportForm extends State<StaffAttendanceReportForm> {
 
     try {
       String? htmlData = await AttendanceReportsHelperFunctions().apiAttendanceReport('staff-attendance-report',formdata);
-      hideLoaderDialog(context);
       if (htmlData != null && htmlData.isNotEmpty) {
+        hideLoaderDialog(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -40,15 +41,12 @@ class _StaffAttendanceReportForm extends State<StaffAttendanceReportForm> {
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("No report data found.")),
-        );
+        hideLoaderDialog(context);
+       showBottomMessage(context, "Report Not Found", true);
       }
     } catch (e) {
-      print("SubmitForm Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong.")),
-      );
+      hideLoaderDialog(context);
+      showBottomMessage(context, "${e}", true);
     }
 
 

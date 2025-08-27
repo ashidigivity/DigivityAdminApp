@@ -1,6 +1,7 @@
 import 'package:digivity_admin_app/AdminPanel/Components/PopupNetworkImage.dart';
 import 'package:digivity_admin_app/AdminPanel/MobileThemsColors/theme_provider.dart';
 import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
+import 'package:digivity_admin_app/Components/CustomConfirmationDialog.dart';
 import 'package:digivity_admin_app/Components/Loader.dart';
 import 'package:digivity_admin_app/helpers/launchAnyUrl.dart';
 import 'package:flutter/material.dart';
@@ -206,8 +207,27 @@ class ShowHomeworkDetailSheet extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: (){
-
+                        onPressed: () async {
+                          if (onDelete != null) {
+                            bool confirmed = await showCustomConfirmationDialog(
+                              context: context,
+                              title: "Alert ?",
+                              message: "Are you sure you want to delete this Homework?",
+                              confirmText: "Yes",
+                              cancelText: "No",
+                            );
+                            if (confirmed) {
+                              showLoaderDialog(context);
+                              final response = await onDelete!();
+                              hideLoaderDialog(context);
+                              Navigator.pop(context);
+                              showBottomMessage(
+                                context,
+                                response['message'],
+                                response['result'] != 1,
+                              );
+                            }
+                          }
                         },
                         icon: const Icon(Icons.delete,color: Colors.white,size: 11,),
                         label: const Text("Remove",style: TextStyle(fontSize:11,color: Colors.white),),

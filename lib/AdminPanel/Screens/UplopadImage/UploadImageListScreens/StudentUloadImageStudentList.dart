@@ -16,23 +16,28 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-class StudentUloadImageStudentList extends StatefulWidget{
-
+class StudentUloadImageStudentList extends StatefulWidget {
   final String? course;
   final String? shortByMethod;
   final String? orderByMethod;
   final String? selectedStatus;
 
-  StudentUloadImageStudentList({this.course,this.shortByMethod,this.orderByMethod,this.selectedStatus});
+  StudentUloadImageStudentList({
+    this.course,
+    this.shortByMethod,
+    this.orderByMethod,
+    this.selectedStatus,
+  });
   @override
   State<StudentUloadImageStudentList> createState() {
     return _StudentUloadImageStudentList();
   }
 }
 
-
-class _StudentUloadImageStudentList extends State<StudentUloadImageStudentList>{
-  final TextEditingController _studentSearchController = TextEditingController();
+class _StudentUloadImageStudentList
+    extends State<StudentUloadImageStudentList> {
+  final TextEditingController _studentSearchController =
+      TextEditingController();
 
   List<Map<String, dynamic>> _originalList = [];
   List<Map<String, dynamic>> _filteredList = [];
@@ -42,7 +47,7 @@ class _StudentUloadImageStudentList extends State<StudentUloadImageStudentList>{
     super.initState();
     _studentSearchController.addListener(_filterStudentList);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async{
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       _fetchlatestdata();
     });
   }
@@ -62,13 +67,12 @@ class _StudentUloadImageStudentList extends State<StudentUloadImageStudentList>{
         orderByMethod: widget.orderByMethod ?? 'asc',
         selectedStatus: widget.selectedStatus ?? 'active',
       );
-
-      hideLoaderDialog(context);
-
       _updateStudentList(students);
     } catch (e) {
       hideLoaderDialog(context);
       print("Error fetching students: $e");
+    } finally {
+      hideLoaderDialog(context);
     }
   }
 
@@ -97,7 +101,6 @@ class _StudentUloadImageStudentList extends State<StudentUloadImageStudentList>{
         'roll_no_controller': TextEditingController(
           text: student.rollNo != null ? student.rollNo.toString() : null,
         ),
-
       };
     }).toList();
   }
@@ -105,7 +108,10 @@ class _StudentUloadImageStudentList extends State<StudentUloadImageStudentList>{
   void _filterStudentList() {
     final query = _studentSearchController.text;
     setState(() {
-      _filteredList = StudentsData().filterStudents(originalList: _originalList, query: query);
+      _filteredList = StudentsData().filterStudents(
+        originalList: _originalList,
+        query: query,
+      );
     });
   }
 
@@ -114,6 +120,7 @@ class _StudentUloadImageStudentList extends State<StudentUloadImageStudentList>{
     _studentSearchController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,208 +147,299 @@ class _StudentUloadImageStudentList extends State<StudentUloadImageStudentList>{
                 Expanded(
                   child: _filteredList.isNotEmpty
                       ? ListView.separated(
-                    itemCount: _filteredList.length,
-                    separatorBuilder: (context, index) =>
-                        Divider(color: Colors.grey.shade300, height: 1),
-                    itemBuilder: (context, index) {
+                          itemCount: _filteredList.length,
+                          separatorBuilder: (context, index) =>
+                              Divider(color: Colors.grey.shade300, height: 1),
+                          itemBuilder: (context, index) {
+                            final student = _filteredList[index];
 
-                      final student = _filteredList[index];
-
-                      return Container(
-                        margin: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                        decoration: BoxDecoration(
-                          color: index % 2 == 0
-                              ? const Color(0xFFDBF3E2) // First color
-                              : const Color(0xFFE2E6EF), // Second color
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            PopupNetworkImage(imageUrl: student['profile_img'],radius: 30,),
-                            // Profile image
-
-                            const SizedBox(width: 14),
-
-                            // Student details
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                            return Container(
+                              margin: EdgeInsets.symmetric(
+                                horizontal: 0,
+                                vertical: 10,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: index % 2 == 0
+                                    ? const Color(0xFFDBF3E2) // First color
+                                    : const Color(0xFFE2E6EF), // Second color
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
                                 children: [
-                                  // Adm No. and Roll No.
-                                  Text(
-                                    "Adm No.: ${student['admission_no'] ?? '-'} | Roll No.: ${student['roll_no'] ?? 'N/A'}",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.grey.shade800,
-                                    ),
+                                  PopupNetworkImage(
+                                    imageUrl: student['profile_img'],
+                                    radius: 30,
                                   ),
-                                  const SizedBox(height: 2),
 
-                                  // Name & Class
-                                  Text(
-                                    "${student['student_name'] ?? ''} (${student['course'] ?? ''})",
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
+                                  // Profile image
+                                  const SizedBox(width: 14),
 
-                                  // Father's Name
-                                  Text(
-                                    "Father : ${student['father_name'] ?? ''}",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey.shade700,
+                                  // Student details
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Adm No. and Roll No.
+                                        Text(
+                                          "Adm No.: ${student['admission_no'] ?? '-'} | Roll No.: ${student['roll_no'] ?? 'N/A'}",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.grey.shade800,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+
+                                        // Name & Class
+                                        Text(
+                                          "${student['student_name'] ?? ''} (${student['course'] ?? ''})",
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+
+                                        // Father's Name
+                                        Text(
+                                          "Father : ${student['father_name'] ?? ''}",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.grey.shade700,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
+
+                                  Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFF514197).withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: IconButton(
+                                      onPressed: () {
+                                        showImagePickerBottomSheet(
+                                          context: context,
+                                          condidatename:
+                                              "${student['student_name'] ?? ''} (${student['course'] ?? ''})",
+                                          onCameraTap: () async {
+                                            final isGranted =
+                                                await PermissionService.requestCameraPermission();
+                                            if (!isGranted) {
+                                              if (!mounted) return;
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    "Camera access denied. Please enable it in settings.",
+                                                  ),
+                                                ),
+                                              );
+                                              return;
+                                            }
+                                            if (isGranted) {
+                                              try {
+                                                final imageHandler =
+                                                    ImageHandler();
+                                                await imageHandler
+                                                    .pickAndResizeImage(
+                                                      source:
+                                                          ImageSource.camera,
+                                                    );
+
+                                                if (imageHandler
+                                                        .resizedImageFile !=
+                                                    null) {
+                                                  showLoaderDialog(context);
+
+                                                  final response =
+                                                      await imageHandler
+                                                          .uploadResizedImage(
+                                                            'student',
+                                                            student['dbId'],
+                                                          );
+
+                                                  if (response['result'] == 1) {
+                                                    final provider =
+                                                        Provider.of<
+                                                          StudentDataProvider
+                                                        >(
+                                                          context,
+                                                          listen: false,
+                                                        );
+
+                                                    await provider
+                                                        .fetchStudents(
+                                                          courseId:
+                                                              widget.course,
+                                                          sortByMethod: widget
+                                                              .shortByMethod,
+                                                          orderByMethod: widget
+                                                              .orderByMethod,
+                                                          selectedStatus: widget
+                                                              .selectedStatus,
+                                                        );
+
+                                                    _updateStudentList(
+                                                      provider.students,
+                                                    );
+                                                    // This updates the UI list properly
+                                                    showBottomMessage(
+                                                      context,
+                                                      response['message'],
+                                                      false,
+                                                    );
+                                                  } else {
+                                                    showBottomMessage(
+                                                      context,
+                                                      response['message'],
+                                                      true,
+                                                    );
+                                                  }
+                                                } else {
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        "⚠️ No image selected",
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              } catch (e) {
+                                                print(
+                                                  "Bug Occured During The Upload Student Image",
+                                                );
+                                                showBottomMessage(
+                                                  context,
+                                                  "${e}",
+                                                  true,
+                                                );
+                                              } finally {
+                                                hideLoaderDialog(context);
+                                              }
+                                            }
+                                          },
+                                          onGalleryTap: () async {
+                                            final isGranted =
+                                                await PermissionService.requestGalleryPermission();
+                                            if (!isGranted) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    "⚠️ Gallery permission denied",
+                                                  ),
+                                                ),
+                                              );
+                                              return;
+                                            }
+                                            try {
+                                              final imageHandler =
+                                                  ImageHandler();
+                                              await imageHandler
+                                                  .pickAndResizeImageFromGalery(
+                                                    source: ImageSource.gallery,
+                                                  );
+
+                                              if (imageHandler
+                                                      .resizedImageFile ==
+                                                  null) {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      "⚠️ No image selected from gallery",
+                                                    ),
+                                                  ),
+                                                );
+                                                return;
+                                              }
+
+                                              showLoaderDialog(context);
+
+                                              final response =
+                                                  await imageHandler
+                                                      .uploadResizedImage(
+                                                        'student',
+                                                        student['dbId'],
+                                                      );
+
+                                              final provider =
+                                                  Provider.of<
+                                                    StudentDataProvider
+                                                  >(context, listen: false);
+
+                                              hideLoaderDialog(context);
+
+                                              if (response['result'] == 1) {
+                                                await provider.fetchStudents(
+                                                  courseId: widget.course,
+                                                  sortByMethod:
+                                                      widget.shortByMethod,
+                                                  orderByMethod:
+                                                      widget.orderByMethod,
+                                                  selectedStatus:
+                                                      widget.selectedStatus,
+                                                );
+
+                                                _updateStudentList(
+                                                  provider.students,
+                                                );
+
+                                                showBottomMessage(
+                                                  context,
+                                                  response['message'],
+                                                  false,
+                                                );
+                                              } else {
+                                                showBottomMessage(
+                                                  context,
+                                                  response['message'],
+                                                  true,
+                                                );
+                                              }
+                                            } catch (e) {
+                                              print(
+                                                "Bug Occured During The Upload Student Image",
+                                              );
+                                              showBottomMessage(
+                                                context,
+                                                "${e}",
+                                                true,
+                                              );
+                                            } finally {
+                                              hideLoaderDialog(context);
+                                            }
+                                          },
+                                        );
+                                      },
+                                      icon: const Icon(
+                                        Icons.camera_alt_outlined,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                  ),
+
+                                  // Camera icon button
                                 ],
                               ),
-                            ),
-
-                            Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Color(0xFF514197).withOpacity(0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child:  IconButton(
-                                onPressed: () {
-                                  showImagePickerBottomSheet(
-                                    context: context,
-                                    condidatename:  "${student['student_name'] ?? ''} (${student['course'] ?? ''})",
-                                    onCameraTap: () async{
-                                      final isGranted = await PermissionService.requestCameraPermission();
-                                      if(isGranted) {
-                                        final imageHandler = ImageHandler();
-                                        await imageHandler.pickAndResizeImage(
-                                            source: ImageSource.camera);
-
-                                        if (imageHandler.resizedImageFile !=
-                                            null) {
-                                          showLoaderDialog(context);
-
-                                          final response = await imageHandler
-                                              .uploadResizedImage(
-                                              'student', student['dbId']);
-
-                                          if (response['result'] == 1) {
-                                            final provider = Provider.of<
-                                                StudentDataProvider>(
-                                                context, listen: false);
-
-                                            await provider.fetchStudents(
-                                              courseId: widget.course,
-                                              sortByMethod: widget
-                                                  .shortByMethod,
-                                              orderByMethod: widget
-                                                  .orderByMethod,
-                                              selectedStatus: widget
-                                                  .selectedStatus,
-                                            );
-
-                                            _updateStudentList(provider
-                                                .students);
-                                            hideLoaderDialog(context);// This updates the UI list properly
-                                            showBottomMessage(
-                                                context, response['message'],
-                                                false);
-                                            hideLoaderDialog(context);
-                                          } else {
-                                            hideLoaderDialog(context);
-                                            showBottomMessage(
-                                                context, response['message'],
-                                                true);
-                                          }
-                                        } else {
-                                          ScaffoldMessenger
-                                              .of(context)
-                                              .showSnackBar(
-                                            const SnackBar(content: Text(
-                                                "⚠️ No image selected")),
-                                          );
-                                        }
-                                      }
-
-
-
-                                    },
-                                    onGalleryTap: () async {
-
-                                      final isGranted =await PermissionService.requestGalleryPermission();
-                                      if(isGranted) {
-                                        final imageHandler = ImageHandler();
-                                        await imageHandler
-                                            .pickAndResizeImageFromGalery(
-                                            source: ImageSource.gallery);
-
-                                        if (imageHandler.resizedImageFile !=
-                                            null) {
-                                          showLoaderDialog(context);
-
-                                          final response = await imageHandler
-                                              .uploadResizedImage(
-                                              'student', student['dbId']);
-                                          final provider = Provider.of<
-                                              StudentDataProvider>(
-                                              context, listen: false);
-                                          hideLoaderDialog(context);
-
-                                          if (response['result'] == 1) {
-                                            await Provider
-                                                .of<
-                                                StudentDataProvider>(
-                                                context, listen: false)
-                                                .fetchStudents(
-                                              courseId: widget.course,
-                                              sortByMethod: widget
-                                                  .shortByMethod,
-                                              orderByMethod: widget
-                                                  .orderByMethod,
-                                              selectedStatus: widget
-                                                  .selectedStatus,
-                                            );
-                                            _updateStudentList(
-                                                provider.students);
-                                            hideLoaderDialog(context);
-                                            showBottomMessage(
-                                                context, response['message'],
-                                                false);
-                                          } else {
-                                            hideLoaderDialog(context);
-                                            showBottomMessage(
-                                                context, response['message'],
-                                                true);
-                                          }
-                                        } else {
-                                          ScaffoldMessenger
-                                              .of(context)
-                                              .showSnackBar(
-                                            const SnackBar(content: Text(
-                                                "⚠️ No image selected from gallery")),
-                                          );
-                                        }
-                                      }
-                                    },
-
-                                  );
-                                },
-                                icon: const Icon(Icons.camera_alt_outlined, color: Colors.green),
-                              ),
-                            ),
-                            // Camera icon button
-
-                          ],
-                        ),
-                      );
-                    },
-                  )
+                            );
+                          },
+                        )
                       : const Center(child: Text("No students found")),
                 ),
-
-
               ],
             ),
           ),

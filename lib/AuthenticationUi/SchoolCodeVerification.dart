@@ -83,7 +83,7 @@ class _SchoolCodeVerificationState extends State<SchoolCodeVerification> {
         children: [
           Image.asset(
             'assets/logos/top2.png',
-            width: width * 0.5,
+            width: width * 1,
             fit: BoxFit.contain,
           ),
           Expanded(

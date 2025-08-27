@@ -31,7 +31,6 @@ class _StudentListScreen extends State<StudentListScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final students = Provider.of<StudentDataProvider>(context, listen: false).students;
-
       _updateStudentList(students);
     });
   }
@@ -87,7 +86,7 @@ class _StudentListScreen extends State<StudentListScreen> {
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: SimpleAppBar(
           titleText: "Search Student List",
-          routeName: 'student-list',
+          routeName: 'back',
         ),
       ),
       body: BackgroundWrapper(

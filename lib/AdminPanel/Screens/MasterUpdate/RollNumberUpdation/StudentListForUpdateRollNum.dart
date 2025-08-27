@@ -44,7 +44,6 @@ class _StudentListForUpdateRollNum extends State<StudentListForUpdateRollNum> {
       hideLoaderDialog(context);
       return;
     }
-
     try {
       final students = await StudentsData().fetchStudents(
         courseId: widget.course!,
@@ -52,15 +51,13 @@ class _StudentListForUpdateRollNum extends State<StudentListForUpdateRollNum> {
         orderByMethod: widget.orderByMethod ?? 'asc',
         selectedStatus: widget.selectedStatus ?? 'active',
       );
-
-      hideLoaderDialog(context);
-
       _updateStudentList(students);
-    } catch (e) {
-      hideLoaderDialog(context);
-      print("Error fetching students: $e");
-    }
+    }catch (e){
+  showBottomMessage(context, "${e}", true);
+  }finally {
+  hideLoaderDialog(context);
   }
+}
 
   void _updateStudentList(List<StudentModel> students) {
     final mappedList = _mapStudentList(students);

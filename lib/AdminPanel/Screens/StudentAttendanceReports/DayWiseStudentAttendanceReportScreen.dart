@@ -1,10 +1,10 @@
 import 'dart:convert';
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/SimpleAppBar.dart';
 import 'package:digivity_admin_app/helpers/CommonFunctions.dart';
 
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
 
 class DayWiseStudentAttendanceReportScreen extends StatefulWidget {
   final String? reportdate;
@@ -22,7 +22,8 @@ class DayWiseStudentAttendanceReportScreen extends StatefulWidget {
   }
 }
 
-class _DayWiseStudentAttendanceReportScreen extends State<DayWiseStudentAttendanceReportScreen> {
+class _DayWiseStudentAttendanceReportScreen
+    extends State<DayWiseStudentAttendanceReportScreen> {
   bool isLoading = true;
   WebViewController? _webViewController;
 
@@ -33,26 +34,35 @@ class _DayWiseStudentAttendanceReportScreen extends State<DayWiseStudentAttendan
   }
 
   void _fetchStudentAttendance() async {
-    final response = await CustomFunctions().fetchDayWiseAttendanceHtml(
-      widget.courseId!,
-      widget.reportdate!,
-    );
+    try {
+      final response = await CustomFunctions().fetchDayWiseAttendanceHtml(
+        widget.courseId!,
+        widget.reportdate!,
+      );
 
-    final controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted);
+      final controller = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted);
 
-    final uri = Uri.dataFromString(
-      response ?? "<h3>No data available</h3>",
-      mimeType: 'text/html',
-      encoding: Encoding.getByName('utf-8'),
-    );
+      final uri = Uri.dataFromString(
+        response ?? "<h3>No data available</h3>",
+        mimeType: 'text/html',
+        encoding: Encoding.getByName('utf-8'),
+      );
 
-    await controller.loadRequest(uri);
+      await controller.loadRequest(uri);
 
-    setState(() {
-      _webViewController = controller;
-      isLoading = false;
-    });
+      setState(() {
+        _webViewController = controller;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("${e}");
+      showBottomMessage(context, "${e}", true);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override

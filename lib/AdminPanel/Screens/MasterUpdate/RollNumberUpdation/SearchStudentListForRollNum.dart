@@ -20,7 +20,8 @@ class SearchStudentListForRollNum extends StatefulWidget {
   const SearchStudentListForRollNum({super.key});
 
   @override
-  State<SearchStudentListForRollNum> createState() => _SearchStudentListForRollNum();
+  State<SearchStudentListForRollNum> createState() =>
+      _SearchStudentListForRollNum();
 }
 
 class _SearchStudentListForRollNum extends State<SearchStudentListForRollNum> {
@@ -28,10 +29,6 @@ class _SearchStudentListForRollNum extends State<SearchStudentListForRollNum> {
   String? selectedSortBy;
   String? selectedStudentSort;
   String? selectedStatus;
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -62,10 +59,8 @@ class _SearchStudentListForRollNum extends State<SearchStudentListForRollNum> {
                         return null;
                       },
                       onChanged: (val) {
-                        selectedCourseId=val;
-                        setState(() {
-
-                        });
+                        selectedCourseId = val;
+                        setState(() {});
                       },
                     ),
                     const SizedBox(height: 20),
@@ -102,7 +97,7 @@ class _SearchStudentListForRollNum extends State<SearchStudentListForRollNum> {
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -116,9 +111,13 @@ class _SearchStudentListForRollNum extends State<SearchStudentListForRollNum> {
             if (selectedCourseId != null && selectedSortBy != null) {
               context.pushNamed(
                 'student-roll-num-update',
-                extra:{'course_id':selectedCourseId.toString(),'selectedSortBy':selectedSortBy.toString(),'orderByMethod':selectedStudentSort.toString(),'selectedStatus':selectedStatus.toString()},
+                extra: {
+                  'course_id': selectedCourseId.toString(),
+                  'selectedSortBy': selectedSortBy.toString(),
+                  'orderByMethod': selectedStudentSort.toString(),
+                  'selectedStatus': selectedStatus.toString(),
+                },
               );
-
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -129,7 +128,6 @@ class _SearchStudentListForRollNum extends State<SearchStudentListForRollNum> {
 
             hideLoaderDialog(context);
           },
-
         ),
       ),
     );

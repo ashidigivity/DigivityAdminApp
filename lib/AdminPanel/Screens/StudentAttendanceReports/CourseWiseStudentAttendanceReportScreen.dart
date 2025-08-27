@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:digivity_admin_app/AuthenticationUi/Loader.dart';
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/SimpleAppBar.dart';
 import 'package:digivity_admin_app/helpers/CommonFunctions.dart';
 
@@ -32,25 +34,33 @@ class _CourseWiseStudentAttendanceReportScreen extends State<CourseWiseStudentAt
   }
 
   void _fetchStudentAttendance() async {
-    final response = await CustomFunctions().fetchCourseAttendanceHtml(
-      widget.reportdate!,
-    );
+    try {
+      final response = await CustomFunctions().fetchCourseAttendanceHtml(
+        widget.reportdate!,
+      );
 
-    final controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted);
+      final controller = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted);
 
-    final uri = Uri.dataFromString(
-      response ?? "<h3>No data available</h3>",
-      mimeType: 'text/html',
-      encoding: Encoding.getByName('utf-8'),
-    );
-
-    await controller.loadRequest(uri);
-
-    setState(() {
-      _webViewController = controller;
-      isLoading = false;
-    });
+      final uri = Uri.dataFromString(
+        response ?? "<h3>No data available</h3>",
+        mimeType: 'text/html',
+        encoding: Encoding.getByName('utf-8'),
+      );
+      await controller.loadRequest(uri);
+      setState(() {
+        _webViewController = controller;
+        isLoading = false;
+      });
+    }catch(e){
+      print("${e}");
+      showBottomMessage(context, "${e}", true);
+    }
+    finally{
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:digivity_admin_app/AdminPanel/Components/PopupNetworkImage.dart';
 import 'package:digivity_admin_app/Authentication/SharedPrefHelper.dart';
 import 'package:flutter/material.dart';
 
@@ -29,12 +30,8 @@ class _UserProfileImageState extends State<UserProfileImage> {
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: widget.radius,
-      backgroundImage: (imageUrl != null && imageUrl!.isNotEmpty)
-          ? NetworkImage(imageUrl!)
-          : const AssetImage('assets/images/logos/default_profile.png') as ImageProvider,
-      backgroundColor: Colors.white,
-    );
+    return PopupNetworkImage(
+        radius: 30,
+        imageUrl: (imageUrl != null && imageUrl!.isNotEmpty) ? imageUrl! : 'assets/images/logos/default_profile.png');
   }
 }

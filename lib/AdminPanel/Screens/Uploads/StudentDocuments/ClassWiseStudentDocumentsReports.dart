@@ -18,16 +18,14 @@ class _ClassWiseStudentDocumentsReportsState
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async{
-      showLoaderDialog(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       await loadClassWiseDocData();
-      hideLoaderDialog(context);
     });
   }
 
   Future<void> loadClassWiseDocData() async {
+    showLoaderDialog(context);
     try {
-
       final data = await Studentdocumentsuploadhelpers()
           .getClassWiseUplodedDocumentsDetails();
       if (data != null) {
@@ -37,19 +35,25 @@ class _ClassWiseStudentDocumentsReportsState
       }
     } catch (e) {
       print("Error: $e");
-      setState(() {
-
-      });
+      setState(() {});
+    } finally {
+      hideLoaderDialog(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:PreferredSize(preferredSize: Size.fromHeight(kToolbarHeight), child: SimpleAppBar(titleText: 'Classwise Student Document Report', routeName: 'back')),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SimpleAppBar(
+          titleText: 'Classwise Student Document Report',
+          routeName: 'back',
+        ),
+      ),
       backgroundColor: Colors.grey[100],
       body: BackgroundWrapper(
-        child:ListView.separated(
+        child: ListView.separated(
           padding: EdgeInsets.all(6),
           itemCount: classList.length,
           separatorBuilder: (_, __) => SizedBox(height: 10),
@@ -98,8 +102,7 @@ class _ClassWiseStudentDocumentsReportsState
                           children: [
                             Text(
                               "Doc. Upload (${data.totalUploadedDoument})",
-                              style: TextStyle(
-                                  color: Colors.teal, fontSize: 9),
+                              style: TextStyle(color: Colors.teal, fontSize: 9),
                             ),
                             Container(
                               height: 10,
@@ -111,8 +114,7 @@ class _ClassWiseStudentDocumentsReportsState
                             ),
                             Text(
                               "Doc. Not Upload (${data.totalStudentDocNotUploaded})",
-                              style: TextStyle(
-                                  color: Colors.red, fontSize: 9),
+                              style: TextStyle(color: Colors.red, fontSize: 9),
                             ),
                             Container(
                               height: 10,
@@ -125,7 +127,9 @@ class _ClassWiseStudentDocumentsReportsState
                             Text(
                               "Std Total Doc. (${data.totalDoument})",
                               style: TextStyle(
-                                  color: Colors.grey[600], fontSize: 9),
+                                color: Colors.grey[600],
+                                fontSize: 9,
+                              ),
                             ),
                           ],
                         ),
@@ -146,7 +150,7 @@ class _ClassWiseStudentDocumentsReportsState
                         fontSize: 10,
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             );
