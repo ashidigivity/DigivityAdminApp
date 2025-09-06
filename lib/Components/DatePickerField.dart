@@ -8,12 +8,8 @@ class DatePickerField extends StatefulWidget {
   final String? label;
   final FormFieldValidator<String>? validator;
 
-  const DatePickerField({
-    Key? key,
-    this.controller,
-    this.label,
-    this.validator,
-  }) : super(key: key);
+  const DatePickerField({Key? key, this.controller, this.label, this.validator})
+    : super(key: key);
 
   @override
   _DatePickerFieldState createState() => _DatePickerFieldState();
@@ -21,8 +17,6 @@ class DatePickerField extends StatefulWidget {
 
 class _DatePickerFieldState extends State<DatePickerField> {
   late TextEditingController _localController;
-
-
 
   @override
   void initState() {
@@ -43,8 +37,8 @@ class _DatePickerFieldState extends State<DatePickerField> {
 
     if (pickedDate != null) {
       _localController.text = DateFormat('dd-MM-yyyy').format(pickedDate);
-      setState(() {});
     }
+    setState(() {});
   }
 
   @override
@@ -58,9 +52,7 @@ class _DatePickerFieldState extends State<DatePickerField> {
       decoration: InputDecoration(
         floatingLabelBehavior: FloatingLabelBehavior.always,
         labelText: widget.label, // 👈 Shows label inside border
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(
             color: uiTheme.inputBorderColor ?? Colors.blue, // dynamic color

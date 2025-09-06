@@ -47,8 +47,9 @@ class _StudentHeightWeightEntry extends State<StudentHeightWeightEntry> {
       "course_section_id": widget.courseId,
       "exam_term_id": widget.examTermId,
     };
-    final response = await StudentExamOtherEntryHelper()
-        .getStudentHeightWeight(bodydata);
+    final response = await StudentExamOtherEntryHelper().getStudentHeightWeight(
+      bodydata,
+    );
     if (response != null) {
       setState(() {
         studentList = response;
@@ -96,11 +97,17 @@ class _StudentHeightWeightEntry extends State<StudentHeightWeightEntry> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildInfoRow("Class/Course", widget.course ?? ''),
+                        child: _buildInfoRow(
+                          "Class/Course",
+                          widget.course ?? '',
+                        ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: _buildInfoRow("Exam Term", widget.examTerm ?? ''),
+                        child: _buildInfoRow(
+                          "Exam Term",
+                          widget.examTerm ?? '',
+                        ),
                       ),
                     ],
                   ),
@@ -114,22 +121,29 @@ class _StudentHeightWeightEntry extends State<StudentHeightWeightEntry> {
               child: studentList.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                itemCount: studentList.length,
-                itemBuilder: (context, index) {
-                  final student = studentList[index];
-                  final studentHeight = studentHeightController[student.studentId.toString()]!;
-                  final studentWeight = studentWeightController[student.studentId.toString()]!;
-                  return StudentHeightWeightCard(
-                    admissionNo: student.admissionNo ?? '',
-                    studentName: student.studentName,
-                    fatherName: student.fatherName,
-                    profileImg: student.profileImg ?? '',
-                    studentHeightController: studentHeight,
-                    studentWeightController: studentWeight,
-                  );
-                },
-              ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      itemCount: studentList.length,
+                      itemBuilder: (context, index) {
+                        final student = studentList[index];
+                        final studentHeight =
+                            studentHeightController[student.studentId
+                                .toString()]!;
+                        final studentWeight =
+                            studentWeightController[student.studentId
+                                .toString()]!;
+                        return StudentHeightWeightCard(
+                          admissionNo: student.admissionNo ?? '',
+                          studentName: student.studentName,
+                          fatherName: student.fatherName,
+                          profileImg: student.profileImg ?? '',
+                          studentHeightController: studentHeight,
+                          studentWeightController: studentWeight,
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -137,50 +151,55 @@ class _StudentHeightWeightEntry extends State<StudentHeightWeightEntry> {
       bottomNavigationBar: Padding(
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
         child: CustomBlueButton(
-            text: 'Save Marks',
-            icon: Icons.save,
-            onPressed: () async{
-              showLoaderDialog(context);
-              final List<Map<String, dynamic>> updatedatalist = [];
+          text: 'Save Marks',
+          icon: Icons.save,
+          onPressed: () async {
+            showLoaderDialog(context);
+            final List<Map<String, dynamic>> updatedatalist = [];
 
-              for (var student in studentList) {
-                final studentId = student.studentId.toString();
-                final studentHeight = studentHeightController[student.studentId.toString()]!;
-                final studentWeight = studentWeightController[student.studentId.toString()]!;
-                final userId = (await SharedPrefHelper.getPreferenceValue('user_id'))?.toString() ?? "";
+            for (var student in studentList) {
+              final studentId = student.studentId.toString();
+              final studentHeight =
+                  studentHeightController[student.studentId.toString()]!;
+              final studentWeight =
+                  studentWeightController[student.studentId.toString()]!;
+              final userId =
+                  (await SharedPrefHelper.getPreferenceValue(
+                    'user_id',
+                  ))?.toString() ??
+                  "";
 
-                updatedatalist.add({
-                  "user_id":userId,
-                  "student_id": studentId,
-                  "height": studentHeight.text.isEmpty ? null : studentHeight.text,
-                  "weight": studentWeight.text.isEmpty ? null : studentWeight.text,
-                });
-              }
-
-              final Map<String, dynamic> bodydata = {
-                'course_section_id': widget.courseId,
-                'exam_term_id': widget.examTermId,
-                'updatedatalist': updatedatalist,
-              };
-              final response =await StudentExamOtherEntryHelper().storeStudentHeightWeight(bodydata!);
-              if(response['result']==1){
-                getStudentList();
-                showBottomMessage(context, response['message'], false);
-              }
-              else{
-                showBottomMessage(context, response['message'], true);
-              }
-              hideLoaderDialog(context);
-
-
-
+              updatedatalist.add({
+                "user_id": userId,
+                "student_id": studentId,
+                "height": studentHeight.text.isEmpty
+                    ? null
+                    : studentHeight.text,
+                "weight": studentWeight.text.isEmpty
+                    ? null
+                    : studentWeight.text,
+              });
             }
 
+            final Map<String, dynamic> bodydata = {
+              'course_section_id': widget.courseId,
+              'exam_term_id': widget.examTermId,
+              'updatedatalist': updatedatalist,
+            };
+            final response = await StudentExamOtherEntryHelper()
+                .storeStudentHeightWeight(bodydata);
+            if (response['result'] == 1) {
+              getStudentList();
+              showBottomMessage(context, response['message'], false);
+            } else {
+              showBottomMessage(context, response['message'], true);
+            }
+            hideLoaderDialog(context);
+          },
         ),
       ),
     );
   }
-
 }
 
 Widget _buildInfoRow(String title, String value) {

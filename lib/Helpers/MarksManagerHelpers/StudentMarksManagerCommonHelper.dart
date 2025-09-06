@@ -106,7 +106,7 @@ class StudentMarksManagerCommonHelper {
           }
         }
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       print("Error parsing exam type list: $e");
     }
 

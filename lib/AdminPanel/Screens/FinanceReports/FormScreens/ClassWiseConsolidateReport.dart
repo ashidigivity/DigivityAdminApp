@@ -48,12 +48,10 @@ class _ClassWiseConsolidateReport extends State<ClassWiseConsolidateReport> {
           ),
         );
       } else {
-
         hideLoaderDialog(context);
         showBottomMessage(context, "No report data found", true);
       }
     } catch (e) {
-
       hideLoaderDialog(context);
       showBottomMessage(context, "${e}", true);
     }

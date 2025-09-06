@@ -88,8 +88,6 @@ class _StudentListFormMarksEntry extends State<StudentListFormMarksEntry> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,7 +179,8 @@ class _StudentListFormMarksEntry extends State<StudentListFormMarksEntry> {
                       itemCount: studentList.length,
                       itemBuilder: (context, index) {
                         final student = studentList[index];
-                        final marksController = marksControllers[student.studentId.toString()]!;
+                        final marksController =
+                            marksControllers[student.studentId.toString()]!;
                         return StudentMarksCard(
                           admissionNo: student.admissionNo.toString(),
                           studentName: student.studentName,
@@ -209,42 +208,41 @@ class _StudentListFormMarksEntry extends State<StudentListFormMarksEntry> {
         child: CustomBlueButton(
           text: 'Save Marks',
           icon: Icons.save,
-            onPressed: () async{
+          onPressed: () async {
             // showLoaderDialog(context);
-              final List<Map<String, dynamic>> updatedatalist = [];
+            final List<Map<String, dynamic>> updatedatalist = [];
 
-              for (var student in studentList) {
-                final studentId = student.studentId.toString();
-                final marks = marksControllers[student.studentId.toString()]!;
-                final markingType = student.markingType.toString();
-                final attendance = student.attendStatus;
-                updatedatalist.add({
-                  "student_id": studentId,
-                  "marks": marks.text.isEmpty ? null : marks.text,
-                  "marking_type": markingType,
-                  "attendance_status": attendance,
-                });
-              }
-
-              final Map<String, dynamic> bodydata = {
-                'course_section_id': widget.courseId,       // example: '1@1'
-                'exam_term_id': widget.examtermId,
-                'exam_type_id': widget.examtypeId,
-                'exam_assessment_id': widget.assessmentId,
-                'subject_id': widget.SubjectId,
-                'updatedatalist': updatedatalist,
-              };
-              final response =await StudentMarksManagerCommonHelper().storeStudentMarks(bodydata!);
-              hideLoaderDialog(context);
-              if(response['result']==1){
-                getStudentList();
-                showBottomMessage(context, response['message'], false);
-              }else{
-                showBottomMessage(context, response['message'], true);
-              }
-
+            for (var student in studentList) {
+              final studentId = student.studentId.toString();
+              final marks = marksControllers[student.studentId.toString()]!;
+              final markingType = student.markingType.toString();
+              final attendance = student.attendStatus;
+              updatedatalist.add({
+                "student_id": studentId,
+                "marks": marks.text.isEmpty ? null : marks.text,
+                "marking_type": markingType,
+                "attendance_status": attendance,
+              });
             }
 
+            final Map<String, dynamic> bodydata = {
+              'course_section_id': widget.courseId, // example: '1@1'
+              'exam_term_id': widget.examtermId,
+              'exam_type_id': widget.examtypeId,
+              'exam_assessment_id': widget.assessmentId,
+              'subject_id': widget.SubjectId,
+              'updatedatalist': updatedatalist,
+            };
+            final response = await StudentMarksManagerCommonHelper()
+                .storeStudentMarks(bodydata);
+            hideLoaderDialog(context);
+            if (response['result'] == 1) {
+              getStudentList();
+              showBottomMessage(context, response['message'], false);
+            } else {
+              showBottomMessage(context, response['message'], true);
+            }
+          },
         ),
       ),
     );

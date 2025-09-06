@@ -1,4 +1,3 @@
-
 import 'package:digivity_admin_app/AdminPanel/Models/MarksManagerModel/ExamRemarkListModel.dart';
 import 'package:digivity_admin_app/AdminPanel/Models/MarksManagerModel/StudentRemarkEntry.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/ExamMarksManager/ExamRemarkEntry/StudentRemakEntryCard.dart';
@@ -37,7 +36,7 @@ class _Studentremarkentry extends State<Studentremarkentry> {
   Map<String, TextEditingController> remarksControllers = {};
   Map<String, TextEditingController> remarksidControllers = {};
   List<StudentRemarkEntry> studentList = [];
-  List<ExamRemarkList> remarkList=[];
+  List<ExamRemarkList> remarkList = [];
   late final TextEditingController commonRemarkController;
 
   @override
@@ -46,18 +45,16 @@ class _Studentremarkentry extends State<Studentremarkentry> {
 
     commonRemarkController = TextEditingController();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async{
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         await getStudentList();
         if (widget.remarkEntryMode == 'dropdown') {
           await getExamRemarkList();
         }
-      }
-      catch(e){
+      } catch (e) {
         print("${e}");
         showBottomMessage(context, "${e}", true);
-      }
-      finally{
+      } finally {
         hideLoaderDialog(context);
       }
 
@@ -70,14 +67,14 @@ class _Studentremarkentry extends State<Studentremarkentry> {
     });
   }
 
-
   Future<void> getStudentList() async {
     final bodydata = {
       "course_section_id": widget.courseId,
       "exam_term_id": widget.examtermId,
-      "exam_type_id":widget.remarkEntryMode
+      "exam_type_id": widget.remarkEntryMode,
     };
-    final response = await StudentMarksManagerCommonHelper().apistudentlistremarksentry(bodydata);
+    final response = await StudentMarksManagerCommonHelper()
+        .apistudentlistremarksentry(bodydata);
     if (response != null) {
       setState(() {
         studentList = response;
@@ -102,6 +99,7 @@ class _Studentremarkentry extends State<Studentremarkentry> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -154,9 +152,7 @@ class _Studentremarkentry extends State<Studentremarkentry> {
               ),
             ),
 
-            Divider(
-
-            ),
+            Divider(),
             Container(
               margin: const EdgeInsets.all(10),
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -174,88 +170,110 @@ class _Studentremarkentry extends State<Studentremarkentry> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                 widget.remarkEntryMode =='typing' ?
-                     CustomTextField(label: 'Remark', hintText: 'Enter Common Remark', controller: commonRemarkController)
-                     :Column(
-                   children: [
-                     InkWell(
-                         onTap: () async{
-                           showLoaderDialog(context);
-                           await getExamRemarkList();
-                           hideLoaderDialog(context);
-                         },
-                       child:  Row(
-                         mainAxisAlignment: MainAxisAlignment.end,
-                         children: [
-                           Icon(Icons.refresh, color: Colors.blue, size: 18),
-                           SizedBox(width: 4),
+                  widget.remarkEntryMode == 'typing'
+                      ? CustomTextField(
+                          label: 'Remark',
+                          hintText: 'Enter Common Remark',
+                          controller: commonRemarkController,
+                        )
+                      : Column(
+                          children: [
+                            InkWell(
+                              onTap: () async {
+                                showLoaderDialog(context);
+                                await getExamRemarkList();
+                                hideLoaderDialog(context);
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Icon(
+                                    Icons.refresh,
+                                    color: Colors.blue,
+                                    size: 18,
+                                  ),
+                                  SizedBox(width: 4),
 
-                           Text("Refresh",
-                               style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold)),
+                                  Text(
+                                    "Refresh",
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Divider(),
+                            CustomDropdown(
+                              items: remarkList.map((e) {
+                                return {
+                                  'id': e.Id.toString(),
+                                  'value': e.examremark,
+                                };
+                              }).toList(),
+                              displayKey: 'value',
+                              valueKey: 'id',
+                              onChanged: (value) async {
+                                showLoaderDialog(context); // Show loader
 
-                         ],
-                       ),
-                     ),
-                     Divider(),
-                     CustomDropdown(items:
-                     remarkList.map((e){
-                       return {
-                         'id':e.Id.toString(),
-                         'value':e.examremark
-                       };
-                     }).toList(), displayKey: 'value', valueKey: 'id', onChanged: (value) async {
-                       showLoaderDialog(context); // Show loader
+                                // Update all remark ID controllers
+                                for (var controller
+                                    in remarksidControllers.values) {
+                                  controller.text = value;
+                                }
 
-                       // Update all remark ID controllers
-                       for (var controller in remarksidControllers.values) {
-                         controller.text = value;
-                       }
+                                // Give the UI a moment to update (awaiting next frame)
+                                await Future.delayed(
+                                  Duration(milliseconds: 100),
+                                );
 
-                       // Give the UI a moment to update (awaiting next frame)
-                       await Future.delayed(Duration(milliseconds: 100));
+                                // Call setState if needed to rebuild the UI
+                                if (mounted) setState(() {});
 
-                       // Call setState if needed to rebuild the UI
-                       if (mounted) setState(() {});
-
-                       hideLoaderDialog(context); // Now hide the loader
-                     },
-                         hint: 'Select a Option')
-                   ],
-                 )
+                                hideLoaderDialog(
+                                  context,
+                                ); // Now hide the loader
+                              },
+                              hint: 'Select a Option',
+                            ),
+                          ],
+                        ),
                 ],
               ),
             ),
             Divider(),
-
 
             /// Student List
             Expanded(
               child: studentList.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
-                itemCount: studentList.length,
-                itemBuilder: (context, index) {
-                  final student = studentList[index];
-                  final key = student.studentId.toString();
-                  final remarksController = remarksControllers[student.studentId.toString()]!;
-                  final remarksidController = remarksidControllers[student.studentId.toString()]!;
-                  return StudentRemakEntryCard(
-                    admissionNo: student.admissionNo.toString(),
-                    studentName: student.studentName,
-                    fatherName: student.fatherName,
-                    profileImg: student.profileImg,
-                    remarksController: remarksController,
-                    remarksidController:remarksidController,
-                    remarkEntryMode: student.remarkEntryMode,
-                    entrymode :widget.remarkEntryMode,
-                    remarkList:remarkList!,
-                  );
-                },
-              ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      itemCount: studentList.length,
+                      itemBuilder: (context, index) {
+                        final student = studentList[index];
+                        final key = student.studentId.toString();
+                        final remarksController =
+                            remarksControllers[student.studentId.toString()]!;
+                        final remarksidController =
+                            remarksidControllers[student.studentId.toString()]!;
+                        return StudentRemakEntryCard(
+                          admissionNo: student.admissionNo.toString(),
+                          studentName: student.studentName,
+                          fatherName: student.fatherName,
+                          profileImg: student.profileImg,
+                          remarksController: remarksController,
+                          remarksidController: remarksidController,
+                          remarkEntryMode: student.remarkEntryMode,
+                          entrymode: widget.remarkEntryMode,
+                          remarkList: remarkList,
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -263,41 +281,44 @@ class _Studentremarkentry extends State<Studentremarkentry> {
       bottomNavigationBar: Padding(
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
         child: CustomBlueButton(
-            text: 'Save Remarks',
-            icon: Icons.save,
-            onPressed: () async{
-              showLoaderDialog(context);
-              final List<Map<String, dynamic>> updatedatalist = [];
-              for (var student in studentList) {
-                final studentId = student.studentId.toString();
-                final remarks = remarksControllers[student.studentId.toString()]!;
-                final remarksid = remarksidControllers[student.studentId.toString()]!;
-                final remarkEntryMode = student.remarkEntryMode.toString();
-                updatedatalist.add({
-                  "student_id": studentId,
-                  "remarks": remarks.text.isEmpty ? null : remarks.text,
-                  "remark_id":remarksid.text.isEmpty ? null : remarksid.text,
-                  "remark_entry_mode": remarkEntryMode.isNotEmpty ? remarkEntryMode : widget.remarkEntryMode,
-                });
-              }
-              final Map<String, dynamic> bodydata = {
-                'course_section_id': widget.courseId,       // example: '1@1'
-                'exam_term_id': widget.examtermId,
-                'updatedatalist': updatedatalist,
-              };
-
-              print(bodydata);
-              final response =await StudentMarksManagerCommonHelper().storeStudentRemarks(bodydata);
-
-              hideLoaderDialog(context);
-              if(response['result']==1){
-                getStudentList();
-                showBottomMessage(context, response['message'], false);
-              }else{
-                showBottomMessage(context, response['message'], true);
-              }
+          text: 'Save Remarks',
+          icon: Icons.save,
+          onPressed: () async {
+            showLoaderDialog(context);
+            final List<Map<String, dynamic>> updatedatalist = [];
+            for (var student in studentList) {
+              final studentId = student.studentId.toString();
+              final remarks = remarksControllers[student.studentId.toString()]!;
+              final remarksid =
+                  remarksidControllers[student.studentId.toString()]!;
+              final remarkEntryMode = student.remarkEntryMode.toString();
+              updatedatalist.add({
+                "student_id": studentId,
+                "remarks": remarks.text.isEmpty ? null : remarks.text,
+                "remark_id": remarksid.text.isEmpty ? null : remarksid.text,
+                "remark_entry_mode": remarkEntryMode.isNotEmpty
+                    ? remarkEntryMode
+                    : widget.remarkEntryMode,
+              });
             }
+            final Map<String, dynamic> bodydata = {
+              'course_section_id': widget.courseId, // example: '1@1'
+              'exam_term_id': widget.examtermId,
+              'updatedatalist': updatedatalist,
+            };
 
+            print(bodydata);
+            final response = await StudentMarksManagerCommonHelper()
+                .storeStudentRemarks(bodydata);
+
+            hideLoaderDialog(context);
+            if (response['result'] == 1) {
+              getStudentList();
+              showBottomMessage(context, response['message'], false);
+            } else {
+              showBottomMessage(context, response['message'], true);
+            }
+          },
         ),
       ),
     );

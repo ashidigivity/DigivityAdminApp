@@ -16,19 +16,16 @@ class StaffAttendanceReportForm extends StatefulWidget {
   }
 }
 
-
-
 class _StaffAttendanceReportForm extends State<StaffAttendanceReportForm> {
   TextEditingController _reportdate = TextEditingController();
 
   void submitForm() async {
     showLoaderDialog(context);
-    final formdata = {
-      'date': _reportdate.text.trim(),
-    };
+    final formdata = {'date': _reportdate.text.trim()};
 
     try {
-      String? htmlData = await AttendanceReportsHelperFunctions().apiAttendanceReport('staff-attendance-report',formdata);
+      String? htmlData = await AttendanceReportsHelperFunctions()
+          .apiAttendanceReport('staff-attendance-report', formdata);
       if (htmlData != null && htmlData.isNotEmpty) {
         hideLoaderDialog(context);
         Navigator.push(
@@ -42,17 +39,13 @@ class _StaffAttendanceReportForm extends State<StaffAttendanceReportForm> {
         );
       } else {
         hideLoaderDialog(context);
-       showBottomMessage(context, "Report Not Found", true);
+        showBottomMessage(context, "Report Not Found", true);
       }
     } catch (e) {
       hideLoaderDialog(context);
       showBottomMessage(context, "${e}", true);
     }
-
-
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +80,6 @@ class _StaffAttendanceReportForm extends State<StaffAttendanceReportForm> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     DatePickerField(
                       controller: _reportdate,
                       label: 'Attendance Date',
@@ -100,14 +92,16 @@ class _StaffAttendanceReportForm extends State<StaffAttendanceReportForm> {
                       icon: Icons.arrow_forward,
                       onPressed: () {
                         if (_reportdate != null) {
-                        submitForm();
+                          submitForm();
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Please select course and date")),
+                            SnackBar(
+                              content: Text("Please select course and date"),
+                            ),
                           );
                         }
                       },
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -118,5 +112,3 @@ class _StaffAttendanceReportForm extends State<StaffAttendanceReportForm> {
     );
   }
 }
-
-

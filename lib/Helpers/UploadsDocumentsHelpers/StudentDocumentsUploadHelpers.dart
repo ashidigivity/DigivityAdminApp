@@ -4,7 +4,7 @@ import 'package:digivity_admin_app/AdminPanel/Models/StudentDocUploadsModels/Stu
 import 'package:digivity_admin_app/Authentication/SharedPrefHelper.dart';
 import 'package:digivity_admin_app/Helpers/getApiService.dart';
 
-class Studentdocumentsuploadhelpers{
+class Studentdocumentsuploadhelpers {
   int? userId;
   String? token;
 
@@ -18,7 +18,8 @@ class Studentdocumentsuploadhelpers{
       if (userId == null || token == null) {
         await init();
       }
-      final url = 'api/MobileApp/master-admin/$userId/CourseWiseUploadedDocuments';
+      final url =
+          'api/MobileApp/master-admin/$userId/CourseWiseUploadedDocuments';
 
       final response = await getApiService.getRequestData(url, token!);
 
@@ -34,16 +35,23 @@ class Studentdocumentsuploadhelpers{
     }
   }
 
-  Future<List<StudentDocumentUplodedModel>?> getClasswiseStudentUplodedDocuments(Map<String,dynamic> bodydata) async {
+  Future<List<StudentDocumentUplodedModel>?>
+  getClasswiseStudentUplodedDocuments(Map<String, dynamic> bodydata) async {
     try {
       if (userId == null || token == null) {
         await init();
       }
       final url = 'api/MobileApp/$userId/StudentWiseDocUploadedReport';
-      final response = await getApiService.postRequestData(url, token!,bodydata!);
+      final response = await getApiService.postRequestData(
+        url,
+        token!,
+        bodydata,
+      );
       if (response['result'] == 1) {
         final List<dynamic> data = response['success'];
-        return data.map((e) => StudentDocumentUplodedModel.fromJson(e)).toList();
+        return data
+            .map((e) => StudentDocumentUplodedModel.fromJson(e))
+            .toList();
       } else {
         throw Exception('Fetch failed: ${response['message']}');
       }
@@ -53,8 +61,9 @@ class Studentdocumentsuploadhelpers{
     }
   }
 
-
-  Future<List<StudentDocumentUpload>?> getStudentUploadDocuments(int StudentId) async {
+  Future<List<StudentDocumentUpload>?> getStudentUploadDocuments(
+    int StudentId,
+  ) async {
     try {
       if (userId == null || token == null) {
         await init();
@@ -74,14 +83,19 @@ class Studentdocumentsuploadhelpers{
     }
   }
 
-
-  Future<Map<String,dynamic>> uploadStudentDocuemnt(Map<String,dynamic> bodydata) async {
+  Future<Map<String, dynamic>> uploadStudentDocuemnt(
+    Map<String, dynamic> bodydata,
+  ) async {
     try {
       if (userId == null || token == null) {
         await init();
       }
       final url = 'api/MobileApp/$userId/uploadStudentDocument';
-      final response = await getApiService.postRequestData(url, token!,bodydata!);
+      final response = await getApiService.postRequestData(
+        url,
+        token!,
+        bodydata,
+      );
       if (response['result'] == 1) {
         print(response);
         return response;
@@ -93,5 +107,4 @@ class Studentdocumentsuploadhelpers{
       rethrow;
     }
   }
-
 }
