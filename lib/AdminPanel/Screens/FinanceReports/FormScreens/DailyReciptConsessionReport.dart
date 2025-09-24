@@ -50,12 +50,10 @@ class _DailyReciptConsessionReport extends State<DailyReciptConsessionReport> {
           ),
         );
       } else {
-
         hideLoaderDialog(context);
         showBottomMessage(context, "No report data found", true);
       }
     } catch (e) {
-
       hideLoaderDialog(context);
       showBottomMessage(context, "${e}", true);
     }

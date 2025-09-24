@@ -53,19 +53,15 @@ class StudentExamOtherEntryHelper {
 
   // Api For Student Total Attendance List
   Future<List<StudentTotalAttendanceModel>> getStudentTotalAttendance(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null && token == null) {
       await init();
     }
 
     final url = "api/MobileApp/teacher/$userId/StudentListExamAttendanceEntry";
 
-    final response = await getApiService.postRequestData(
-      url,
-      token!,
-      bodydata!,
-    );
+    final response = await getApiService.postRequestData(url, token!, bodydata);
 
     if (response['result'] == 1 &&
         response['success'] != null &&
@@ -78,7 +74,7 @@ class StudentExamOtherEntryHelper {
         return studenttotalatt
             .map<StudentTotalAttendanceModel>(
               (e) => StudentTotalAttendanceModel.fromJson(e),
-        )
+            )
             .toList();
       }
     }
@@ -88,8 +84,8 @@ class StudentExamOtherEntryHelper {
 
   // Api For Student Total Attendance List
   Future<Map<String, dynamic>> storeStudentTotalAttendance(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null && token == null) {
       await init();
     }
@@ -102,7 +98,7 @@ class StudentExamOtherEntryHelper {
       final response = await getApiService.postRequestData(
         url,
         token!,
-        bodydata!,
+        bodydata,
       );
 
       if (response['result'] == 1) {
@@ -118,8 +114,8 @@ class StudentExamOtherEntryHelper {
 
   //   Get Data for The Class total attendance
   Future<List<ClassTotalAttendanceModel>> apiclasswisetotalattendance(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null && token == null && role == null) {
       await init();
     }
@@ -146,7 +142,7 @@ class StudentExamOtherEntryHelper {
           return classtotalattendance
               .map<ClassTotalAttendanceModel>(
                 (e) => ClassTotalAttendanceModel.fromJson(e),
-          )
+              )
               .toList();
         }
       }
@@ -158,8 +154,8 @@ class StudentExamOtherEntryHelper {
   }
 
   Future<Map<String, dynamic>> storeClassWiseAttendance(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null && token == null) {
       await init();
     }
@@ -169,7 +165,7 @@ class StudentExamOtherEntryHelper {
       final response = await getApiService.postRequestData(
         url,
         token!,
-        bodydata!,
+        bodydata,
       );
       if (response['result'] == 1) {
         return response;
@@ -184,19 +180,15 @@ class StudentExamOtherEntryHelper {
 
   //   Student Height Weight List
   Future<List<StudentHeightWeightModel>> getStudentHeightWeight(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null && token == null) {
       await init();
     }
 
     final url = "api/MobileApp/teacher/$userId/StudentListForHeightWeight";
 
-    final response = await getApiService.postRequestData(
-      url,
-      token!,
-      bodydata!,
-    );
+    final response = await getApiService.postRequestData(url, token!, bodydata);
 
     if (response['result'] == 1 &&
         response['success'] != null &&
@@ -209,7 +201,7 @@ class StudentExamOtherEntryHelper {
         return students
             .map<StudentHeightWeightModel>(
               (e) => StudentHeightWeightModel.fromJson(e),
-        )
+            )
             .toList();
       }
     }
@@ -219,8 +211,8 @@ class StudentExamOtherEntryHelper {
 
   // Api For Student Height Weight Store
   Future<Map<String, dynamic>> storeStudentHeightWeight(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null && token == null) {
       await init();
     }
@@ -230,7 +222,7 @@ class StudentExamOtherEntryHelper {
       final response = await getApiService.postRequestData(
         url,
         token!,
-        bodydata!,
+        bodydata,
       );
 
       if (response['result'] == 1) {
@@ -250,17 +242,13 @@ class StudentExamOtherEntryHelper {
   // Api For the Student Total Attend PTM List
 
   Future<List<StudentPtmListModel>> getStudentTotalAttendPtm(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null && token == null) {
       await init();
     }
     final url = "api/MobileApp/teacher/$userId/StudentListPTMEntry";
-    final response = await getApiService.postRequestData(
-      url,
-      token!,
-      bodydata!,
-    );
+    final response = await getApiService.postRequestData(url, token!, bodydata);
     if (response['result'] == 1 &&
         response['success'] != null &&
         response['success'] is List &&
@@ -278,8 +266,8 @@ class StudentExamOtherEntryHelper {
   }
 
   Future<Map<String, dynamic>> storeStudentTotalAttendptm(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null && token == null) {
       await init();
     }
@@ -288,7 +276,7 @@ class StudentExamOtherEntryHelper {
       final response = await getApiService.postRequestData(
         url,
         token!,
-        bodydata!,
+        bodydata,
       );
 
       if (response['result'] == 1) {
@@ -302,11 +290,10 @@ class StudentExamOtherEntryHelper {
     }
   }
 
-
-//   Class wise total Conducted PTM
+  //   Class wise total Conducted PTM
   Future<List<ClasswiseTotalConductedPtmModel>> apiclasswisetotalconductedptm(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null && token == null && role == null) {
       await init();
     }
@@ -333,7 +320,7 @@ class StudentExamOtherEntryHelper {
           return classtotalattendance
               .map<ClasswiseTotalConductedPtmModel>(
                 (e) => ClasswiseTotalConductedPtmModel.fromJson(e),
-          )
+              )
               .toList();
         }
       }
@@ -344,19 +331,20 @@ class StudentExamOtherEntryHelper {
     }
   }
 
-// Api submit total class wise conducted ptm
+  // Api submit total class wise conducted ptm
   Future<Map<String, dynamic>> storeStudentClasswiseCondcutedPTM(
-      Map<String, dynamic> bodydata,
-      ) async {
+    Map<String, dynamic> bodydata,
+  ) async {
     if (userId == null && token == null) {
       await init();
     }
     try {
-      final url = "api/MobileApp/teacher/$userId/ApiStoreClassTotalConductedPTM";
+      final url =
+          "api/MobileApp/teacher/$userId/ApiStoreClassTotalConductedPTM";
       final response = await getApiService.postRequestData(
         url,
         token!,
-        bodydata!,
+        bodydata,
       );
 
       if (response['result'] == 1) {
@@ -369,5 +357,4 @@ class StudentExamOtherEntryHelper {
       print("Data Saved Error $e");
     }
   }
-
 }

@@ -55,8 +55,9 @@ class _StudentPtmEntryList extends State<StudentPtmEntryList> {
         studentList = response;
         // Initialize controllers
         for (var student in studentList) {
-          ptmControllers[student.studentId.toString()] =
-              TextEditingController(text: student.totalAttPtm?.toString() ?? '');
+          ptmControllers[student.studentId.toString()] = TextEditingController(
+            text: student.totalAttPtm?.toString() ?? '',
+          );
         }
       });
     }
@@ -95,11 +96,17 @@ class _StudentPtmEntryList extends State<StudentPtmEntryList> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildInfoRow("Class/Course", widget.course ?? ''),
+                        child: _buildInfoRow(
+                          "Class/Course",
+                          widget.course ?? '',
+                        ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: _buildInfoRow("Exam Term", widget.examTerm ?? ''),
+                        child: _buildInfoRow(
+                          "Exam Term",
+                          widget.examTerm ?? '',
+                        ),
                       ),
                     ],
                   ),
@@ -113,20 +120,24 @@ class _StudentPtmEntryList extends State<StudentPtmEntryList> {
               child: studentList.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                itemCount: studentList.length,
-                itemBuilder: (context, index) {
-                  final student = studentList[index];
-                  final PTMControllers = ptmControllers[student.studentId.toString()]!;
-                  return StudentPtmEntryCard(
-                    admissionNo: student.admissionNo ?? '',
-                    studentName: student.studentName,
-                    fatherName: student.fatherName,
-                    profileImg: student.profileImg ?? '',
-                    ptmControllers: PTMControllers,
-                  );
-                },
-              ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      itemCount: studentList.length,
+                      itemBuilder: (context, index) {
+                        final student = studentList[index];
+                        final PTMControllers =
+                            ptmControllers[student.studentId.toString()]!;
+                        return StudentPtmEntryCard(
+                          admissionNo: student.admissionNo ?? '',
+                          studentName: student.studentName,
+                          fatherName: student.fatherName,
+                          profileImg: student.profileImg ?? '',
+                          ptmControllers: PTMControllers,
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -134,46 +145,50 @@ class _StudentPtmEntryList extends State<StudentPtmEntryList> {
       bottomNavigationBar: Padding(
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
         child: CustomBlueButton(
-            text: 'Save Attend PTM',
-            icon: Icons.save,
-            onPressed: () async{
-              showLoaderDialog(context);
-              final List<Map<String, dynamic>> updatedatalist = [];
+          text: 'Save Attend PTM',
+          icon: Icons.save,
+          onPressed: () async {
+            showLoaderDialog(context);
+            final List<Map<String, dynamic>> updatedatalist = [];
 
-              for (var student in studentList) {
-                final studentId = student.studentId.toString();
-                final totalattendptm = ptmControllers[student.studentId.toString()]!;
-                final userId = (await SharedPrefHelper.getPreferenceValue('user_id'))?.toString() ?? "";
+            for (var student in studentList) {
+              final studentId = student.studentId.toString();
+              final totalattendptm =
+                  ptmControllers[student.studentId.toString()]!;
+              final userId =
+                  (await SharedPrefHelper.getPreferenceValue(
+                    'user_id',
+                  ))?.toString() ??
+                  "";
 
-                updatedatalist.add({
-                  "user_id":userId,
-                  "student_id": studentId,
-                  "total_attend_ptm": totalattendptm.text.isEmpty ? null : totalattendptm.text,
-                });
-              }
-
-              final Map<String, dynamic> bodydata = {
-                'course_section_id': widget.courseId,
-                'exam_term_id': widget.examTermId,
-                'updatedatalist': updatedatalist,
-              };
-              final response =await StudentExamOtherEntryHelper().storeStudentTotalAttendptm(bodydata!);
-              if(response['result']==1){
-                getStudentList();
-                showBottomMessage(context, response['message'], false);
-              }
-              else{
-                showBottomMessage(context, response['message'], true);
-              }
-              hideLoaderDialog(context);
-              
+              updatedatalist.add({
+                "user_id": userId,
+                "student_id": studentId,
+                "total_attend_ptm": totalattendptm.text.isEmpty
+                    ? null
+                    : totalattendptm.text,
+              });
             }
 
+            final Map<String, dynamic> bodydata = {
+              'course_section_id': widget.courseId,
+              'exam_term_id': widget.examTermId,
+              'updatedatalist': updatedatalist,
+            };
+            final response = await StudentExamOtherEntryHelper()
+                .storeStudentTotalAttendptm(bodydata);
+            if (response['result'] == 1) {
+              getStudentList();
+              showBottomMessage(context, response['message'], false);
+            } else {
+              showBottomMessage(context, response['message'], true);
+            }
+            hideLoaderDialog(context);
+          },
         ),
       ),
     );
   }
-
 }
 
 Widget _buildInfoRow(String title, String value) {

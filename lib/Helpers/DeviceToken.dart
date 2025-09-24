@@ -1,11 +1,11 @@
-
 import 'package:digivity_admin_app/Authentication/SharedPrefHelper.dart';
 import 'package:digivity_admin_app/Helpers/getApiService.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class DeviceToken {
   int? userId;
-  String? accessToken;  // renamed from 'token' to 'accessToken' to avoid confusion
+  String?
+  accessToken; // renamed from 'token' to 'accessToken' to avoid confusion
 
   DeviceToken();
 
@@ -33,12 +33,8 @@ class DeviceToken {
         true) {
       String? firebaseToken = await messaging.getToken();
 
-      if (firebaseToken == null) {
-        print("Failed to get Firebase token");
-        return;
-      }
-
-      final url = "api/MobileApp/master-admin/$userId/PushNotificationDeviceToken";
+      final url =
+          "api/MobileApp/master-admin/$userId/PushNotificationDeviceToken";
 
       final body = {
         "appname": "AdminApp",
@@ -47,7 +43,11 @@ class DeviceToken {
         "active_status": "1",
       };
 
-      final response = await getApiService.postRequestData(url, accessToken!, body);
+      final response = await getApiService.postRequestData(
+        url,
+        accessToken!,
+        body,
+      );
 
       if (response != null && response['result'] == 1) {
         print('FCM Device Token saved successfully: $firebaseToken');

@@ -11,7 +11,9 @@ class HomeWorkHelper {
     token = await SharedPrefHelper.getPreferenceValue('access_token');
   }
 
-  Future<List<HomeworkModel>> getCreatedHomeworks([Map<String, dynamic>? bodydata]) async {
+  Future<List<HomeworkModel>> getCreatedHomeworks([
+    Map<String, dynamic>? bodydata,
+  ]) async {
     final requestBody = bodydata ?? {};
     try {
       if (userId == null || token == null) {
@@ -19,7 +21,11 @@ class HomeWorkHelper {
       }
       final url = 'api/MobileApp/master-admin/$userId/HomeworkReport';
 
-      final response = await getApiService.postRequestData(url, token!, requestBody!);
+      final response = await getApiService.postRequestData(
+        url,
+        token!,
+        requestBody,
+      );
 
       if (response['result'] == 1) {
         final List<dynamic> data = response['success'];
@@ -39,7 +45,8 @@ class HomeWorkHelper {
         await init();
       }
 
-      final url = 'api/MobileApp/master-admin/$userId/$homeWorkId/RemoveHomework';
+      final url =
+          'api/MobileApp/master-admin/$userId/$homeWorkId/RemoveHomework';
       final response = await getApiService.getRequestData(url, token!);
 
       if (response['result'] == 1) {
@@ -51,10 +58,7 @@ class HomeWorkHelper {
         };
       }
     } catch (e) {
-      return {
-        'result': 0,
-        'message': 'Fetch failed: $e',
-      };
+      return {'result': 0, 'message': 'Fetch failed: $e'};
     }
   }
 }

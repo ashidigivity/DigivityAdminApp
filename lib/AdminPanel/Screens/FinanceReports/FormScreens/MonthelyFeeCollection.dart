@@ -1,4 +1,3 @@
-
 import 'package:digivity_admin_app/AdminPanel/Screens/FinanceReports/FinanceReportScreen/FeereportHtmlshowScreen.dart';
 import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/BackgrounWeapper.dart';
@@ -11,19 +10,16 @@ import 'package:digivity_admin_app/helpers/FinanceHelperFunction.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class MonthelyFeeCollection extends StatefulWidget{
-
+class MonthelyFeeCollection extends StatefulWidget {
   @override
   State<MonthelyFeeCollection> createState() {
     return _MonthelyFeeCollection();
   }
 }
 
-class _MonthelyFeeCollection extends State<MonthelyFeeCollection>{
-
+class _MonthelyFeeCollection extends State<MonthelyFeeCollection> {
   TextEditingController _fromdate = TextEditingController();
   TextEditingController _todate = TextEditingController();
-
 
   void submitForm() async {
     showLoaderDialog(context);
@@ -33,7 +29,10 @@ class _MonthelyFeeCollection extends State<MonthelyFeeCollection>{
     };
 
     try {
-      String? htmlData = await FinanceHelperFunction().apifeecollectionreport('monthly-fee-collection-report',formdata);
+      String? htmlData = await FinanceHelperFunction().apifeecollectionreport(
+        'monthly-fee-collection-report',
+        formdata,
+      );
       if (htmlData != null && htmlData.isNotEmpty) {
         hideLoaderDialog(context);
         Navigator.push(
@@ -53,45 +52,43 @@ class _MonthelyFeeCollection extends State<MonthelyFeeCollection>{
       hideLoaderDialog(context);
       showBottomMessage(context, "${e}", true);
     }
-
-
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(preferredSize: Size.fromHeight(kToolbarHeight), child: SimpleAppBar(titleText: 'Monthly Fee Collection Report', routeName: 'back')),
-      body: BackgroundWrapper(child:
-      Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          CardContainer(
-            child: Column(
-              children: [
-                DatePickerField(
-                  label: 'From Date',
-                  controller: _fromdate,
-                ),
-                SizedBox(height: 20,),
-                DatePickerField(
-                  label: 'To Date',
-                  controller: _todate,
-                ),
-                SizedBox(height: 20,),
-                CustomBlueButton(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SimpleAppBar(
+          titleText: 'Monthly Fee Collection Report',
+          routeName: 'back',
+        ),
+      ),
+      body: BackgroundWrapper(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            CardContainer(
+              child: Column(
+                children: [
+                  DatePickerField(label: 'From Date', controller: _fromdate),
+                  SizedBox(height: 20),
+                  DatePickerField(label: 'To Date', controller: _todate),
+                  SizedBox(height: 20),
+                  CustomBlueButton(
                     width: double.infinity,
-                    text: 'Get Result', icon: Icons.arrow_forward, onPressed: () async{
-
-                  submitForm();
-                })
-
-              ],
+                    text: 'Get Result',
+                    icon: Icons.arrow_forward,
+                    onPressed: () async {
+                      submitForm();
+                    },
+                  ),
+                ],
+              ),
             ),
-          )
-        ],)
+          ],
+        ),
       ),
     );
   }
 }
-
