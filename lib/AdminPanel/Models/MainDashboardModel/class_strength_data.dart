@@ -13,7 +13,7 @@ class ClassStrengthData {
     return ClassStrengthData(
       maleCount: json['male_count'],
       femaleCount: json['female_count'],
-      course: json['course']['course'], // <- this returns String directly
+      course: json['course'],
     );
   }
 }

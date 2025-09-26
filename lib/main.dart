@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:digivity_admin_app/AdminPanel/MobileThemsColors/theme_provider.dart';
 import 'package:digivity_admin_app/Authentication/appRouter.dart';
 import 'package:digivity_admin_app/Authentication/firebase_options.dart';
+import 'package:digivity_admin_app/Helpers/NotificationCounter.dart';
 import 'package:digivity_admin_app/Providers/DashboardProvider.dart';
 import 'package:digivity_admin_app/Providers/StaffDataProvider.dart';
 import 'package:digivity_admin_app/Providers/StudentAttendanceProvider.dart';
@@ -37,6 +38,14 @@ void main() async {
       debugPrint("Stack trace: $stackTrace");
     }
 
+
+    try {
+      final notificationService = NotificationService();
+      await notificationService.init();
+    } catch (e, stackTrace) {
+      debugPrint("Firebase Initialization Failed: $e");
+      debugPrint("Stack trace: $stackTrace");
+    }
     // Initialize path provider explicitly to catch issues early
     try {
       await getApplicationDocumentsDirectory();
@@ -53,7 +62,8 @@ void main() async {
           ChangeNotifierProvider(create: (_) => DashboardProvider()),
           ChangeNotifierProvider(create: (_) => StudentDataProvider()),
           ChangeNotifierProvider(create: (_) => StaffDataProvider()),
-          ChangeNotifierProvider(create: (_) => StudentAttendanceProvider())
+          ChangeNotifierProvider(create: (_) => StudentAttendanceProvider()),
+          ChangeNotifierProvider.value(value: NotificationService()),
         ],
         child: const MyApp(),
       ),

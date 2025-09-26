@@ -231,7 +231,9 @@ class _StudentUloadImageStudentList
                                               "${student['student_name'] ?? ''} (${student['course'] ?? ''})",
                                           onCameraTap: () async {
                                             final isGranted =
-                                                await PermissionService.requestCameraPermission();
+                                                await PermissionService.requestCameraPermission(
+                                                  context,
+                                                );
                                             if (!isGranted) {
                                               if (!mounted) return;
                                               ScaffoldMessenger.of(
@@ -331,7 +333,9 @@ class _StudentUloadImageStudentList
                                           },
                                           onGalleryTap: () async {
                                             final isGranted =
-                                                await PermissionService.requestGalleryPermission();
+                                                await PermissionService.requestGalleryPermission(
+                                                  context,
+                                                );
                                             if (!isGranted) {
                                               ScaffoldMessenger.of(
                                                 context,

@@ -46,7 +46,6 @@ class _AddNoticeScreen extends State<AddNoticeScreen> {
   List<String> selectedstaffs = [];
   List<File> selectedFiles = [];
   AssignmentType _selectedType = AssignmentType.student;
-
   @override
   void initState() {
     super.initState();
@@ -96,8 +95,14 @@ class _AddNoticeScreen extends State<AddNoticeScreen> {
                 Timepickerfield(label: 'Notice Time', controller: _noticeTime),
                 const SizedBox(height: 20),
                 AssignmentTypeSelector(
-                  label: 'Notice Type',
                   selectedType: _selectedType,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedType = value;
+                      });
+                    }
+                  },
                 ),
                 const SizedBox(height: 20),
 
@@ -241,11 +246,10 @@ class _AddNoticeScreen extends State<AddNoticeScreen> {
                 } else {
                   showBottomMessage(context, response['message'], true);
                 }
-              } catch(e){
+              } catch (e) {
                 print("Bug Occured During The Upload Assignment ${e}");
                 showBottomMessage(context, "${e}", true);
-              }
-              finally{
+              } finally {
                 hideLoaderDialog(context);
               }
             }

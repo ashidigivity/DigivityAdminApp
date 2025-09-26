@@ -36,7 +36,6 @@ class DashboardProvider extends ChangeNotifier {
   Future<void> fetchDashboardData(BuildContext context) async {
     try {
       notifyListeners();
-
       final userid = await SharedPrefHelper.getPreferenceValue('user_id');
       final token = await SharedPrefHelper.getPreferenceValue('access_token');
       final url = "api/MobileApp/master-admin/$userid/home";
@@ -44,7 +43,7 @@ class DashboardProvider extends ChangeNotifier {
       showLoaderDialog(context);
       final response = await getApiService.getRequestData(url, token);
       final dashboardResponse = DashboardResponse.fromJson(response);
-      final dataInfo = dashboardResponse.success[0].dataInfo;
+      final dataInfo = dashboardResponse.success[0].dataInfo ?? [];
 
 
 
@@ -59,7 +58,9 @@ class DashboardProvider extends ChangeNotifier {
 
       sliderdata = dataInfo
           .where((item) => allowedKeys.contains(item.key))
-          .toList();
+          .toList() ?? [];
+
+
 
       /// Paymode Data
       final paymodeEntry = dataInfo.firstWhere(
@@ -67,14 +68,17 @@ class DashboardProvider extends ChangeNotifier {
         orElse: () => DataInfo(key: '', value: []),
       );
 
+
       paymodeList = (paymodeEntry.value as List)
           .map((e) => PaymodeData.fromJson(e))
-          .toList();
+          .toList() ?? [];
 
-      labelsofpaymodes = paymodeList.map((e) => e.paymode).toList();
+
+
+      labelsofpaymodes = paymodeList.map((e) => e.paymode).toList() ?? [];
       totalcountsofpaumodes = paymodeList
           .map((e) => double.tryParse(e.total.toString()) ?? 0.0)
-          .toList();
+          .toList() ?? [];
 
       /// Classwise Gender Count
       final classCourseData = dataInfo.firstWhere(
@@ -82,21 +86,24 @@ class DashboardProvider extends ChangeNotifier {
         orElse: () => DataInfo(key: '', value: []),
       );
 
-      classStrengthList = (classCourseData.value as List)
-          .map((e) => ClassStrengthData.fromJson(e))
-          .toList();
 
-      labelsofclass = classStrengthList.map((e) => e.course).toList();
+      classStrengthList = (classCourseData.value as List ?? [])
+          .map((e) => ClassStrengthData.fromJson(e))
+          .toList() ?? [];
+
+      labelsofclass = classStrengthList.map((e) => e.course).toList() ?? [];
       totalclassmalecount =
-          classStrengthList.map((e) => e.maleCount.toDouble()).toList();
+          classStrengthList.map((e) => e.maleCount.toDouble()).toList() ?? [];
       totalclassfemalecount =
-          classStrengthList.map((e) => e.femaleCount.toDouble()).toList();
+          classStrengthList.map((e) => e.femaleCount.toDouble()).toList() ?? [];
 
       /// Course Data
-      final courseJson = response['success'][0]['course'] as List;
+      final courseJson = response['success'][0]['course'] as List ?? [];
+
+
       courseeslist = courseJson
           .map((e) => CourseData.fromJson(e as Map<String, dynamic>))
-          .toList();
+          .toList() ?? [];
 
       /// Staff Attendance Section
       final attendace = dataInfo.firstWhere(
@@ -107,6 +114,8 @@ class DashboardProvider extends ChangeNotifier {
       attendanceSummary = AttendanceModel.fromJson(
         Map<String, dynamic>.from(attendace.value),
       );
+
+
 
       labelsofattendance = [
         'Present',
@@ -152,12 +161,11 @@ class DashboardProvider extends ChangeNotifier {
         studentattendanceSummary?.unmarked.toDouble() ?? 0.0,
       ];
 
-
-      hideLoaderDialog(context);
     } catch (e, st) {
       debugPrint("Error fetching dashboard data: $e\n$st");
     } finally {
       notifyListeners();
+      hideLoaderDialog(context);
     }
   }
 
@@ -170,3 +178,5 @@ class DashboardProvider extends ChangeNotifier {
         'count': e.count?.toString() ?? '0',
       }).toList();
 }
+
+

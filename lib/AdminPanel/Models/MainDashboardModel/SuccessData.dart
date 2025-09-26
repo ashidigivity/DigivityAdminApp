@@ -24,18 +24,18 @@ class SuccessData {
 
   factory SuccessData.fromJson(Map<String, dynamic> json) {
     return SuccessData(
-      userInfo: (json['user-info'] as List)
+      userInfo: (json['user-info'] as List ?? [])
           .map((e) => UserInfo.fromJson(e))
-          .toList(),
-      dataInfo: (json['data-info'] as List)
+          .toList() ?? [],
+      dataInfo: (json['data-info'] as List ?? [])
           .map((e) => DataInfo.fromJson(e))
-          .toList(),
-      module: (json['module'] as List)
+          .toList() ?? [],
+      module: (json['module'] as List ?? [])
           .map((e) => ModuleData.fromJson(e))
-          .toList(),
-      course: (json['course'] as List)
+          .toList() ?? [],
+      course: (json['course'] as List ?? [])
           .map((e) => CourseData.fromJson(e))
-          .toList(),
+          .toList() ?? [],
       website: json['website'],
       academicSession: json['academic_session'],
       lastLoginAt: json['last_login_at'],

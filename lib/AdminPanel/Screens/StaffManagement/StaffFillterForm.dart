@@ -172,7 +172,7 @@ class _StaffFilterForm extends State<StaffFilterForm> {
                 'designation_id': selectedDesignationId ?? '',
                 'SearchBy': searchBy ?? '',
                 'order_by': shortBy ?? '',
-                'sort_by_method': 'sortBy',
+                'sort_by_method': shortByType,
                 'status': status ?? '',
               };
               await Provider.of<StaffDataProvider>(

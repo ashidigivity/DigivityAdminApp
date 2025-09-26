@@ -23,8 +23,8 @@ class _PiechartState extends State<Piechart> {
   @override
   Widget build(BuildContext context) {
     final defaultColors = [
-      Colors.green,
       Colors.blue,
+      Colors.green,
       Colors.orange,
       Colors.red,
       Colors.purple,
@@ -48,33 +48,35 @@ class _PiechartState extends State<Piechart> {
       );
     }
 
- // Debugging: Check if color list is passed
+    // 🔹 Calculate total
+    final total = widget.values.fold<double>(0, (a, b) => a + b);
 
     // === Updated section list generation ===
     final List<PieChartSectionData> sections = [];
 
     for (int index = 0; index < widget.values.length; index++) {
-      if (widget.values[index] == 0.0) continue;
-
       final color = (widget.colors != null && index < widget.colors!.length)
           ? widget.colors![index]
           : defaultColors[index % defaultColors.length];
 
       final isTouched = index == touchedIndex;
 
-      sections.add(PieChartSectionData(
-        value: widget.values[index],
-        title: isTouched
-            ? '${widget.sections[index]}\n(${widget.values[index].toStringAsFixed(0)})'
-            : '',
-        color: color,
-        radius: isTouched ? 70 : 60,
-        titleStyle: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
+      sections.add(
+        PieChartSectionData(
+          value: widget.values[index] == 0.0 ? 0.0001 : widget.values[index],
+          // 🔹 0 ko bhi pie me rakhna hai, warna index bigad jaayega
+          title: isTouched && widget.values[index] > 0
+              ? '${widget.sections[index]}\n(${widget.values[index].toStringAsFixed(0)})'
+              : '',
+          color: color,
+          radius: isTouched ? 70 : 60,
+          titleStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
-      ));
+      );
     }
 
     return Column(
@@ -92,7 +94,8 @@ class _PiechartState extends State<Piechart> {
                       touchedIndex = null;
                       return;
                     }
-                    touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                    touchedIndex =
+                        pieTouchResponse.touchedSection!.touchedSectionIndex;
                   });
                 },
               ),
@@ -103,33 +106,69 @@ class _PiechartState extends State<Piechart> {
           ),
         ),
         const SizedBox(height: 16),
+
+        // 🔹 Legends
         Wrap(
-          spacing: 12,
-          runSpacing: 8,
+          spacing: 5,
+          runSpacing: 5,
           alignment: WrapAlignment.center,
           children: List.generate(widget.sections.length, (index) {
             if (widget.values[index] == 0.0) return const SizedBox();
 
-            final color = (widget.colors != null && index < widget.colors!.length)
+            final color =
+                (widget.colors != null && index < widget.colors!.length)
                 ? widget.colors![index]
                 : defaultColors[index % defaultColors.length];
 
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  margin: const EdgeInsets.only(right: 6),
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(2),
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 12,
+                    height: 12,
+                    margin: const EdgeInsets.only(right: 6),
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
-                ),
-                Text('${widget.sections[index]} (${widget.values[index].toStringAsFixed(1)})'),
-              ],
+                  Flexible(
+                    child: Text(
+                      '${widget.sections[index]} : ${widget.values[index].toStringAsFixed(1)}',
+                      overflow: TextOverflow.visible,
+                      softWrap: true,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
             );
           }),
+        ),
+
+        const SizedBox(height: 12),
+
+        // 🔹 Total row
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            "Total : ${total.toStringAsFixed(1)}",
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
         ),
       ],
     );

@@ -1,5 +1,5 @@
 import 'package:digivity_admin_app/AdminPanel/MobileThemsColors/theme_provider.dart';
-import 'package:digivity_admin_app/Components/Loader.dart';
+import 'package:digivity_admin_app/Helpers/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,12 +27,21 @@ void showDocumentPickerBottomSheet({
         padding: const EdgeInsets.all(20.0),
         child: Wrap(
           children: [
-            const Center(child: Icon(Icons.keyboard_arrow_up, size: 30, color: Colors.grey)),
+            const Center(
+              child: Icon(
+                Icons.keyboard_arrow_up,
+                size: 30,
+                color: Colors.grey,
+              ),
+            ),
             const SizedBox(height: 10),
             Center(
               child: Text(
                 title,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             const SizedBox(height: 6),
@@ -50,10 +59,17 @@ void showDocumentPickerBottomSheet({
                 backgroundColor: Color(0xFFE5E6FA),
                 child: Icon(Icons.camera_alt, color: Colors.orange),
               ),
-              title: const Text("Take Photo from Camera", style: TextStyle(fontWeight: FontWeight.bold)),
-              onTap: () {
-                Navigator.pop(context);
-                onCameraTap();
+              title: const Text(
+                "Take Photo from Camera",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              onTap: () async {
+                final camerapermission =
+                    await PermissionService.requestCameraPermission(context);
+                if (camerapermission) {
+                  Navigator.pop(context);
+                  onCameraTap();
+                }
               },
             ),
             const SizedBox(height: 10),
@@ -64,10 +80,17 @@ void showDocumentPickerBottomSheet({
                 backgroundColor: Color(0xFFE5E6FA),
                 child: Icon(Icons.photo_library_outlined, color: Colors.pink),
               ),
-              title: const Text("Choose from Gallery", style: TextStyle(fontWeight: FontWeight.bold)),
-              onTap: () {
+              title: const Text(
+                "Choose from Gallery",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              onTap: () async {
                 Navigator.pop(context);
-                onGalleryTap();
+                final camerapermission =
+                    await PermissionService.requestGalleryPermission(context);
+                if (camerapermission) {
+                  onGalleryTap();
+                }
               },
             ),
             const SizedBox(height: 10),
@@ -78,11 +101,17 @@ void showDocumentPickerBottomSheet({
                 backgroundColor: Color(0xFFE5E6FA),
                 child: Icon(Icons.insert_drive_file, color: Colors.blueAccent),
               ),
-              title: const Text("Pick Document", style: TextStyle(fontWeight: FontWeight.bold)),
-              onTap: () {
-
-                Navigator.pop(context);
-                onPickDocument();
+              title: const Text(
+                "Pick Document",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              onTap: () async {
+                final camerapermission =
+                    await PermissionService.requestStoragePermission(context);
+                if (camerapermission) {
+                  Navigator.pop(context);
+                  onPickDocument();
+                }
               },
             ),
             const SizedBox(height: 10),
@@ -92,7 +121,10 @@ void showDocumentPickerBottomSheet({
               child: TextButton.icon(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.close, color: Colors.red),
-                label: const Text("Cancel", style: TextStyle(color: Colors.red)),
+                label: const Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.red),
+                ),
               ),
             ),
           ],

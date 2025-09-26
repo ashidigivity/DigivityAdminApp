@@ -91,6 +91,7 @@ class _Addassignment extends State<Addassignment> {
                 SizedBox(height: 16),
                 CourseComponent(
                   isSubject: true,
+                  forData: "subjects",
                   onChanged: (value) {
                     courseId = value;
                     setState(() {});
@@ -180,24 +181,42 @@ class _Addassignment extends State<Addassignment> {
                     showDocumentPickerBottomSheet(
                       context: context,
                       title: "Upload File",
-                      onCameraTap: () =>
+                      onCameraTap: () {
+                        try {
                           FilePickerHelper.pickFromCamera((file) {
                             setState(() {
                               selectedFiles.add(file);
                             });
-                          }),
-                      onGalleryTap: () =>
+                          });
+                        } catch (e) {
+                          print("${e}");
+                          showBottomMessage(context, "${e}", true);
+                        }
+                      },
+                      onGalleryTap: () {
+                        try {
                           FilePickerHelper.pickFromGallery((file) {
                             setState(() {
                               selectedFiles.add(file);
                             });
-                          }),
-                      onPickDocument: () =>
+                          });
+                        } catch (e) {
+                          print("${e}");
+                          showBottomMessage(context, "${e}", true);
+                        }
+                      },
+                      onPickDocument: () {
+                        try {
                           FilePickerHelper.pickDocuments((files) {
                             setState(() {
                               selectedFiles.addAll(files);
                             });
-                          }),
+                          });
+                        } catch (e) {
+                          print("${e}");
+                          showBottomMessage(context, "${e}", true);
+                        }
+                      },
                     );
                   },
                   selectedFiles: selectedFiles,

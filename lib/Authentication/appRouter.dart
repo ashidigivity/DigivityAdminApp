@@ -76,6 +76,7 @@ import 'package:digivity_admin_app/AuthenticationUi/SchoolCodeVerification.dart'
 import 'package:digivity_admin_app/AuthenticationUi/SplashScreen.dart';
 import 'package:digivity_admin_app/AuthenticationUi/TwoFactorAuthentication.dart';
 import 'package:digivity_admin_app/AuthenticationUi/UserProfile.dart';
+import 'package:digivity_admin_app/Components/NotificationScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -409,9 +410,11 @@ final GoRouter appRouter = GoRouter(
       path: '/student-attendance-list',
       builder: (context, state) {
         final data = state.extra as Map<String, dynamic>;
+
         return StudentMarkAttendance(
           courseId: data['course_id'],
           selectedSortBy: data['selectedSortBy'],
+          selectedOrderBy: data['selectedOrderBy'],
           selectedDate: data['selectedDate'],
         );
       },
@@ -791,6 +794,17 @@ final GoRouter appRouter = GoRouter(
         return SendSmsTousers();
       },
     ),
+
+
+    GoRoute(
+      name: 'notification-screen',
+      path: '/notification-screen',
+      builder: (context, state) {
+        return NotificationScreen();
+      },
+    ),
+
+
     GoRoute(
       name: 'compose-sms',
       path: '/compose-sms',

@@ -2,16 +2,21 @@ class ModuleData {
   final List<ModuleItem> quickAction;
   final List<ModuleItem> reports;
 
-  ModuleData({required this.quickAction, required this.reports});
+  ModuleData({
+    required this.quickAction,
+    required this.reports,
+  });
 
   factory ModuleData.fromJson(Map<String, dynamic> json) {
     return ModuleData(
-      quickAction: (json['quick-action'] as List)
-          .map((e) => ModuleItem.fromJson(e))
-          .toList(),
-      reports: (json['reports'] as List)
-          .map((e) => ModuleItem.fromJson(e))
-          .toList(),
+      quickAction: (json['quick-action'] as List<dynamic>?)
+          ?.map((e) => ModuleItem.fromJson(e as Map<String, dynamic>))
+          .toList()
+          ?? [],
+      reports: (json['reports'] as List<dynamic>?)
+          ?.map((e) => ModuleItem.fromJson(e as Map<String, dynamic>))
+          .toList()
+          ?? [],
     );
   }
 }
