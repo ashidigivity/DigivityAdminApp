@@ -184,7 +184,7 @@ class _StaffUploadImageList extends State<StaffUploadImageList> {
                                               "${staff['full_name'] ?? ''} (${staff['profession'] ?? ''})",
                                           onCameraTap: () async {
                                             final isGranted =
-                                                await PermissionService.requestCameraPermission();
+                                                await PermissionService.requestCameraPermission(context);
                                             if (!isGranted) {
                                               if (!mounted) return;
                                               ScaffoldMessenger.of(
@@ -273,7 +273,7 @@ class _StaffUploadImageList extends State<StaffUploadImageList> {
                                           },
                                           onGalleryTap: () async {
                                             final isGranted =
-                                                await PermissionService.requestGalleryPermission();
+                                                await PermissionService.requestGalleryPermission(context);
                                             if (!isGranted) {
                                               if (!mounted) return;
                                               ScaffoldMessenger.of(

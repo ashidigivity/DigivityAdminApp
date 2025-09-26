@@ -19,7 +19,6 @@ class StaffListScreen extends StatefulWidget {
 
 class _StaffListScreen extends State<StaffListScreen> {
   final TextEditingController _staffSearchController = TextEditingController();
-
   List<Map<String, dynamic>> _originalList = [];
   List<Map<String, dynamic>> _filteredList = [];
 
@@ -68,15 +67,20 @@ class _StaffListScreen extends State<StaffListScreen> {
   }
 
   void _filterStaffList() {
-    final query = _staffSearchController.text.toLowerCase();
-    setState(() {
-      _filteredList = _originalList.where((staff) {
-        return (staff['full_name']?.toLowerCase().contains(query) ?? false) ||
-            (staff['staff_no']?.toLowerCase().contains(query) ?? false) ||
-            (staff['contact_no']?.toLowerCase().contains(query) ?? false) ||
-            (staff['address']?.toLowerCase().contains(query) ?? false);
-      }).toList();
-    });
+    try {
+      final query = _staffSearchController.text.toLowerCase();
+      setState(() {
+        _filteredList = _originalList.where((staff) {
+          return (staff['full_name']?.toLowerCase().contains(query) ?? false) ||
+              (staff['staff_no']?.toLowerCase().contains(query) ?? false) ||
+              (staff['contact_no']?.toLowerCase().contains(query) ?? false) ||
+              (staff['address']?.toLowerCase().contains(query) ?? false);
+        }).toList();
+      });
+    } catch (e) {
+      showBottomMessage(context, "${e}", true);
+      _filteredList = [];
+    }
   }
 
   @override
@@ -87,7 +91,6 @@ class _StaffListScreen extends State<StaffListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // DO NOT call _updateStaffList here
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: PreferredSize(
@@ -110,91 +113,24 @@ class _StaffListScreen extends State<StaffListScreen> {
                   child: Consumer<StaffDataProvider>(
                     builder: (context, staffProvider, _) {
                       final updatedList = _mapStaffList(staffProvider.staffs);
-
                       final filtered = _staffSearchController.text.isEmpty
                           ? updatedList
                           : updatedList.where((staff) {
-                              final query = _staffSearchController.text
-                                  .toLowerCase();
-                              return (staff['full_name']
-                                          ?.toLowerCase()
-                                          .contains(query) ??
-                                      false) ||
-                                  (staff['staff_no']?.toLowerCase().contains(
-                                        query,
-                                      ) ??
-                                      false) ||
-                                  (staff['contact_no']?.toLowerCase().contains(
-                                        query,
-                                      ) ??
-                                      false) ||
-                                  (staff['address']?.toLowerCase().contains(
-                                        query,
-                                      ) ??
-                                      false);
-                            }).toList();
+                        final query = _staffSearchController.text.toLowerCase();
+                        return (staff['full_name']?.toLowerCase().contains(query) ?? false) ||
+                            (staff['staff_no']?.toLowerCase().contains(query) ?? false) ||
+                            (staff['contact_no']?.toLowerCase().contains(query) ?? false) ||
+                            (staff['address']?.toLowerCase().contains(query) ?? false);
+                      }).toList();
 
                       return filtered.isNotEmpty
                           ? ListView.builder(
-                              itemCount: filtered.length,
-                              itemBuilder: (context, index) {
-                                final staff = filtered[index];
-                                final bgColor = index % 2 == 0
-                                    ? const Color(0xFFDBF3E2)
-                                    : const Color(0xFFE0E7FF);
-
-                                return Card(
-                                  color: bgColor,
-                                  margin: const EdgeInsets.symmetric(
-                                    vertical: 6,
-                                  ),
-                                  child: ListTile(
-                                    onTap: () {
-                                      showStaffListBottomSheet(
-                                        context,
-                                        staff['staff_id'],
-                                        staff['full_name'] ?? 'Unknown',
-                                        staff['staff_no'].toString(),
-                                        staff['contact_no'].toString(),
-                                        staff['status'],
-                                        (updatedList) =>
-                                            _updateStaffList(updatedList),
-                                      );
-                                    },
-                                    leading: PopupNetworkImage(
-                                      imageUrl: staff['profile_img'],
-                                      radius: 30,
-                                    ),
-                                    title: Text(
-                                      staff['full_name'] ?? '',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text("Staff Id: ${staff['staff_id']}"),
-                                        Text(
-                                          "Profession: ${staff['profession']}",
-                                        ),
-                                        Text(
-                                          "Designation: ${staff['designation']}",
-                                        ),
-                                        Text(
-                                          "Department: ${staff['department']}",
-                                        ),
-                                        Text("Mobile: ${staff['contact_no']}"),
-                                        Text("Father: ${staff['father_name']}"),
-                                        Text("Address: ${staff['address']}"),
-                                        Text("Status: ${staff['status']}"),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            )
+                        itemCount: filtered.length,
+                        itemBuilder: (context, index) {
+                          final staff = filtered[index];
+                          return _modernStaffCard(staff);
+                        },
+                      )
                           : const Center(child: Text("No staff found"));
                     },
                   ),
@@ -203,6 +139,110 @@ class _StaffListScreen extends State<StaffListScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// 🔹 Modern Staff Card
+  Widget _modernStaffCard(Map<String, dynamic> staff) {
+    return GestureDetector(
+      onTap: () {
+        showStaffListBottomSheet(
+          context,
+          staff['staff_id'] ?? 0,
+          staff['full_name'] ?? 'Unknown',
+          staff['staff_no'].toString(),
+          staff['contact_no'].toString(),
+          staff['status'],
+              (updatedList) => _updateStaffList(updatedList),
+        );
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 4,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Profile Image
+              PopupNetworkImage(
+                imageUrl: staff['profile_img'],
+                radius: 32,
+              ),
+              const SizedBox(width: 14),
+              // Staff Details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Name + Status
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            staff['full_name'] ?? '',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: staff['status'] == 1
+                                ? Colors.green.withOpacity(0.1)
+                                : Colors.red.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            staff['status'] == 1 ? 'Active' : 'Inactive',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: staff['status'] == 1 ? Colors.green : Colors.red,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    _infoRow(Icons.badge, "ID: ${staff['staff_id']}"),
+                    _infoRow(Icons.confirmation_number, "Staff No: ${staff['staff_no']}"),
+                    _infoRow(Icons.work, "Profession: ${staff['profession']}"),
+                    _infoRow(Icons.account_tree, "Designation: ${staff['designation']}"),
+                    _infoRow(Icons.apartment, "Department: ${staff['department']}"),
+                    _infoRow(Icons.phone, "Mobile: ${staff['contact_no']}"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 🔹 Helper Widget for Info Row
+  Widget _infoRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: Colors.grey[600]),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 13, color: Colors.black87),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       ),
     );
   }

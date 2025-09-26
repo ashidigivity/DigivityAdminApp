@@ -1,4 +1,3 @@
-
 import 'package:digivity_admin_app/Helpers/getApiService.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -24,7 +23,7 @@ class StudentDataProvider with ChangeNotifier {
 
     final body = {
       "course_id": courseId,
-      "sort_by_method": 'sortBy',
+      "sort_by_method": orderByMethod,
       "order_by": sortByMethod,
       "status": selectedStatus,
     };
@@ -52,12 +51,10 @@ class StudentDataProvider with ChangeNotifier {
     }
   }
 
-
-
   void removeStudentById(String studentId) {
-    _students.removeWhere((student) => student.studentId.toString() == studentId);
+    _students.removeWhere(
+      (student) => student.studentId.toString() == studentId,
+    );
     notifyListeners();
   }
-
-
 }

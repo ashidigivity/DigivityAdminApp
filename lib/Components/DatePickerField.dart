@@ -7,9 +7,15 @@ class DatePickerField extends StatefulWidget {
   final TextEditingController? controller;
   final String? label;
   final FormFieldValidator<String>? validator;
+  final void Function(DateTime)? onDateSelected; // 👈 callback
 
-  const DatePickerField({Key? key, this.controller, this.label, this.validator})
-    : super(key: key);
+  const DatePickerField({
+    Key? key,
+    this.controller,
+    this.label,
+    this.validator,
+    this.onDateSelected,
+  }) : super(key: key);
 
   @override
   _DatePickerFieldState createState() => _DatePickerFieldState();
@@ -22,23 +28,38 @@ class _DatePickerFieldState extends State<DatePickerField> {
   void initState() {
     super.initState();
     _localController = widget.controller ?? TextEditingController();
+
+    // Set default text if empty
     if (_localController.text.isEmpty) {
       _localController.text = DateFormat('dd-MM-yyyy').format(DateTime.now());
     }
   }
 
   Future<void> _selectDate() async {
-    DateTime? pickedDate = await showDatePicker(
+    DateTime initialDate;
+
+    // parse current text safely
+    try {
+      initialDate = DateFormat('dd-MM-yyyy').parse(_localController.text);
+    } catch (e) {
+      initialDate = DateTime.now();
+    }
+
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.tryParse(_localController.text) ?? DateTime.now(),
+      initialDate: initialDate,
       firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      lastDate: DateTime.now(),
     );
 
     if (pickedDate != null) {
       _localController.text = DateFormat('dd-MM-yyyy').format(pickedDate);
+      setState(() {});
+
+      if (widget.onDateSelected != null) {
+        widget.onDateSelected!(pickedDate);
+      }
     }
-    setState(() {});
   }
 
   @override
@@ -51,24 +72,26 @@ class _DatePickerFieldState extends State<DatePickerField> {
       onTap: _selectDate,
       decoration: InputDecoration(
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        labelText: widget.label, // 👈 Shows label inside border
+        labelText: widget.label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        labelStyle: TextStyle(
+          color: uiTheme.inputBorderColor ?? Colors.grey.shade600,
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(
-            color: uiTheme.inputBorderColor ?? Colors.blue, // dynamic color
+            color: uiTheme.inputBorderColor ?? Colors.blue,
             width: 2.0,
           ),
           borderRadius: BorderRadius.circular(8),
         ),
-
-        // Enabled (unfocused) border
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
             color: uiTheme.inputBorderColor ?? Colors.grey.shade300,
           ),
           borderRadius: BorderRadius.circular(8),
         ),
-
         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       ),
     );

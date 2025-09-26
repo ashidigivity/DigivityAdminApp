@@ -129,7 +129,7 @@ class CustomFunctions {
 //   Attedance Reports Section Start Here
   Future<String?> fetchDayWiseAttendanceHtml(String courseId,String reportDate) async {
     if (userId == null || token == null) {
-      await init(); // Your user/token initialization logic
+      await init();
     }
 
     final url = "api/MobileApp/master-admin/$userId/Daywiseattendancereport";
@@ -140,7 +140,7 @@ class CustomFunctions {
       'to_date':reportDate
     };
 
-    final response = await getApiService.postRequestData(url, token!, formData);
+    final response = await getApiService.postRequestData(url, token!, formData!);
 
     if (response['result'] == 1 &&
         response['success'] != null &&

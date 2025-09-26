@@ -66,7 +66,7 @@ class _CustomMenuModalState extends State<CustomMenuModal> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Navigation Menus",
+                    "Navigation Menu",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],

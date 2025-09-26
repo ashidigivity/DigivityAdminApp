@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:digivity_admin_app/AdminPanel/MobileThemsColors/theme_provider.dart';
 import 'package:digivity_admin_app/Authentication/SharedPrefHelper.dart';
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/Loader.dart';
+import 'package:digivity_admin_app/Components/NotificationBadge.dart';
 import 'package:digivity_admin_app/Providers/DashboardProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -32,8 +34,12 @@ class _AppBarComponentState extends State<AppBarComponent> {
   }
 
   Future<void> getUserData() async{
-    logo = await SharedPrefHelper.getPreferenceValue('profile_image');
-    username = await SharedPrefHelper.getPreferenceValue('name');
+    try {
+      logo = await SharedPrefHelper.getPreferenceValue('profile_image');
+      username = await SharedPrefHelper.getPreferenceValue('name');
+    }catch(e){
+      showBottomMessage(context, "${e}", true);
+    }
     setState(() {
     });
   }
@@ -78,28 +84,17 @@ class _AppBarComponentState extends State<AppBarComponent> {
                 ),
                 SizedBox(width: 15),
                 Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    Icon(Icons.notifications_none, color: uiTheme.appbarIconColor?? Colors.white, size: 20),
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          '3',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ),
+                    Icon(
+                      Icons.notifications_none,
+                      color: uiTheme.appbarIconColor ?? Colors.white,
+                      size: 22,
                     ),
+                    NotificationBadge(),
                   ],
                 ),
+
               ],
             ),
             SizedBox(width: 16),

@@ -25,7 +25,6 @@ class StudentMarksManagerCommonHelper {
     if (userId == null && token == null) {
       await init();
     }
-
     final url = "api/MobileApp/teacher/$userId/StudentExamMarksEntry";
     try {
       final response = await getApiService.getRequestData(url, token!);

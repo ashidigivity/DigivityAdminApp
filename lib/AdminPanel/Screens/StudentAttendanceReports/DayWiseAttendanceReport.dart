@@ -83,7 +83,6 @@ class _DayWiseAttendanceReport extends State<DayWiseAttendanceReport> {
                       icon: Icons.arrow_forward,
                       onPressed: () {
                         if (selectedCourseId.isNotEmpty && _reportdate != null) {
-
                           context.pushNamed(
                             'daywise-student-attendance-report',
                             pathParameters: {

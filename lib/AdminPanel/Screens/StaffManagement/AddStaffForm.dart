@@ -94,7 +94,7 @@ class _AddStaffForm extends State<AddStaffForm> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: SimpleAppBar(titleText: "Add New Student", routeName: 'back'),
+        child: SimpleAppBar(titleText: "Add New Staff", routeName: 'back'),
       ),
       body: BackgroundWrapper(
         child: CardContainer(

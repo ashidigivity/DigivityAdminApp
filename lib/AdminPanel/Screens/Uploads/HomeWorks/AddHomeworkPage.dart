@@ -34,16 +34,16 @@ class AddHomeworkPage extends StatefulWidget {
 class _AddHomeworkPage extends State<AddHomeworkPage> {
   final _formkye = GlobalKey<FormState>();
   final GlobalKey<NotifyBySectionState> notifyKey =
-  GlobalKey<NotifyBySectionState>();
+      GlobalKey<NotifyBySectionState>();
   final GlobalKey<DynamicUrlInputListState> urlKey =
-  GlobalKey<DynamicUrlInputListState>();
+      GlobalKey<DynamicUrlInputListState>();
 
   bool isSubmissionEnabled = false;
   TextEditingController _submissionDate = TextEditingController();
   TextEditingController _submissionTime = TextEditingController();
   TextEditingController _homeworkController = TextEditingController();
   TextEditingController _homeworkDescriptionController =
-  TextEditingController();
+      TextEditingController();
   TextEditingController _hw_date = TextEditingController();
   TextEditingController _to_date = TextEditingController();
   String? courseId;
@@ -73,6 +73,7 @@ class _AddHomeworkPage extends State<AddHomeworkPage> {
               children: [
                 CourseComponent(
                   isSubject: true,
+                  forData: "subjects",
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Select First Course";

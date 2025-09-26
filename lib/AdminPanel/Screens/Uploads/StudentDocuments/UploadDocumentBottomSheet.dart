@@ -43,6 +43,8 @@ class UploadDocumentBottomSheet extends StatefulWidget {
 class _UploadDocumentBottomSheetState extends State<UploadDocumentBottomSheet> {
   List<File> selectedFiles = [];
 
+
+
   @override
   Widget build(BuildContext context) {
     final uiTheme = Provider.of<UiThemeProvider>(context);
@@ -148,18 +150,15 @@ class _UploadDocumentBottomSheetState extends State<UploadDocumentBottomSheet> {
                     showDocumentPickerBottomSheet(
                       context: context,
                       title: "Upload File",
-                      onCameraTap: () =>
-                          FilePickerHelper.pickFromCamera((file) {
-                            setState(() => selectedFiles.add(file));
-                          }),
-                      onGalleryTap: () =>
-                          FilePickerHelper.pickFromGallery((file) {
-                            setState(() => selectedFiles.add(file));
-                          }),
-                      onPickDocument: () =>
-                          FilePickerHelper.pickDocuments((files) {
-                            setState(() => selectedFiles.addAll(files));
-                          }),
+                      onCameraTap: () => FilePickerHelper.pickFromCamera((file) {
+                        setState(() => selectedFiles.add(file));
+                      }),
+                      onGalleryTap: () => FilePickerHelper.pickFromGallery((file) {
+                        setState(() => selectedFiles.add(file));
+                      }),
+                      onPickDocument: () => FilePickerHelper.pickDocuments((files) {
+                        setState(() => selectedFiles.addAll(files));
+                      }),
                     );
                   },
                   selectedFiles: selectedFiles,
@@ -214,53 +213,45 @@ class _UploadDocumentBottomSheetState extends State<UploadDocumentBottomSheet> {
                       child: ElevatedButton.icon(
                         onPressed: () async {
                           if (widget.onupload != null) {
-                            try {
-                              showLoaderDialog(context);
+                            showLoaderDialog(context);
 
-                              String? base64File;
-                              String? fileName;
+                            String? base64File;
+                            String? fileName;
 
-                              if (selectedFiles.isNotEmpty) {
-                                final file = selectedFiles.first;
-                                final bytes = await file.readAsBytes();
-                                base64File = base64Encode(bytes);
-                                fileName = file.path.split('/').last;
-                              }
+                            if (selectedFiles.isNotEmpty) {
+                              final file = selectedFiles.first;
+                              final bytes = await file.readAsBytes();
+                              base64File = base64Encode(bytes);
+                              fileName = file.path.split('/').last;
+                            }
 
-                              final bodydata = {
-                                'student_id': widget.StudentId,
-                                'document_id': widget.documentId,
-                                'document_name': widget.documentName,
-                                'document_file':
-                                    base64File ?? widget.docuemntFile,
-                                'file_name':
-                                    fileName ??
-                                    widget.docuemntFile?.split('/').last,
-                              };
+                            final bodydata = {
+                              'student_id': widget.StudentId,
+                              'document_id': widget.documentId,
+                              'document_name': widget.documentName,
+                              'document_file':
+                              base64File ?? widget.docuemntFile,
+                              'file_name':
+                              fileName ??
+                                  widget.docuemntFile?.split('/').last,
+                            };
 
-                              final response = await widget.onupload!(bodydata);
-                              Navigator.pop(context, response);
+                            final response = await widget.onupload!(bodydata);
+                            Navigator.pop(context, response); // dismiss loader
 
-                              if (response['result'] == 1) {
-                                showBottomMessage(
-                                  context,
-                                  response['message'],
-                                  false,
-                                );
-                              } else {
-                                showBottomMessage(
-                                  context,
-                                  response['message'],
-                                  true,
-                                );
-                              }
-                            } catch (e) {
-                              print(
-                                "Error Occured During The Upload Documents ${e}",
+                            if (response['result'] == 1) {
+                              Navigator.pop(context); // close bottom sheet
+                              showBottomMessage(
+                                context,
+                                response['message'],
+                                false,
                               );
-                              showBottomMessage(context, "${e}", true);
-                            } finally {
-                              hideLoaderDialog(context);
+                            } else {
+                              showBottomMessage(
+                                context,
+                                response['message'],
+                                true,
+                              );
                             }
                           }
                         },
