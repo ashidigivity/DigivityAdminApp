@@ -46,6 +46,10 @@ import 'package:digivity_admin_app/AdminPanel/Screens/StudentAttendanceReports/D
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentAttendanceReports/StaffAttendanceReportForm.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentAttendanceReports/StudentAttendaceReports.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/EditStudentDetails.dart';
+import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentBirthdayList.dart';
+import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentComplaint/AddStudentComplaint.dart';
+import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentComplaint/ComplaintList.dart';
+import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentComplaint/FliterStudentComplaint.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentDashboard.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentListScreen.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentLsitsDataForm.dart';
@@ -555,6 +559,33 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
+
+    /// Student Complaint Section Start Here
+    GoRoute(
+      name: "student-complaint-filter",
+      path: "/student-complaint-filter",
+      builder: (context, state) {
+        return FilterStudentComplaint();
+      },
+    ),
+    GoRoute(
+      name: "student-raised-complaint",
+      path: "/student-raised-complaint",
+      builder: (context, state) {
+        final formdata = state.extra as Map<String, dynamic>;
+        return ComplaintList(formdata: formdata);
+      },
+    ),
+
+    GoRoute(
+      name: "add-student-complaint",
+      path: "/add-student-complaint",
+      builder: (context, state) {
+        return AddStudentComplaint();
+      },
+    ),
+
+
     //   user switch for multiple
     GoRoute(
       name: 'select-another-user',
@@ -795,7 +826,6 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
-
     GoRoute(
       name: 'notification-screen',
       path: '/notification-screen',
@@ -803,7 +833,6 @@ final GoRouter appRouter = GoRouter(
         return NotificationScreen();
       },
     ),
-
 
     GoRoute(
       name: 'compose-sms',
@@ -820,6 +849,15 @@ final GoRouter appRouter = GoRouter(
             data['selectedAdminstration'] ?? [],
           ),
         );
+      },
+    ),
+
+    // Student Birthday Report
+    GoRoute(
+      name: 'student-birthday-reports',
+      path: '/student-birthday-reports',
+      builder: (context, state) {
+        return StudentBirthdayList();
       },
     ),
   ],

@@ -43,7 +43,7 @@ class CustomBottomNavBar extends StatelessWidget {
       onTap: (index) => _onTap(context, index),
 
       selectedItemColor: uiTheme.appbarIconColor ?? Colors.black,
-      unselectedItemColor:uiTheme.appbarIconColor ?? Colors.white,
+      unselectedItemColor: uiTheme.appbarIconColor ?? Colors.white,
 
       // Optional: More styling control
       selectedLabelStyle: TextStyle(
@@ -52,7 +52,7 @@ class CustomBottomNavBar extends StatelessWidget {
       ),
       unselectedLabelStyle: TextStyle(
         color: uiTheme.appbarIconColor ?? Colors.white,
-        fontWeight: FontWeight.w400
+        fontWeight: FontWeight.w400,
       ),
 
       items: [

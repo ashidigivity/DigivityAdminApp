@@ -24,7 +24,9 @@ class _Studentsyllabus extends State<Studentsyllabus> {
   @override
   void initState() {
     super.initState();
-    _fetchSyllabus({});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchSyllabus({});
+    });
   }
 
   Future<void> _fetchSyllabus(Map<String, dynamic>? bodydata) async {
@@ -45,10 +47,6 @@ class _Studentsyllabus extends State<Studentsyllabus> {
 
   @override
   Widget build(BuildContext context) {
-
-
-
-
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
@@ -64,12 +62,20 @@ class _Studentsyllabus extends State<Studentsyllabus> {
                 onChanged: (value) {
                   final query = value.toLowerCase();
                   setState(() {
-                    _filteredSyllabus = _syllabuss.where((sy) =>
-                    (sy.subject ?? '').toLowerCase().contains(query) ||
-                     (sy.syllabusTitle ?? '').toLowerCase().contains(query) ||
-                     (sy.syllabusDetail ?? '').toLowerCase().contains(query)
-
-                    ).toList();
+                    _filteredSyllabus = _syllabuss
+                        .where(
+                          (sy) =>
+                              (sy.subject ?? '').toLowerCase().contains(
+                                query,
+                              ) ||
+                              (sy.syllabusTitle ?? '').toLowerCase().contains(
+                                query,
+                              ) ||
+                              (sy.syllabusDetail ?? '').toLowerCase().contains(
+                                query,
+                              ),
+                        )
+                        .toList();
                   });
                 },
               ),
@@ -78,41 +84,46 @@ class _Studentsyllabus extends State<Studentsyllabus> {
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : _filteredSyllabus.isEmpty
-                    ? const Center(child: Text('No homework found'))
+                    ? const Center(child: Text('No Student Syllabus found'))
                     : ListView.builder(
-                  itemCount: _filteredSyllabus.length,
-                  itemBuilder: (context, index) {
-                    final sy = _filteredSyllabus[index];
-                    return Syllabuscard(
-                      syllabusId: sy.syllabusId,
-                      course: sy.course ?? '',
-                      subject: sy.subject ?? '',
-                      syllabusTitle: sy.syllabusTitle ?? '',
-                      syllabusDetail: sy.syllabusDetail ?? '',
-                      submittedBy: sy.submittedBy ?? '',
-                      submittedByProfile: sy.submittedByProfile ?? '',
-                      attachments: sy.attachment.map((e) => {
-                        'file_name': e.fileName,
-                        'file_path': e.filePath,
-                        'extension': e.extension,
-                      }).toList(),
-                       withapp: sy.withApp,
-                      withWebsite: sy.withWebsite,
+                        itemCount: _filteredSyllabus.length,
+                        itemBuilder: (context, index) {
+                          final sy = _filteredSyllabus[index];
+                          return Syllabuscard(
+                            syllabusId: sy.syllabusId,
+                            course: sy.course ?? '',
+                            subject: sy.subject ?? '',
+                            syllabusTitle: sy.syllabusTitle ?? '',
+                            syllabusDetail: sy.syllabusDetail ?? '',
+                            submittedBy: sy.submittedBy ?? '',
+                            submittedByProfile: sy.submittedByProfile ?? '',
+                            attachments: sy.attachment
+                                .map(
+                                  (e) => {
+                                    'file_name': e.fileName,
+                                    'file_path': e.filePath,
+                                    'extension': e.extension,
+                                  },
+                                )
+                                .toList(),
+                            withapp: sy.withApp,
+                            withWebsite: sy.withWebsite,
 
-                      // 👇 This function gets passed into the bottom sheet
-                      onDelete: () async {
-                        final helper = SyllabusHelper();
-                        final response = await helper.deleteSyllabus(sy.syllabusId); // delete from backend
+                            // 👇 This function gets passed into the bottom sheet
+                            onDelete: () async {
+                              final helper = SyllabusHelper();
+                              final response = await helper.deleteSyllabus(
+                                sy.syllabusId,
+                              ); // delete from backend
 
-                        if (response['result'] == 1) {
-                          await _fetchSyllabus({}); // refresh list
-                        }
-                        return response;
-                      },
-                    );
-
-                  },
-                ),
+                              if (response['result'] == 1) {
+                                await _fetchSyllabus({}); // refresh list
+                              }
+                              return response;
+                            },
+                          );
+                        },
+                      ),
               ),
             ],
           ),

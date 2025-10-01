@@ -42,7 +42,7 @@ class ShowNoticeDetailsSheet extends StatelessWidget {
     this.authorizedBy,
     this.noticeurls,
     required this.onDelete,
-    this.noticeNo
+    this.noticeNo,
   });
 
   @override
@@ -89,25 +89,41 @@ class ShowNoticeDetailsSheet extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(noticeDate, style: const TextStyle(color: Colors.grey)),
-                  Text('Hello',
-                      style: const TextStyle(
-                          color: Colors.green, fontWeight: FontWeight.w600)),
+                  Text(
+                    noticeNo!,
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ],
               ),
               const Divider(),
               const SizedBox(height: 16),
 
-              Text(noticeTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(
+                noticeTitle,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 6),
               Text(noticeDescription),
 
               const SizedBox(height: 16),
               const Divider(),
 
-              const Text("Attachments:", style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                "Attachments:",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 10),
               if (attachments.isEmpty)
-                const Text("No Attachments Found", style: TextStyle(color: Colors.grey)),
+                const Text(
+                  "No Attachments Found",
+                  style: TextStyle(color: Colors.grey),
+                ),
               ...attachments.map((file) {
                 final name = file['file_name'] ?? 'Unnamed';
                 final ext = file['extension'] ?? '';
@@ -125,14 +141,21 @@ class ShowNoticeDetailsSheet extends StatelessWidget {
                     onTap: () async => openFile(url),
                     child: Row(
                       children: [
-                        Icon(ext == 'pdf' ? Icons.picture_as_pdf : Icons.link,
-                            color: ext == 'pdf' ? Colors.red : Colors.blue),
+                        Icon(
+                          ext == 'pdf' ? Icons.picture_as_pdf : Icons.link,
+                          color: ext == 'pdf' ? Colors.red : Colors.blue,
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: Text(name, overflow: TextOverflow.ellipsis)),
+                        Expanded(
+                          child: Text(name, overflow: TextOverflow.ellipsis),
+                        ),
                         IconButton(
-                          icon: const Icon(Icons.remove_red_eye, color: Colors.blue),
+                          icon: const Icon(
+                            Icons.remove_red_eye,
+                            color: Colors.blue,
+                          ),
                           onPressed: () async => openFile(url),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -143,67 +166,95 @@ class ShowNoticeDetailsSheet extends StatelessWidget {
               const Divider(),
 
               /// Notification Type
-              const Text("Notify On:", style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                "Notify On:",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
 
               Wrap(
                 spacing: 8,
                 runSpacing: 4,
                 children: [
-                  if (withapp == 'yes') _notifyChip(getSelectedNotifyValues()['with_app'], ''),
-                  if (withtextSms == 'yes') _notifyChip(getSelectedNotifyValues()['with_text_sms'], ''),
-                  if (withEmail == 'yes') _notifyChip(getSelectedNotifyValues()['with_email'], ''),
-                  if (withWebsite == 'yes') _notifyChip(getSelectedNotifyValues()['with_website'], ''),
+                  if (withapp == 'yes')
+                    _notifyChip(getSelectedNotifyValues()['with_app'], ''),
+                  if (withtextSms == 'yes')
+                    _notifyChip(getSelectedNotifyValues()['with_text_sms'], ''),
+                  if (withEmail == 'yes')
+                    _notifyChip(getSelectedNotifyValues()['with_email'], ''),
+                  if (withWebsite == 'yes')
+                    _notifyChip(getSelectedNotifyValues()['with_website'], ''),
                 ],
               ),
 
               const SizedBox(height: 14),
               if (authorizedBy != null && authorizedBy!.trim().isNotEmpty) ...[
                 const Divider(),
-                const Text("Authorized By:", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  "Authorized By:",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
                 Text(authorizedBy!),
               ],
 
               if (noticeurls!.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                ...noticeurls!.map((url) => Container(
-                  width: 180,
-                  margin: const EdgeInsets.all(5),
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey, width: 2),
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.grey.shade200,
-                  ),
-                  child: InkWell(
-                    onTap: () => openFile(url),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.link, color: Colors.blue),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text("View Attached Link",
-                            style: TextStyle(color: Colors.blue),
+                ...noticeurls!.map(
+                  (url) => Container(
+                    width: 180,
+                    margin: const EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey, width: 2),
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.grey.shade200,
+                    ),
+                    child: InkWell(
+                      onTap: () => openFile(url),
+                      child: Row(
+                        children: const [
+                          Icon(Icons.link, color: Colors.blue),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              "View Attached Link",
+                              style: TextStyle(color: Colors.blue),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                )),
+                ),
               ],
               const SizedBox(height: 20),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(children: [
-                    PopupNetworkImage(imageUrl: submittedByProfile, radius: 20),
-                    const SizedBox(width: 8),
-                    Text("Submitted by $submittedBy",
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                  ]),
-                  Text("Attachment (${attachments.length})",
-                      style: const TextStyle(color: Colors.pinkAccent, fontWeight: FontWeight.bold)),
+                  Row(
+                    children: [
+                      PopupNetworkImage(
+                        imageUrl: submittedByProfile,
+                        radius: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Submitted by $submittedBy",
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    "Attachment (${attachments.length})",
+                    style: const TextStyle(
+                      color: Colors.pinkAccent,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
 
@@ -215,9 +266,18 @@ class ShowNoticeDetailsSheet extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close, color: Colors.white, size: 11),
-                      label: const Text("Close", style: TextStyle(fontSize: 11, color: Colors.white)),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 11,
+                      ),
+                      label: const Text(
+                        "Close",
+                        style: TextStyle(fontSize: 11, color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -228,7 +288,8 @@ class ShowNoticeDetailsSheet extends StatelessWidget {
                           bool confirmed = await showCustomConfirmationDialog(
                             context: context,
                             title: "Alert ?",
-                            message: "Are you sure you want to delete this Notice?",
+                            message:
+                                "Are you sure you want to delete this Notice?",
                             confirmText: "Yes",
                             cancelText: "No",
                           );
@@ -245,9 +306,18 @@ class ShowNoticeDetailsSheet extends StatelessWidget {
                           }
                         }
                       },
-                      icon: const Icon(Icons.delete, color: Colors.white, size: 11),
-                      label: const Text("Remove", style: TextStyle(fontSize: 11, color: Colors.white)),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                        size: 11,
+                      ),
+                      label: const Text(
+                        "Remove",
+                        style: TextStyle(fontSize: 11, color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
                     ),
                   ),
                 ],

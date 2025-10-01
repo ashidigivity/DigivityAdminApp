@@ -34,16 +34,16 @@ class AddSyllabusPage extends StatefulWidget {
 class _AddSyllabusPage extends State<AddSyllabusPage> {
   final _formkye = GlobalKey<FormState>();
   final GlobalKey<NotifyBySectionState> notifyKey =
-  GlobalKey<NotifyBySectionState>();
+      GlobalKey<NotifyBySectionState>();
   final GlobalKey<DynamicUrlInputListState> urlKey =
-  GlobalKey<DynamicUrlInputListState>();
+      GlobalKey<DynamicUrlInputListState>();
 
   bool isSubmissionEnabled = false;
   TextEditingController _referenceController = TextEditingController();
   TextEditingController _syllabusPripority = TextEditingController();
   TextEditingController _syllabusTitleController = TextEditingController();
   TextEditingController _syllabusDescriptionController =
-  TextEditingController();
+      TextEditingController();
   String? courseId;
   int? _selectedSubjectId;
   List<SubjectModel> subjectList = [];
@@ -72,15 +72,16 @@ class _AddSyllabusPage extends State<AddSyllabusPage> {
               children: [
                 CourseComponent(
                   isSubject: true,
+                  forData: "subjects",
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Select First Course";
+                    }
+                    return null;
+                  },
                   onChanged: (value) {
                     courseId = value;
                     setState(() {});
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please Select The Course First";
-                    }
-                    return null;
                   },
                   onSubjectListChanged: (List<SubjectModel> subjects) {
                     setState(() {

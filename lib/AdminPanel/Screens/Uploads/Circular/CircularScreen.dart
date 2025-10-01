@@ -24,7 +24,9 @@ class _Circularscreen extends State<Circularscreen> {
   @override
   void initState() {
     super.initState();
-    ferchedCircular({});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ferchedCircular({});
+    });
   }
 
   Future<void> ferchedCircular(Map<String, dynamic>? bodydata) async {
@@ -77,7 +79,7 @@ class _Circularscreen extends State<Circularscreen> {
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : _filterdCirculars.isEmpty
-                    ? const Center(child: Text('No Notice found'))
+                    ? const Center(child: Text('No Circular found'))
                     : ListView.builder(
                   itemCount: _filterdCirculars.length,
                   itemBuilder: (context, index) {

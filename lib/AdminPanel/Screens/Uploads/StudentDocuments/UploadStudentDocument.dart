@@ -1,5 +1,6 @@
 import 'package:digivity_admin_app/AdminPanel/Models/StudentDocUploadsModels/StudentDocumentUpload.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/Uploads/StudentDocuments/UploadDocumentBottomSheet.dart';
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/BackgrounWeapper.dart';
 import 'package:digivity_admin_app/Components/Loader.dart';
 import 'package:digivity_admin_app/Components/SimpleAppBar.dart';
@@ -30,28 +31,33 @@ class UploadStudentDocument extends StatefulWidget {
 }
 
 class _UploadStudentDocument extends State<UploadStudentDocument> {
-
-
-
-
-   List<StudentDocumentUpload>? documentsdata =[];
-
+  List<StudentDocumentUpload>? documentsdata = [];
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-showLoaderDialog(context);
-fetchDocumentsRecords();
-hideLoaderDialog(context);
+      showLoaderDialog(context);
+      try {
+        fetchDocumentsRecords();
+      } catch (e) {
+        showBottomMessage(context, "${e}", true);
+      } finally {
+        hideLoaderDialog(context);
+      }
     });
-    }
+  }
 
-    Future<void> fetchDocumentsRecords() async{
-    final docdata = await Studentdocumentsuploadhelpers().getStudentUploadDocuments(widget.StudentId);
-    setState(() {
-      documentsdata = docdata;
-    });
+  Future<void> fetchDocumentsRecords() async {
+    try {
+      final docdata = await Studentdocumentsuploadhelpers()
+          .getStudentUploadDocuments(widget.StudentId);
+      setState(() {
+        documentsdata = docdata;
+      });
+    }catch(e){
+      showBottomMessage(context, "${e}", true);
     }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +65,9 @@ hideLoaderDialog(context);
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: SimpleAppBar(
-            titleText: '${widget.studentName} (${widget.Course})',
-            routeName: 'back'),
+          titleText: '${widget.studentName} (${widget.Course})',
+          routeName: 'back',
+        ),
       ),
       body: BackgroundWrapper(
         child: SingleChildScrollView(
@@ -86,9 +93,10 @@ hideLoaderDialog(context);
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 5,
-                        offset: Offset(0, 2)),
+                      color: Colors.black12,
+                      blurRadius: 5,
+                      offset: Offset(0, 2),
+                    ),
                   ],
                 ),
                 child: Row(
@@ -98,17 +106,17 @@ hideLoaderDialog(context);
                       borderRadius: BorderRadius.circular(8),
                       child: widget.imageUrl.isNotEmpty
                           ? Image.network(
-                        widget.imageUrl,
-                        height: 110,
-                        width: 80,
-                        fit: BoxFit.cover,
-                      )
+                              widget.imageUrl,
+                              height: 110,
+                              width: 80,
+                              fit: BoxFit.cover,
+                            )
                           : Image.asset(
-                        'assets/images/default_student.png',
-                        height: 100,
-                        width: 80,
-                        fit: BoxFit.cover,
-                      ),
+                              'assets/images/default_student.png',
+                              height: 100,
+                              width: 80,
+                              fit: BoxFit.cover,
+                            ),
                     ),
                     SizedBox(width: 15),
                     Expanded(
@@ -135,11 +143,13 @@ hideLoaderDialog(context);
                   children: [
                     Text(
                       "Documents",
-                      style:
-                      TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     InkWell(
-                      onTap: () async{
+                      onTap: () async {
                         showLoaderDialog(context);
                         await fetchDocumentsRecords();
                         hideLoaderDialog(context);
@@ -148,11 +158,10 @@ hideLoaderDialog(context);
                         children: [
                           Icon(Icons.refresh, color: Colors.blue, size: 18),
                           SizedBox(width: 4),
-                          Text("Refresh",
-                              style: TextStyle(color: Colors.blue)),
+                          Text("Refresh", style: TextStyle(color: Colors.blue)),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -161,11 +170,11 @@ hideLoaderDialog(context);
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: DocumentSection(
-                    studentId: widget.StudentId,
-                    studentName: widget.studentName,
-                    documents: documentsdata!,
+                  studentId: widget.StudentId,
+                  studentName: widget.studentName,
+                  documents: documentsdata!,
                   onRefresh: fetchDocumentsRecords,
-                )
+                ),
               ),
             ],
           ),
@@ -207,8 +216,6 @@ hideLoaderDialog(context);
   }
 }
 
-
-
 // Document Section Widget
 class DocumentSection extends StatelessWidget {
   final List<StudentDocumentUpload> documents;
@@ -220,7 +227,7 @@ class DocumentSection extends StatelessWidget {
     required this.documents,
     required this.studentName,
     required this.studentId,
-    required this.onRefresh
+    required this.onRefresh,
   });
 
   @override
@@ -232,7 +239,8 @@ class DocumentSection extends StatelessWidget {
     return Column(
       children: List.generate(documents.length, (index) {
         final doc = documents[index];
-        final isUploaded = doc.documentFile != null && doc.documentFile!.isNotEmpty;
+        final isUploaded =
+            doc.documentFile != null && doc.documentFile!.isNotEmpty;
 
         return InkWell(
           onTap: () async {
@@ -244,16 +252,16 @@ class DocumentSection extends StatelessWidget {
                 studentName: studentName,
                 documentName: doc.documentName,
                 StudentId: studentId,
-                documentId:doc.documentId,
+                documentId: doc.documentId,
                 docuemntFile: doc.documentFile,
                 onupload: (Map<String, dynamic> bodydata) async {
-                  final response = await Studentdocumentsuploadhelpers().uploadStudentDocuemnt(bodydata);
+                  final response = await Studentdocumentsuploadhelpers()
+                      .uploadStudentDocuemnt(bodydata);
                   if (response['result'] == 1) {
                     onRefresh();
                   }
                   return response;
                 },
-
               ),
             );
           },
@@ -272,8 +280,13 @@ class DocumentSection extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(doc.documentName,
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    Text(
+                      doc.documentName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
                     SizedBox(height: 4),
                     Text(
                       isUploaded ? "Uploaded" : "No Document Found!",

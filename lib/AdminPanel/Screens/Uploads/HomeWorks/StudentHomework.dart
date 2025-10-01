@@ -24,7 +24,9 @@ class _StudentHomeworkState extends State<StudentHomework> {
   @override
   void initState() {
     super.initState();
-    _fetchHomeworks({}); // pass empty map initially
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchHomeworks({});
+    });// pass empty map initially
   }
 
   Future<void> _fetchHomeworks(Map<String, dynamic>? bodydata) async {
@@ -73,7 +75,7 @@ class _StudentHomeworkState extends State<StudentHomework> {
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : _filteredHomeworks.isEmpty
-                    ? const Center(child: Text('No homework found'))
+                    ? const Center(child: Text('No Homework Found'))
                     : ListView.builder(
                   itemCount: _filteredHomeworks.length,
                   itemBuilder: (context, index) {

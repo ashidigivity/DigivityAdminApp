@@ -46,6 +46,7 @@ class UiThemeProvider with ChangeNotifier {
 
       final url = "api/MobileApp/master-admin/$userId/MobileUISettingsApi";
       final response = await getApiService.getRequestData(url, token);
+      print("Mobile Ui Theem ${response}");
       final data = MobileUiSettings.fromJson(response['success']);
 
       setThemeSettings(data);

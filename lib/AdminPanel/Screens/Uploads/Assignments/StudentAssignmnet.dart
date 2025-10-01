@@ -26,7 +26,9 @@ class _StudentAssignmnet extends State<StudentAssignmnet> {
   @override
   void initState() {
     super.initState();
-    _fetchSyllabus({});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchSyllabus({});
+    });
   }
 
   Future<void> _fetchSyllabus(Map<String, dynamic>? bodydata) async {
@@ -50,7 +52,10 @@ class _StudentAssignmnet extends State<StudentAssignmnet> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: SimpleAppBar(titleText: 'Student Assignments', routeName: 'back'),
+        child: SimpleAppBar(
+          titleText: 'Student Assignments',
+          routeName: 'back',
+        ),
       ),
       body: BackgroundWrapper(
         child: Container(
@@ -62,12 +67,20 @@ class _StudentAssignmnet extends State<StudentAssignmnet> {
                 onChanged: (value) {
                   final query = value.toLowerCase();
                   setState(() {
-                    _filteredassignments = _assignments.where((assign) =>
-                        (assign.subject ?? '').toLowerCase().contains(query) ||
-                        (assign.assignmentTitle ?? '').toLowerCase().contains(query) ||
-                        (assign.assignment ?? '').toLowerCase().contains(query)
-
-                    ).toList();
+                    _filteredassignments = _assignments
+                        .where(
+                          (assign) =>
+                              (assign.subject ?? '').toLowerCase().contains(
+                                query,
+                              ) ||
+                              (assign.assignmentTitle ?? '')
+                                  .toLowerCase()
+                                  .contains(query) ||
+                              (assign.assignment ?? '').toLowerCase().contains(
+                                query,
+                              ),
+                        )
+                        .toList();
                   });
                 },
               ),
@@ -76,43 +89,48 @@ class _StudentAssignmnet extends State<StudentAssignmnet> {
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : _filteredassignments.isEmpty
-                    ? const Center(child: Text('No homework found'))
+                    ? const Center(child: Text('No Assignment Found'))
                     : ListView.builder(
-                  itemCount: _filteredassignments.length,
-                  itemBuilder: (context, index) {
-                    final assign = _filteredassignments[index];
-                    return Assignmentcard(
-                      assignmentId: assign.assignmentId,
-                      course: assign.course ?? '',
-                      assigmetSubmissionDate:assign.submittedDate ?? '',
-                      assignmentDate:assign.assignmentDate,
-                      subject: assign.subject ?? '',
-                      assignmentTitle: assign.assignmentTitle ?? '',
-                      assignmentDetail: assign.assignment ?? '',
-                      submittedBy: assign.submittedBy ?? '',
-                      submittedByProfile: assign.submittedByProfile ?? '',
-                      attachments: assign.attachment.map((e) => {
-                        'file_name': e.fileName,
-                        'file_path': e.filePath,
-                        'extension': e.extension,
-                      }).toList(),
-                      withapp: assign.withApp,
-                      withWebsite: assign.withWebsite,
-                      withEmail:assign.withEmail,
-                      withtextSms:assign.withTextSms,
+                        itemCount: _filteredassignments.length,
+                        itemBuilder: (context, index) {
+                          final assign = _filteredassignments[index];
+                          return Assignmentcard(
+                            assignmentId: assign.assignmentId,
+                            course: assign.course ?? '',
+                            assigmetSubmissionDate: assign.submittedDate ?? '',
+                            assignmentDate: assign.assignmentDate,
+                            subject: assign.subject ?? '',
+                            assignmentTitle: assign.assignmentTitle ?? '',
+                            assignmentDetail: assign.assignment ?? '',
+                            submittedBy: assign.submittedBy ?? '',
+                            submittedByProfile: assign.submittedByProfile ?? '',
+                            attachments: assign.attachment
+                                .map(
+                                  (e) => {
+                                    'file_name': e.fileName,
+                                    'file_path': e.filePath,
+                                    'extension': e.extension,
+                                  },
+                                )
+                                .toList(),
+                            withapp: assign.withApp,
+                            withWebsite: assign.withWebsite,
+                            withEmail: assign.withEmail,
+                            withtextSms: assign.withTextSms,
 
-                      onDelete: () async {
-                        final helper = Assignmenthelper();
-                        final response = await helper.deleteAssignment(assign.assignmentId); // delete from backend
-                        if (response['result'] == 1) {
-                          await _fetchSyllabus({}); // refresh list
-                        }
-                        return response;
-                      },
-                    );
-
-                  },
-                ),
+                            onDelete: () async {
+                              final helper = Assignmenthelper();
+                              final response = await helper.deleteAssignment(
+                                assign.assignmentId,
+                              ); // delete from backend
+                              if (response['result'] == 1) {
+                                await _fetchSyllabus({}); // refresh list
+                              }
+                              return response;
+                            },
+                          );
+                        },
+                      ),
               ),
             ],
           ),

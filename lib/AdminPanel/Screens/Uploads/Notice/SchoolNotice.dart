@@ -23,7 +23,9 @@ class _Schoolnotice extends State<Schoolnotice> {
   @override
   void initState() {
     super.initState();
-    fetchedNotice({});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchedNotice({});
+    });
   }
 
   Future<void> fetchedNotice(Map<String, dynamic>? formdata) async {

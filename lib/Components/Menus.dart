@@ -1,5 +1,5 @@
-
 import 'package:digivity_admin_app/AdminPanel/MobileThemsColors/theme_provider.dart';
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Helpers/UserPermissions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -20,71 +20,83 @@ class _CustomMenuModalState extends State<CustomMenuModal> {
   @override
   void initState() {
     super.initState();
-    _fetchMenuItems();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchMenuItems();
+    });
   }
 
   Future<void> _fetchMenuItems() async {
-    final data = await UserPermissions().getPermissions();
-    setState(() {
-      _quickActions = data['quickActions'] ?? [];
-      _reports = data['reports'] ?? [];
-      _isLoading = false;
-    });
+    try {
+      final data = await UserPermissions().getPermissions();
+      setState(() {
+        _quickActions = data['quickActions'] ?? [];
+        _reports = data['reports'] ?? [];
+        _isLoading = false;
+      });
+    } catch (e) {
+      showTopToast(context, "$e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-
     final uiTheme = Provider.of<UiThemeProvider>(context);
 
     return FractionallySizedBox(
       heightFactor: 0.7,
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration:  BoxDecoration(
-          color: uiTheme.bottomSheetBgColor ??  Color(0xFF514197).withOpacity(0.1),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        decoration: BoxDecoration(
+          color:
+              uiTheme.bottomSheetBgColor ?? Color(0xFF514197).withOpacity(0.1),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 5,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[400],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 5,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Navigation Menu",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    buildModuleGrid(
+                      'Quick Actions',
+                      uiTheme,
+                      _quickActions,
+                      context,
+                    ),
+                    const SizedBox(height: 10),
+                    buildModuleGrid('Reports', uiTheme, _reports, context),
+                    const SizedBox(height: 5),
+                  ],
                 ),
               ),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Navigation Menu",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 5),
-              buildModuleGrid('Quick Actions',uiTheme, _quickActions),
-              const SizedBox(height: 10),
-              buildModuleGrid('Reports',uiTheme , _reports),
-              const SizedBox(height: 5),
-            ],
-          ),
-        ),
       ),
     );
   }
-
 }
-
 
 IconData getIconForModule(String moduleId) {
   switch (moduleId) {
@@ -126,10 +138,15 @@ IconData getIconForModule(String moduleId) {
       return Icons.document_scanner;
     case 'exam-entry':
       return Icons.fact_check;
+    case 'student-complaint':
+      return Icons.report_problem;
+    case 'my-student-birthday':
+      return Icons.cake;
     default:
       return Icons.widgets; // default icon
   }
 }
+
 getRouteForModule(String moduleId) {
   switch (moduleId) {
     case 'new-student':
@@ -149,9 +166,7 @@ getRouteForModule(String moduleId) {
     case 'staff-photo':
       return 'staff-upload-image';
     case 'master-update':
-      return 'master-update';
-    case 'student-complaint':
-      return Icons.report_problem;
+      return 'master-update'; // coming soon
     case 'student-list':
       return 'student-list';
     case 'staff-list':
@@ -165,18 +180,26 @@ getRouteForModule(String moduleId) {
     case 'upload-notice':
       return 'upload-notice';
     case 'upload-circular':
-        return 'upload-circular';
+      return 'upload-circular';
     case 'student-documents':
       return 'student-documents';
     case 'exam-entry':
       return 'exam-entry';
+    case 'student-complaint':
+      return 'student-complaint-filter';
+    case 'my-student-birthday':
+      return 'student-birthday-reports';
     default:
-      return Icons.widgets; // default icon
+      return ''; // default: coming soon
   }
 }
 
-
-Widget buildModuleGrid(String title, UiThemeProvider uiTheme , List<Map<String, dynamic>> modules) {
+Widget buildModuleGrid(
+  String title,
+  UiThemeProvider uiTheme,
+  List<Map<String, dynamic>> modules,
+  BuildContext rootContext,
+) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -201,8 +224,17 @@ Widget buildModuleGrid(String title, UiThemeProvider uiTheme , List<Map<String, 
           final module = modules[index];
           return GestureDetector(
             onTap: () {
-              // handle navigation
-              context.pushNamed(getRouteForModule(module['module_id']));
+              final route = getRouteForModule(module['module_id']);
+              print(route);
+              try {
+                if (route.isNotEmpty) {
+                  rootContext.pushNamed(route);
+                } else {
+                  showTopToast(rootContext, "Oops!! Coming Soon");
+                }
+              } catch (e) {
+                showTopToast(rootContext, "$e");
+              }
             },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -210,7 +242,9 @@ Widget buildModuleGrid(String title, UiThemeProvider uiTheme , List<Map<String, 
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: uiTheme.bottomSheetBgColor ?? Color(0xFF514197).withOpacity(0.1),
+                    color:
+                        uiTheme.bottomSheetBgColor ??
+                        Color(0xFF514197).withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -222,7 +256,10 @@ Widget buildModuleGrid(String title, UiThemeProvider uiTheme , List<Map<String, 
                 Text(
                   module['module_text'] ?? '',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 11,color:uiTheme.appbarIconColor ?? Color(0xFF514197)),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: uiTheme.appbarIconColor ?? Color(0xFF514197),
+                  ),
                 ),
               ],
             ),
@@ -233,10 +270,9 @@ Widget buildModuleGrid(String title, UiThemeProvider uiTheme , List<Map<String, 
   );
 }
 
-
 void showCustomMenuModal(BuildContext context) {
   showModalBottomSheet(
-    backgroundColor: Color(0xFFF8F1F9),
+    backgroundColor: const Color(0xFFF8F1F9),
     context: context,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(
@@ -244,4 +280,50 @@ void showCustomMenuModal(BuildContext context) {
     ),
     builder: (context) => const CustomMenuModal(),
   );
+}
+
+// ----------------------------
+// Modern Animated Top Toast
+// ----------------------------
+void showTopToast(BuildContext context, String message) {
+  final overlay = Overlay.of(context);
+  final overlayEntry = OverlayEntry(
+    builder: (context) => Positioned(
+      top: MediaQuery.of(context).padding.top + 20,
+      left: 20,
+      right: 20,
+      child: Material(
+        color: Colors.transparent,
+        child: AnimatedOpacity(
+          opacity: 1,
+          duration: const Duration(milliseconds: 300),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.black87,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline, color: Colors.white),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  overlay.insert(overlayEntry);
+
+  Future.delayed(const Duration(seconds: 2), () {
+    overlayEntry.remove();
+  });
 }
