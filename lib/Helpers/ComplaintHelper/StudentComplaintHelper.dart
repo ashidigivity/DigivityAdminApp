@@ -22,7 +22,7 @@ class StudentComplaintHelper {
       await init();
     }
     try {
-      final String url = "/api/MobileApp/master-admin/$userId/ComplaintType";
+      final String url = "api/MobileApp/master-admin/$userId/ComplaintType";
 
       final response = await getApiService.getRequestData(url, token!);
 
@@ -51,7 +51,8 @@ class StudentComplaintHelper {
       await init();
     }
     try {
-      final String url = "api/MobileApp/master-admin/$userId/RaisedComplaintList";
+      final String url =
+          "api/MobileApp/master-admin/$userId/RaisedComplaintList";
       print(formdta);
       final response = await getApiService.postRequestData(
         url,
@@ -80,7 +81,6 @@ class StudentComplaintHelper {
     }
 
     try {
-      print(formdata);
       final String url = "api/MobileApp/master-admin/$userId/StoreComplaint";
       final response = await getApiService.postRequestData(
         url,
@@ -88,8 +88,6 @@ class StudentComplaintHelper {
         formdata!,
       );
 
-
-      print(formdata);
       if (response['result'] == 1) {
         return response;
       }

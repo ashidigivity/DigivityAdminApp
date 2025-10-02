@@ -109,7 +109,6 @@ class _StudentListsDataFormState extends State<StudentListsDataForm> {
                   orderByMethod: selectedStudentSort ?? 'asc',
                   selectedStatus: selectedStatus ?? 'active',
                 );
-
                 hideLoaderDialog(context);
                 context.pushNamed('student-search');
               } catch (e) {

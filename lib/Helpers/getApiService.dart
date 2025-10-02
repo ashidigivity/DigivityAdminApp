@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:digivity_admin_app/Authentication/SharedPrefHelper.dart';
 import 'package:http/http.dart' as http;
 
-class getApiService{
+class getApiService {
   // GET request
   static Future<dynamic> getApiServiceForLogin(String url) async {
     try {
@@ -17,11 +17,13 @@ class getApiService{
       throw Exception('Error: $e');
     }
   }
-  static Future<dynamic> getRequestData(String url,String token) async{
+
+  static Future<dynamic> getRequestData(String url, String token) async {
     try {
       final baseUrl = await SharedPrefHelper.getPreferenceValue('base_url');
       final finalUrl = "$baseUrl/$url";
-      final response = await http.get(Uri.parse(finalUrl),
+      final response = await http.get(
+        Uri.parse(finalUrl),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -40,7 +42,10 @@ class getApiService{
   }
 
   static Future<dynamic> postRequestData(
-      String url, String token, Map<String, dynamic> body) async {
+    String url,
+    String token,
+    Map<String, dynamic> body,
+  ) async {
     try {
       final baseUrl = await SharedPrefHelper.getPreferenceValue('base_url');
       final finalUrl = "$baseUrl/$url";
@@ -72,6 +77,4 @@ class getApiService{
       throw Exception('Error: $e');
     }
   }
-
 }
-

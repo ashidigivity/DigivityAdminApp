@@ -28,13 +28,7 @@ class _SimpleAppBar extends State<SimpleAppBar> {
         leading: IconButton(
           onPressed: () {
             if (widget.routeName == 'back') {
-              context.pop(); // remove current screen
-              final topRoute = GoRouter.of(
-                context,
-              ).routerDelegate.currentConfiguration.last.matchedLocation;
-              if (topRoute.isNotEmpty) {
-                context.pushReplacement(topRoute);
-              }
+              context.pop();
             } else {
               context.goNamed(widget.routeName);
             }

@@ -47,7 +47,10 @@ class _SidebarState extends State<Sidebar> {
             DrawerHeader(
               decoration: BoxDecoration(
                 color: uiTheme.appBarColor ?? Colors.blue,
-                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(50),bottomRight: Radius.circular(50))
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(50),
+                  bottomRight: Radius.circular(50),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,

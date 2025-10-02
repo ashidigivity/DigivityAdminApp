@@ -32,6 +32,7 @@ import 'package:digivity_admin_app/AdminPanel/Screens/MasterUpdate/FieldUpdateSt
 import 'package:digivity_admin_app/AdminPanel/Screens/MasterUpdate/MasterUpdateIndex.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/MasterUpdate/RollNumberUpdation/SearchStudentListForRollNum.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/MasterUpdate/RollNumberUpdation/StudentListForUpdateRollNum.dart';
+import 'package:digivity_admin_app/AdminPanel/Screens/PageRefresher/AutoRefreshWrapper.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StaffManagement/AddStaffForm.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StaffManagement/StaffFillterForm.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StaffManagement/StaffListScreen.dart';
@@ -80,6 +81,7 @@ import 'package:digivity_admin_app/AuthenticationUi/SchoolCodeVerification.dart'
 import 'package:digivity_admin_app/AuthenticationUi/SplashScreen.dart';
 import 'package:digivity_admin_app/AuthenticationUi/TwoFactorAuthentication.dart';
 import 'package:digivity_admin_app/AuthenticationUi/UserProfile.dart';
+import 'package:digivity_admin_app/Components/BackgrounWeapper.dart';
 import 'package:digivity_admin_app/Components/NotificationScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -98,6 +100,7 @@ Future<void> main() async {
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
+
   routes: [
     GoRoute(
       path: '/',
@@ -559,7 +562,6 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
-
     /// Student Complaint Section Start Here
     GoRoute(
       name: "student-complaint-filter",
@@ -584,7 +586,6 @@ final GoRouter appRouter = GoRouter(
         return AddStudentComplaint();
       },
     ),
-
 
     //   user switch for multiple
     GoRoute(

@@ -209,9 +209,8 @@ class _AddStudentComplaint extends State<AddStudentComplaint> {
                   "complaint_type_id": _complainttype.toString(),
                   "complaint": _complaint.text,
                   "complaint_date": _complaintdate.text,
-                  "complaint_by":
-                      complaintby?.toString() ?? "0", // logged-in user
-                  "complaint_to": complaintTo ?? 0, // student selected
+                  "complaint_by": complaintby?.toString() ?? "0",
+                  "complaint_to": complaintTo ?? 0,
                   "status": "yes",
                   "course_id": courseId.toString(),
                   ...notifyData,
@@ -219,7 +218,6 @@ class _AddStudentComplaint extends State<AddStudentComplaint> {
 
                 final response = await StudentComplaintHelper()
                     .storeStudentComplaint(formdata);
-
                 if (response['result'] == 1) {
                   _resetForm();
                   showBottomMessage(context, response['message'], false);

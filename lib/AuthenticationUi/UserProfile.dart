@@ -1,3 +1,4 @@
+import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/BottomNavigation.dart';
 import 'package:digivity_admin_app/helpers//CommonFunctions.dart';
 import 'package:digivity_admin_app/Components/AppBarComponent.dart';
@@ -31,75 +32,113 @@ class Profile extends State<UserProfile> {
 
   Future<void> _userData() async {
     showLoaderDialog(context);
-    final data = await CustomFunctions().getUserProfileData();
-
-    print(data);
-    hideLoaderDialog(context);
-    if (data != null) {
-      setState(() {
-        userdata = data;
-      });
+    try {
+      final data = await CustomFunctions().getUserProfileData();
+      if (data != null) {
+        setState(() {
+          userdata = data;
+        });
+      }
+    } catch (e) {
+      showBottomMessage(context, "${e}", true);
+    } finally {
+      hideLoaderDialog(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: const Sidebar(),
-        appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight),
-          child: AppBarComponent(appbartitle: "User Profile"),
-        ),
-        body:BackgroundWrapper(
-          child: CardContainer(
-            margin: EdgeInsets.all(5),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Academic Session',
-                    style: TextStyle(
-                      fontSize: AppFontSizes.xLarge,
-                      fontWeight: AppFontWeights.bold,
-                    ),
+      drawer: const Sidebar(),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: AppBarComponent(appbartitle: "User Profile"),
+      ),
+      body: BackgroundWrapper(
+        child: CardContainer(
+          margin: EdgeInsets.all(5),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Academic Session',
+                  style: TextStyle(
+                    fontSize: AppFontSizes.xLarge,
+                    fontWeight: AppFontWeights.bold,
                   ),
-                  Text(
-                    '${userdata["academicyear"] ?? "N/A"}',
-                    style: TextStyle(
-                      fontSize: AppFontSizes.large,
-                      fontWeight: AppFontWeights.bold,
-                    ),
+                ),
+                Text(
+                  '${userdata["academicyear"] ?? "N/A"}',
+                  style: TextStyle(
+                    fontSize: AppFontSizes.large,
+                    fontWeight: AppFontWeights.bold,
                   ),
+                ),
 
-
-                  Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: NetworkImage(userdata['profile_image'] ?? ''),
-                        backgroundColor: Colors.grey.shade200,
+                Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage: NetworkImage(
+                        userdata['profile_image'] ?? '',
                       ),
-                      const SizedBox(height: 1),
+                      backgroundColor: Colors.grey.shade200,
+                    ),
+                    const SizedBox(height: 1),
 
-                      // User Info List
-                      buildProfileRow(Icons.person, "Name", userdata['name'] ?? 'N/A'),
-                      buildProfileRow(Icons.verified_user, "Role", userdata['role'] ?? 'N/A'),
-                      buildProfileRow(Icons.male, "Gender", userdata['gender'] ?? 'N/A'),
-                      buildProfileRow(Icons.calendar_today, "Date of Birth", userdata['dob'] ?? 'N/A'),
-                      buildProfileRow(Icons.phone, "Contact No", userdata['contact'] ?? 'N/A'),
-                      buildProfileRow(Icons.email, "Email", userdata['email'] ?? 'N/A'),
-                      buildProfileRow(Icons.lock, "2 FA Authentication", userdata['tow_factor_auth'] == true ? "Enable" : "Disable"),
-                      buildProfileRow(Icons.access_time, "Last Login at", userdata['lastlogin'] ?? 'N/A'),
-
-                    ],
-                  )
-                  // Profile Picture
-                ],
-              ),
-            ),),
+                    // User Info List
+                    buildProfileRow(
+                      Icons.person,
+                      "Name",
+                      userdata['name'] ?? 'N/A',
+                    ),
+                    buildProfileRow(
+                      Icons.verified_user,
+                      "Role",
+                      userdata['role'] ?? 'N/A',
+                    ),
+                    buildProfileRow(
+                      Icons.male,
+                      "Gender",
+                      userdata['gender'] ?? 'N/A',
+                    ),
+                    buildProfileRow(
+                      Icons.calendar_today,
+                      "Date of Birth",
+                      userdata['dob'] ?? 'N/A',
+                    ),
+                    buildProfileRow(
+                      Icons.phone,
+                      "Contact No",
+                      userdata['contact'] ?? 'N/A',
+                    ),
+                    buildProfileRow(
+                      Icons.email,
+                      "Email",
+                      userdata['email'] ?? 'N/A',
+                    ),
+                    buildProfileRow(
+                      Icons.lock,
+                      "2 FA Authentication",
+                      userdata['tow_factor_auth'] == true
+                          ? "Enable"
+                          : "Disable",
+                    ),
+                    buildProfileRow(
+                      Icons.access_time,
+                      "Last Login at",
+                      userdata['lastlogin'] ?? 'N/A',
+                    ),
+                  ],
+                ),
+                // Profile Picture
+              ],
+            ),
+          ),
         ),
-        bottomNavigationBar:const CustomBottomNavBar()
+      ),
+      bottomNavigationBar: const CustomBottomNavBar(),
     );
   }
 }
@@ -108,9 +147,7 @@ Widget buildProfileRow(IconData icon, String label, String value) {
   return Container(
     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
     decoration: const BoxDecoration(
-      border: Border(
-        bottom: BorderSide(color: Color(0xFFE0E0E0), width: 1),
-      ),
+      border: Border(bottom: BorderSide(color: Color(0xFFE0E0E0), width: 1)),
     ),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,10 +167,7 @@ Widget buildProfileRow(IconData icon, String label, String value) {
             children: [
               Text(
                 label,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey,
-                ),
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
               ),
               const SizedBox(height: 4),
               Text(
@@ -150,4 +184,3 @@ Widget buildProfileRow(IconData icon, String label, String value) {
     ),
   );
 }
-
