@@ -6,10 +6,8 @@ import 'package:digivity_admin_app/Components/AppBarComponent.dart';
 import 'package:digivity_admin_app/Components/BackgrounWeapper.dart';
 import 'package:digivity_admin_app/Components/BottomNavigation.dart';
 import 'package:digivity_admin_app/Components/CardContainer.dart';
-import 'package:digivity_admin_app/Components/NotificationBadge.dart';
 import 'package:digivity_admin_app/Components/SideBar.dart';
 import 'package:digivity_admin_app/Components/SliderCarouselWidget.dart';
-import 'package:digivity_admin_app/Helpers/DeviceToken.dart';
 import 'package:digivity_admin_app/Providers/DashboardProvider.dart';
 import 'package:digivity_admin_app/helpers/permission_handler.dart';
 import 'package:flutter/material.dart';
@@ -220,34 +218,26 @@ class _DashboardState extends State<Dashboard> {
               ),
             ),
             Positioned(
-              bottom: 16,
-              right: 16,
+              bottom: 22,
+              right: 15,
               child: FloatingActionButton(
                 backgroundColor: uiTheme.appBarColor ?? Colors.blue,
                 onPressed: () async {
-                  final permission =
-                  await PermissionService.requestNotificationPermission(
-                    context,
-                  );
-                  if (permission) {
-                    context.pushNamed("notification-screen");
-                  } else {
-                    showBottomMessage(
-                      context,
-                      "Notification Permission Not Provided",
-                      true,
-                    );
+                  try{
+                    context.pushNamed("student-global-search");
+                  }catch(e){
+                    showBottomMessage(context, "${e}", true);
                   }
+
                 },
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
                     Icon(
-                      Icons.notifications_none,
+                      Icons.search,
                       color: uiTheme.appbarIconColor ?? Colors.white,
                       size: 22,
                     ),
-                    NotificationBadge(),
                   ],
                 ),
               ),

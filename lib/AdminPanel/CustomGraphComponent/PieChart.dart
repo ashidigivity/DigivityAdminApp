@@ -64,19 +64,20 @@ class _PiechartState extends State<Piechart> {
       sections.add(
         PieChartSectionData(
           value: widget.values[index] == 0.0 ? 0.0001 : widget.values[index],
-          // 🔹 0 ko bhi pie me rakhna hai, warna index bigad jaayega
           title: isTouched && widget.values[index] > 0
               ? '${widget.sections[index]}\n(${widget.values[index].toStringAsFixed(0)})'
-              : '',
+              : '', // only show when touched
           color: color,
           radius: isTouched ? 70 : 60,
           titleStyle: const TextStyle(
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
       );
+
+
     }
 
     return Column(

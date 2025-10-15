@@ -15,23 +15,25 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  // Ensure Flutter binding is initialized before any async operations
-  WidgetsFlutterBinding.ensureInitialized();
 
-  // Set up global error handling
-  FlutterError.onError = (FlutterErrorDetails details) {
-    FlutterError.presentError(details);
-    debugPrint('Flutter Error: ${details.exception}');
-    debugPrint('Stack trace: ${details.stack}');
-  };
 
   // Add crash protection wrapper
   runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      debugPrint('Flutter Error: ${details.exception}');
+      debugPrint('Stack trace: ${details.stack}');
+    };
+
     try {
-      // Initialize Firebase
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      }
+
       debugPrint("Firebase Initialized Successfully");
     } catch (e, stackTrace) {
       debugPrint("Firebase Initialization Failed: $e");

@@ -52,6 +52,7 @@ import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/Student
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentComplaint/ComplaintList.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentComplaint/FliterStudentComplaint.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentDashboard.dart';
+import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentGlobalSearch/GlobalStudentSearch.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentListScreen.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentLsitsDataForm.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentProfile.dart';
@@ -859,6 +860,18 @@ final GoRouter appRouter = GoRouter(
       path: '/student-birthday-reports',
       builder: (context, state) {
         return StudentBirthdayList();
+      },
+    ),
+
+
+
+    // Student Global Search Section Start Here
+
+    GoRoute(
+      name: 'student-global-search',
+      path: '/student-global-search',
+      builder: (context, state) {
+        return GlobalStudentSearch();
       },
     ),
   ],
