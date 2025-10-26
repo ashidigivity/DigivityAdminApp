@@ -53,6 +53,7 @@ import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/Student
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentComplaint/FliterStudentComplaint.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentDashboard.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentGlobalSearch/GlobalStudentSearch.dart';
+import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentGlobalSearch/StudentIformation.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentListScreen.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentLsitsDataForm.dart';
 import 'package:digivity_admin_app/AdminPanel/Screens/StudentsManagement/StudentProfile.dart';
@@ -874,6 +875,19 @@ final GoRouter appRouter = GoRouter(
         return GlobalStudentSearch();
       },
     ),
+
+    GoRoute(
+      name: 'student-information-global-search',
+      path: '/student-information-global-search',
+      builder: (context, state) {
+       final studentdata = state.extra as Map<String,dynamic>;
+        return StudentInformation(studentId: studentdata["studentId"]);
+      },
+    ),
+
+
+
+
   ],
   redirect: (context, state) async {
     final prefs = await SharedPreferences.getInstance();

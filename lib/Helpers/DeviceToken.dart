@@ -4,10 +4,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 class DeviceToken {
   int? userId;
-  String?
-  accessToken; // renamed from 'token' to 'accessToken' to avoid confusion
+  String? accessToken; // renamed from 'token' to 'accessToken' to avoid confusion
 
   DeviceToken();
+
+
 
   Future<void> init() async {
     userId = await SharedPrefHelper.getPreferenceValue('user_id');
@@ -15,10 +16,12 @@ class DeviceToken {
   }
 
   Future<void> getDeviceToken() async {
-    if (userId == null || accessToken == null) {
+    if (userId == null && accessToken == null) {
       await init();
     }
 
+    print("Device Token Reponse");
+    print("${userId} - $accessToken");
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
     // iOS permission request

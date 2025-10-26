@@ -33,7 +33,6 @@ class CustomBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     final selectedIndex = _getSelectedIndex(location);
-
     final uiTheme = Provider.of<UiThemeProvider>(context);
 
     return BottomNavigationBar(
@@ -42,16 +41,20 @@ class CustomBottomNavBar extends StatelessWidget {
       currentIndex: selectedIndex,
       onTap: (index) => _onTap(context, index),
 
-      selectedItemColor: uiTheme.appbarIconColor ?? Colors.black,
-      unselectedItemColor: uiTheme.appbarIconColor ?? Colors.white,
+      // Always show labels
+      showUnselectedLabels: true,
 
-      // Optional: More styling control
+      // Selected/Unselected colors
+      selectedItemColor: uiTheme.appbarIconColor ?? Colors.black,
+      unselectedItemColor:
+      (uiTheme.appbarIconColor ?? Colors.black).withOpacity(0.5), // feeka color
+
       selectedLabelStyle: TextStyle(
-        color: uiTheme.appbarIconColor ?? Colors.white,
+        color: uiTheme.appbarIconColor ?? Colors.black,
         fontWeight: FontWeight.bold,
       ),
       unselectedLabelStyle: TextStyle(
-        color: uiTheme.appbarIconColor ?? Colors.white,
+        color: (uiTheme.appbarIconColor ?? Colors.black).withOpacity(0.5),
         fontWeight: FontWeight.w400,
       ),
 
@@ -59,21 +62,27 @@ class CustomBottomNavBar extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(
             Icons.home,
-            color: uiTheme.appbarIconColor ?? Colors.black,
+            color: selectedIndex == 0
+                ? uiTheme.appbarIconColor ?? Colors.black
+                : (uiTheme.appbarIconColor ?? Colors.black).withOpacity(0.5),
           ),
           label: 'Home',
         ),
         BottomNavigationBarItem(
           icon: Icon(
             Icons.person,
-            color: uiTheme.appbarIconColor ?? Colors.black,
+            color: selectedIndex == 1
+                ? uiTheme.appbarIconColor ?? Colors.black
+                : (uiTheme.appbarIconColor ?? Colors.black).withOpacity(0.5),
           ),
           label: 'Profile',
         ),
         BottomNavigationBarItem(
           icon: Icon(
             Icons.menu,
-            color: uiTheme.appbarIconColor ?? Colors.black,
+            color: selectedIndex == 2
+                ? uiTheme.appbarIconColor ?? Colors.black
+                : (uiTheme.appbarIconColor ?? Colors.black).withOpacity(0.5),
           ),
           label: 'Menus',
         ),

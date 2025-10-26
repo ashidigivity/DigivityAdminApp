@@ -1,14 +1,16 @@
-class StudentProfileModel {
+class StudentInformationForGlobalSearch {
   final Map<String, dynamic> studentPersonalInfo;
   final Map<String, dynamic> feeInformation;
   final Map<String, dynamic> fatherInformation;
+  final Map<String, dynamic> academicInformation;
   final Map<String, dynamic> motherInformation;
   final Map<String, dynamic> addressInformation;
   final Map<String, dynamic> localGuardianInformation;
   final Map<String, dynamic> emergencyInformation;
   final List<Map<String, dynamic>> uploadDocs;
+  final List<Map<String, dynamic>> cmmitmentDetails;
 
-  StudentProfileModel({
+  StudentInformationForGlobalSearch({
     required this.studentPersonalInfo,
     required this.feeInformation,
     required this.fatherInformation,
@@ -17,16 +19,17 @@ class StudentProfileModel {
     required this.localGuardianInformation,
     required this.emergencyInformation,
     required this.uploadDocs,
+    required this.academicInformation,
+    required this.cmmitmentDetails
   });
 
-  factory StudentProfileModel.fromJson(Map<String, dynamic> json) {
-    final data = json['data'] ?? {};
+  factory StudentInformationForGlobalSearch.fromJson(Map<String, dynamic> json) {
+    final studentData = json['student_data'] ?? {};
 
-    final studentData = data['student_data'] ?? {};
-
-    return StudentProfileModel(
+    return StudentInformationForGlobalSearch(
       studentPersonalInfo:
       Map<String, dynamic>.from(studentData['student_persional_information'] ?? {}),
+      academicInformation:Map<String, dynamic>.from(studentData['academic_information'] ?? {}),
       feeInformation: Map<String, dynamic>.from(studentData['fee_information'] ?? {}),
       fatherInformation: Map<String, dynamic>.from(studentData['father_information'] ?? {}),
       motherInformation: Map<String, dynamic>.from(studentData['mother_information'] ?? {}),
@@ -34,7 +37,11 @@ class StudentProfileModel {
       localGuardianInformation:
       Map<String, dynamic>.from(studentData['local_guardial_iformation'] ?? {}),
       emergencyInformation: Map<String, dynamic>.from(studentData['emg_information'] ?? {}),
-      uploadDocs: (data['upload_docs'] as List<dynamic>?)
+      uploadDocs: (json['upload_docs'] as List<dynamic>?)
+          ?.map((e) => Map<String, dynamic>.from(e))
+          .toList() ??
+          [],
+      cmmitmentDetails: (json['commitments_details'] as List<dynamic>?)
           ?.map((e) => Map<String, dynamic>.from(e))
           .toList() ??
           [],

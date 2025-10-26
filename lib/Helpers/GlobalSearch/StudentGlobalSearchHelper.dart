@@ -1,7 +1,13 @@
+import 'dart:ffi';
+import 'dart:math';
+
+import 'package:digivity_admin_app/AdminPanel/Models/GlobalSearchModel/StudentInformationForGlobalSearch.dart';
 import 'package:digivity_admin_app/AdminPanel/Models/Studdent/StudentGlobalSearch/StudentGlobalSearchModel.dart';
 import 'package:digivity_admin_app/Authentication/SharedPrefHelper.dart';
 import 'package:digivity_admin_app/Helpers/getApiService.dart';
 import 'package:flutter/cupertino.dart';
+
+import '../../AdminPanel/Models/GlobalSearchModel/StudentGlobalSearchModel.dart';
 
 class StudentGlobalSearchHelper {
   int? userId;
@@ -44,6 +50,82 @@ class StudentGlobalSearchHelper {
     }
   }
 
+  /// Get Particular Student Data
+  Future<StudentInformationForGlobalSearch?> getStudentListForGlobalSearch(int? studentId) async {
+    if (userId == null || token == null) {
+      await init();
+    }
+
+    final String url = "api/MobileApp/StudentGlobalSearch/GetStudentData/$userId/$studentId";
+    print("Controller Function Section: $url");
+
+    try {
+      final response = await getApiService.getRequestData(url, token!);
+
+      if (response["result"] == 1 && response["success"] is List && response["success"].isNotEmpty) {
+        final Map<String, dynamic> firstStudent = Map<String, dynamic>.from(response["success"][0]);
+        final studentInformation = StudentInformationForGlobalSearch.fromJson(firstStudent);
+        print("Student Info: $studentInformation");
+        return studentInformation;
+      } else {
+        print("No student data found or invalid response");
+        return null;
+      }
+    } catch (e) {
+      print("Error in getStudentListForGlobalSearch: $e");
+      return null;
+    }
+  }
+
+/// Get Report Data For A Particular Student Data Like Attendance And Finance
+  Future<String?> apiGetStudentDataGlobalSearch(dynamic studentId,String reportName) async {
+    if (userId == null || token == null) {
+      await init();
+    }
+
+    // Map of report names to endpoint suffixes
+    final reportEndpoints = {
+      'feeInformation': 'GetStudentFeeDetails',
+      'attendanceinformation': 'GetStudentAttendanceDetails',
+      "commitmentinformation":'GetStudentCommitmentDetails'
+    };
+
+    final endpoint = reportEndpoints[reportName];
+    if (endpoint == null) return null;
+
+    final url = "api/MobileApp/StudentGlobalSearch/$endpoint/$userId/$studentId";
+
+    print("Final Url For The Student Attendance IS : ");
+    print(url);
+
+    final response = await getApiService.getRequestData(url, token!);
+
+    if (response['result'] == 1 &&
+        response['success'] != null &&
+        response['success'].isNotEmpty &&
+        response['success'][0]['data'] != null) {
+      return response['success'][0]['data'];
+    }
+
+    return null;
+  }
 
 
+  /// Get Data For The Student Commitments Data
+Future<void> getStudentCommitment(dynamic studentId) async{
+    if(userId == null || token == null){
+      await init();
+    }
+
+    try{
+      final String url = "api/MobileApp/GetStudentCommitmentDetails/$userId/$studentId";
+      final response  = getApiService.getRequestData(url, token!);
+      
+    }catch(e){
+
+    }
 }
+
+
+
+ }

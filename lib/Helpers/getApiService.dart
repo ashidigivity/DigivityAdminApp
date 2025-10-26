@@ -18,6 +18,31 @@ class getApiService {
     }
   }
 
+
+  /// Send Otp And Get User data
+  static Future<Map<String, dynamic>> sendOtp(String url) async {
+    try {
+      final uri = Uri.parse(url);
+      final response = await http.get(uri);
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200) {
+
+        return data;
+      } else {
+        // throw Exception('Server returned ${response.statusCode}');
+        return {
+          "result": 0,
+          "message": data["message"] ?? "Server error: ${response.statusCode}",
+          "success": [],
+        };
+      }
+    } catch (e) {
+      throw Exception('Failed to send OTP: $e');
+    }
+  }
+
+
+  /// Get Request Apis
   static Future<dynamic> getRequestData(String url, String token) async {
     try {
       final baseUrl = await SharedPrefHelper.getPreferenceValue('base_url');

@@ -414,7 +414,7 @@ class _LoginPageScreenState extends State<LoginPageScreen>
 
         var successList = data['success'] as List? ?? [];
 
-        if (data['result'] == "1" && successList.isEmpty) {
+          if (data['result'] == "1" && data['success'].isEmpty) {
           hideLoaderDialog(context);
           showBottomMessage(context, data['message'], true);
           return;
@@ -434,44 +434,43 @@ class _LoginPageScreenState extends State<LoginPageScreen>
           return;
         }
 
+        if (!mounted) return;
+        hideLoaderDialog(context);
+
+        await SharedPrefHelper.storeSuccessData(userData);
+
+
         try {
           await DeviceToken().getDeviceToken();
         } catch (e) {
           debugPrint("Error generating device token: $e");
         }
 
-        if (!mounted) return;
-        hideLoaderDialog(context);
-
-        await SharedPrefHelper.storeSuccessData(userData);
         context.goNamed('dashboard');
       }
-      else if(_loginMode == "otp") {
-
-        print(_loginMode);
-        // ✅ OTP login logic
+      else if (_loginMode == "otp") {
+        print("Login mode: $_loginMode");
         showLoaderDialog(context, message: "Sending OTP...");
 
-        final String verificationId = await service.sendOTP(
-          phone: _phoneController.text.trim(),
-          // OTP valid for 5 minutes
-        );
+        try {
+          final response = await service.loginWithOtp(
+            schoolData: widget.schoolData,
+            phone: _phoneController.text.trim(),
+          );
 
-        print(verificationId);
+          hideLoaderDialog(context); // hide loader immediately after response
 
-        if (!mounted) return;
-        hideLoaderDialog(context);
+          // Check if OTP sending failed
+          if (response["result"] == 0 || response["success"].isEmpty) {
+            print(response);
+            showBottomMessage(context, response["message"] ?? "Failed to send OTP", true);
+            return;
+          }
 
-        // Navigate to OTP verification screen
-      //   Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //       builder: (_) => OTPVerificationScreen(
-      //         verificationId: verificationId,
-      //         schoolData: widget.schoolData,
-      //       ),
-      //     ),
-      //   );
+        } catch (e) {
+          hideLoaderDialog(context); // always hide loader on error
+          showBottomMessage(context, "OTP failed: ${e.toString()}", false);
+        }
       }
     } catch (e) {
       if (!mounted) return;

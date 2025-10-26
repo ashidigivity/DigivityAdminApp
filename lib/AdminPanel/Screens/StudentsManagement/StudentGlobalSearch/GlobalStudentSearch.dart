@@ -1,15 +1,15 @@
 import 'dart:async';
 
-import 'package:digivity_admin_app/AdminPanel/Components/PopupNetworkImage.dart';
 import 'package:digivity_admin_app/AdminPanel/Components/SearchBox.dart';
+import 'package:digivity_admin_app/AdminPanel/Models/GlobalSearchModel/StudentGlobalSearchModel.dart';
 import 'package:digivity_admin_app/AdminPanel/Models/Studdent/StudentGlobalSearch/StudentCardGlobalSearch.dart';
-import 'package:digivity_admin_app/AdminPanel/Models/Studdent/StudentGlobalSearch/StudentGlobalSearchModel.dart';
 import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/BackgrounWeapper.dart';
 import 'package:digivity_admin_app/Components/SimpleAppBar.dart';
 import 'package:digivity_admin_app/Helpers/GlobalSearch/StudentGlobalSearchHelper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class GlobalStudentSearch extends StatefulWidget {
   @override
@@ -125,9 +125,7 @@ class _GlobalStudentSearch extends State<GlobalStudentSearch> {
                         course: student.course,
                         fatherName:student.fatherName,
                         admissionNo: student.admissionNo,
-                        onTap: () {
-                          // Navigate to student details
-                        },
+                        studentId: student.studentId,
                       ),
                     );
                   },

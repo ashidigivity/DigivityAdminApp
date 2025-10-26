@@ -46,6 +46,10 @@ class _SchoolCodeVerificationState extends State<SchoolCodeVerification>
   }
 
   Future<void> _verify() async {
+    if(_schoolCodeController.text.trim().length != 6){
+      showBottomMessage(context, "Please Enter 6 Character Code", true);
+      return;
+    }
     if (_busy || !mounted) return;
     setState(() => _busy = true);
     FocusManager.instance.primaryFocus?.unfocus();

@@ -55,56 +55,53 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     super.dispose();
   }
 
-  Future<void> _verifyOTP() async {
-    if (_otpController.text.isEmpty) return;
-
-    setState(() => _isLoading = true);
-    showLoaderDialog(context, message: "Verifying OTP...");
-
-    try {
-      final success = await LoginService().verifyOTP(
-        verificationId: widget.verificationId,
-        otp: _otpController.text.trim(),
-      );
-
-      hideLoaderDialog(context);
-
-      if (success) {
-        // Optionally save login info here
-        await SharedPrefHelper.storeSuccessData({
-          'isLogin': true,
-          'base_url': widget.schoolData['base_url'],
-        });
-
-        if (!mounted) return;
-        context.goNamed('dashboard');
-      } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Invalid or expired OTP")),
-        );
-      }
-    } catch (e) {
-      hideLoaderDialog(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
+  // Future<void> _verifyOTP() async {
+  //   if (_otpController.text.isEmpty) return;
+  //
+  //   setState(() => _isLoading = true);
+  //   showLoaderDialog(context, message: "Verifying OTP...");
+  //
+  //   try {
+  //     final success = await LoginService().verifyOTP(
+  //       verificationId: widget.verificationId,
+  //       otp: _otpController.text.trim(),
+  //     );
+  //
+  //     hideLoaderDialog(context);
+  //
+  //     if (success) {
+  //       // Optionally save login info here
+  //       await SharedPrefHelper.storeSuccessData({
+  //         'isLogin': true,
+  //         'base_url': widget.schoolData['base_url'],
+  //       });
+  //
+  //       if (!mounted) return;
+  //       context.goNamed('dashboard');
+  //     } else {
+  //       if (!mounted) return;
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text("Invalid or expired OTP")),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     hideLoaderDialog(context);
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Error: $e")),
+  //     );
+  //   } finally {
+  //     if (mounted) setState(() => _isLoading = false);
+  //   }
+  // }
 
   Future<void> _resendOTP() async {
     if (!_isResendEnabled) return;
 
     setState(() => _isLoading = true);
     try {
-      final newVerificationId = await LoginService().sendOTP(
-        phone: widget.schoolData['phone'] ?? '',
-      );
+
 
       // Update verificationId
-      _verificationId = newVerificationId;
 
       _startTimer();
     } catch (e) {
@@ -189,7 +186,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
 
                     // Verify button
                     ElevatedButton(
-                      onPressed: _isLoading ? null : _verifyOTP,
+                      onPressed: _isLoading ? null : null,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         backgroundColor: Colors.purple.shade400,
