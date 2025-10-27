@@ -1,14 +1,9 @@
-import 'package:digivity_admin_app/Authentication/LoginService.dart';
-import 'package:digivity_admin_app/AuthenticationUi/OTPVerificationScreen.dart';
-import 'package:digivity_admin_app/Components/BouncingBubble.dart';
-import 'package:flutter/material.dart';
-import 'package:digivity_admin_app/Authentication/SharedPrefHelper.dart';
-import 'package:digivity_admin_app/AuthenticationUi/Loader.dart';
+import 'dart:async';
 import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
-import 'package:digivity_admin_app/Components/BouncingBubble.dart';
-import 'package:digivity_admin_app/Helpers/DeviceToken.dart';
-import 'package:digivity_admin_app/Helpers/getApiService.dart';
 import 'package:flutter/material.dart';
+import 'package:digivity_admin_app/Authentication/LoginService.dart';
+import 'package:digivity_admin_app/AuthenticationUi/Loader.dart';
+import 'package:digivity_admin_app/Components/BouncingBubble.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginPageScreen extends StatefulWidget {
@@ -22,13 +17,13 @@ class LoginPageScreen extends StatefulWidget {
 class _LoginPageScreenState extends State<LoginPageScreen>
     with TickerProviderStateMixin {
   final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
   bool _isLoading = false;
-  String _loginMode = 'password'; // default is password
+  String _loginMode = 'password';
+  Map<String,dynamic> passdata={};// default
 
   late AnimationController _formAnimationController;
   late Animation<double> _formAnimation;
@@ -44,14 +39,12 @@ class _LoginPageScreenState extends State<LoginPageScreen>
       parent: _formAnimationController,
       curve: Curves.easeInOut,
     );
-    // Open password form by default
     _formAnimationController.forward();
   }
 
   @override
   void dispose() {
     _usernameController.dispose();
-    _passwordController.dispose();
     _phoneController.dispose();
     _formAnimationController.dispose();
     super.dispose();
@@ -66,18 +59,107 @@ class _LoginPageScreenState extends State<LoginPageScreen>
     }
   }
 
+  Future<void> _handleLogin() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+    final service = LoginService();
+
+    try {
+      if (_loginMode == 'password') {
+        showLoaderDialog(context, message: "Fetching data...");
+        try {
+          final Map<String, dynamic> data = await service.loginWithUserName(
+            username: _usernameController.text.trim(),
+            schoolData: widget.schoolData,
+          );
+
+          if (data.isNotEmpty &&
+              data['success'] != null &&
+              (data['success'] as Map).isNotEmpty) {
+            if (!mounted) return;
+
+            // Prepare data to pass
+            final passdata = {
+              "userInfomation": data,
+              "schoolData": widget.schoolData,
+              "loginMode":_loginMode,
+              "username":_usernameController.text
+            };
+
+
+            hideLoaderDialog(context);
+
+            // Navigate using named route
+            context.pushNamed(
+              'otp_verification',
+              extra: passdata,
+            );
+
+          } else {
+            if (!mounted) return;
+            hideLoaderDialog(context);
+            showBottomMessage(context, "${data['message']}", true);
+          }
+        } catch (e) {
+          if (!mounted) return;
+          hideLoaderDialog(context);
+          showBottomMessage(context, "${e.toString()}", true);
+        }
+      }
+
+
+      // else if (_loginMode == "otp") {
+      //   showLoaderDialog(context, message: "Sending OTP...");
+      //   try {
+      //     final response = await service.loginWithOtp(
+      //       schoolData: widget.schoolData,
+      //       phone: _phoneController.text.trim(),
+      //     );
+      //     hideLoaderDialog(context);
+      //
+      //     if (response["result"] == 1 &&
+      //         (response["success"] as List).isNotEmpty) {
+      //       final verificationId = response["verification_id"] ?? "";
+      //       if (!mounted) return;
+      //       // context.push(MaterialPageRoute(
+      //       //   builder: (_) => OTPVerificationScreen(
+      //       //     verificationId: verificationId,
+      //       //     schoolData: widget.schoolData,
+      //       //   ),
+      //       // ));
+      //     } else {
+      //       showBottomMessage(
+      //         context,
+      //         response["message"] ?? "Failed to send OTP",
+      //         true,
+      //       );
+      //     }
+      //   } catch (e) {
+      //     hideLoaderDialog(context);
+      //     showBottomMessage(context, "${e}", true);
+      //   }
+      // }
+    } catch (e) {
+      hideLoaderDialog(context);
+      showBottomMessage(context, e.toString(), true);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final schoolData = widget.schoolData;
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-    bool _isPressed = true;
+    bool _isPressed = false;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          // Gradient background
+          // Gradient Background
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -101,8 +183,7 @@ class _LoginPageScreenState extends State<LoginPageScreen>
             top: height * 0.2,
             color: Colors.blue,
             bounceHeight: 20,
-            // optional
-            duration: Duration(seconds: 3), // optional
+            duration: const Duration(seconds: 3),
           ),
           BouncingBubble(
             size: 40,
@@ -117,32 +198,7 @@ class _LoginPageScreenState extends State<LoginPageScreen>
             color: Colors.blueAccent,
           ),
 
-          BouncingBubble(
-            size: 60,
-            left: width * 0.1,
-            top: height * 0.9,
-            color: Colors.purple,
-          ),
-          BouncingBubble(
-            size: 80,
-            left: width * 0.4,
-            top: height * 0.8,
-            color: Colors.blue,
-          ),
-          BouncingBubble(
-            size: 40,
-            left: width * 0.6,
-            top: height * 0.7,
-            color: Colors.purpleAccent,
-          ),
-          BouncingBubble(
-            size: 50,
-            left: width * 0.8,
-            top: height * 0.9,
-            color: Colors.blueAccent,
-          ),
-
-          // Login Card
+          // Center Card
           Center(
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: width * 0.06),
@@ -168,8 +224,7 @@ class _LoginPageScreenState extends State<LoginPageScreen>
                   ),
                   const SizedBox(height: 32),
 
-                  // Toggle Buttons
-                  // Replace your Row + _buildToggleOption calls with this:
+                  // Toggle
                   Container(
                     height: 48,
                     decoration: BoxDecoration(
@@ -178,7 +233,6 @@ class _LoginPageScreenState extends State<LoginPageScreen>
                     ),
                     child: Stack(
                       children: [
-                        // Sliding background
                         AnimatedAlign(
                           alignment: _loginMode == 'password'
                               ? Alignment.centerLeft
@@ -186,9 +240,7 @@ class _LoginPageScreenState extends State<LoginPageScreen>
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                           child: Container(
-                            width:
-                                MediaQuery.of(context).size.width *
-                                0.42, // roughly half
+                            width: width * 0.42,
                             margin: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
                               color: Colors.purple.shade400,
@@ -205,8 +257,6 @@ class _LoginPageScreenState extends State<LoginPageScreen>
                             ),
                           ),
                         ),
-
-                        // Toggle texts
                         Row(
                           children: [
                             Expanded(
@@ -249,7 +299,7 @@ class _LoginPageScreenState extends State<LoginPageScreen>
 
                   const SizedBox(height: 24),
 
-                  // Animated Login Form
+                  // Animated Form
                   SizeTransition(
                     sizeFactor: _formAnimation,
                     axisAlignment: -1,
@@ -275,31 +325,6 @@ class _LoginPageScreenState extends State<LoginPageScreen>
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   prefixIcon: const Icon(Icons.person),
-                                ),
-                                validator: (v) =>
-                                    v!.isEmpty ? 'Required' : null,
-                              ),
-                              const SizedBox(height: 16),
-                              TextFormField(
-                                controller: _passwordController,
-                                obscureText: _obscurePassword,
-                                decoration: InputDecoration(
-                                  labelText: 'Password',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  prefixIcon: const Icon(Icons.lock),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _obscurePassword
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                    ),
-                                    onPressed: () => setState(
-                                      () =>
-                                          _obscurePassword = !_obscurePassword,
-                                    ),
-                                  ),
                                 ),
                                 validator: (v) =>
                                     v!.isEmpty ? 'Required' : null,
@@ -331,6 +356,7 @@ class _LoginPageScreenState extends State<LoginPageScreen>
                                   setState(() => _isPressed = false),
                               onTapCancel: () =>
                                   setState(() => _isPressed = false),
+                              onTap: _isLoading ? null : _handleLogin,
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 100),
                                 transform: Matrix4.identity()
@@ -380,7 +406,6 @@ class _LoginPageScreenState extends State<LoginPageScreen>
                                   ),
                                 ),
                               ),
-                              onTap: _isLoading ? null : _handleLogin,
                             ),
                           ],
                         ),
@@ -394,90 +419,5 @@ class _LoginPageScreenState extends State<LoginPageScreen>
         ],
       ),
     );
-  }
-
-  Future<void> _handleLogin() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isLoading = true);
-    final service = LoginService();
-
-    try {
-      if (_loginMode == 'password') {
-        showLoaderDialog(context, message: "Fetching data...");
-
-        final Map<String, dynamic> data = await service.loginWithPassword(
-          username: _usernameController.text.trim(),
-          password: _passwordController.text.trim(),
-          schoolData: widget.schoolData,
-        );
-
-        var successList = data['success'] as List? ?? [];
-
-          if (data['result'] == "1" && data['success'].isEmpty) {
-          hideLoaderDialog(context);
-          showBottomMessage(context, data['message'], true);
-          return;
-        }
-
-        Map<String, dynamic> userData = {};
-        for (var item in data['success']) {
-          userData[item['key']] = item['value'];
-        }
-
-        userData['base_url'] = widget.schoolData['base_url'];
-        userData['isLogin'] = true;
-
-        if (userData['role'] != 'master-admin' && userData['role'] != 'admin') {
-          hideLoaderDialog(context);
-          showBottomMessage(context, "Invalid User", true);
-          return;
-        }
-
-        if (!mounted) return;
-        hideLoaderDialog(context);
-
-        await SharedPrefHelper.storeSuccessData(userData);
-
-
-        try {
-          await DeviceToken().getDeviceToken();
-        } catch (e) {
-          debugPrint("Error generating device token: $e");
-        }
-
-        context.goNamed('dashboard');
-      }
-      else if (_loginMode == "otp") {
-        print("Login mode: $_loginMode");
-        showLoaderDialog(context, message: "Sending OTP...");
-
-        try {
-          final response = await service.loginWithOtp(
-            schoolData: widget.schoolData,
-            phone: _phoneController.text.trim(),
-          );
-
-          hideLoaderDialog(context); // hide loader immediately after response
-
-          // Check if OTP sending failed
-          if (response["result"] == 0 || response["success"].isEmpty) {
-            print(response);
-            showBottomMessage(context, response["message"] ?? "Failed to send OTP", true);
-            return;
-          }
-
-        } catch (e) {
-          hideLoaderDialog(context); // always hide loader on error
-          showBottomMessage(context, "OTP failed: ${e.toString()}", false);
-        }
-      }
-    } catch (e) {
-      if (!mounted) return;
-      hideLoaderDialog(context);
-      showBottomMessage(context, e.toString(), true);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
   }
 }

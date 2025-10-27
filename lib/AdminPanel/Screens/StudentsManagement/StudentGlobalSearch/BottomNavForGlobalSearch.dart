@@ -4,7 +4,6 @@ import 'package:digivity_admin_app/AuthenticationUi/Loader.dart';
 import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Helpers/GlobalSearch/StudentGlobalSearchHelper.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class BottomNavForGlobalSearch extends StatefulWidget {
@@ -120,10 +119,10 @@ class _BottomNavForGlobalSearchState extends State<BottomNavForGlobalSearch> {
             ],
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween, // 👈 evenly spread tabs
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(tabs.length, (index) {
               bool isSelected = widget.currentIndex == index;
-              return Expanded( // 👈 makes each tab equal width
+              return Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: InkWell(

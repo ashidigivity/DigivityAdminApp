@@ -20,8 +20,7 @@ class DeviceToken {
       await init();
     }
 
-    print("Device Token Reponse");
-    print("${userId} - $accessToken");
+
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
     // iOS permission request
@@ -36,6 +35,8 @@ class DeviceToken {
         true) {
       String? firebaseToken = await messaging.getToken();
 
+      print("Device Token Reponse");
+      print(firebaseToken);
       final url =
           "api/MobileApp/master-admin/$userId/PushNotificationDeviceToken";
 

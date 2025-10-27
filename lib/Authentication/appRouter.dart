@@ -78,6 +78,7 @@ import 'package:digivity_admin_app/AdminPanel/Screens/UplopadImage/UploadImageLi
 import 'package:digivity_admin_app/AdminPanel/Screens/UplopadImage/UploadImageListScreens/StudentUloadImageStudentList.dart';
 import 'package:digivity_admin_app/AuthenticationUi/ChangeSessions.dart';
 import 'package:digivity_admin_app/AuthenticationUi/LoginPageScreen.dart';
+import 'package:digivity_admin_app/AuthenticationUi/OTPVerificationScreen.dart';
 import 'package:digivity_admin_app/AuthenticationUi/OnboardingScreen.dart';
 import 'package:digivity_admin_app/AuthenticationUi/SchoolCodeVerification.dart';
 import 'package:digivity_admin_app/AuthenticationUi/SplashScreen.dart';
@@ -128,6 +129,27 @@ final GoRouter appRouter = GoRouter(
         return LoginPageScreen(schoolData: schoolData);
       },
     ),
+
+
+    GoRoute(
+      name: 'otp_verification',
+      path: '/otp_verification',
+      builder: (context, state) {
+        final passData = state.extra as Map<String, dynamic>;
+        final userInfo = passData['userInfomation'] as Map<String, dynamic>;
+        final schoolData = passData['schoolData'] as Map<String, dynamic>;
+        final loginMode = passData['loginMode'] as String;
+        final username = passData['username'] as String;
+        return OTPOrPasswordScreen(
+          userInfomation: userInfo,
+          schoolData: schoolData,
+            loginMode:loginMode,
+            username:username
+        );
+      },
+    ),
+
+
     GoRoute(
       path: '/dashboard',
       name: 'dashboard',
@@ -864,10 +886,7 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
-
-
     // Student Global Search Section Start Here
-
     GoRoute(
       name: 'student-global-search',
       path: '/student-global-search',
@@ -880,32 +899,33 @@ final GoRouter appRouter = GoRouter(
       name: 'student-information-global-search',
       path: '/student-information-global-search',
       builder: (context, state) {
-       final studentdata = state.extra as Map<String,dynamic>;
+        final studentdata = state.extra as Map<String, dynamic>;
         return StudentInformation(studentId: studentdata["studentId"]);
       },
     ),
-
-
-
-
   ],
   redirect: (context, state) async {
     final prefs = await SharedPreferences.getInstance();
     final isLogin = prefs.getBool('isLogin') ?? false;
 
+    const allowedWhenLoggedOut = [
+      '/',
+      '/schoolCodeVerification',
+      '/otp_verification',
+      '/login',
+    ];
+
     if (isLogin && state.fullPath == '/') {
       return '/splash';
     }
 
-    if (!isLogin &&
-        state.fullPath != '/' &&
-        state.fullPath != '/schoolCodeVerification' &&
-        state.fullPath != '/login') {
+    if (!isLogin && !allowedWhenLoggedOut.contains(state.fullPath)) {
       return '/';
     }
 
     return null;
   },
+
 );
 
 class MyApp extends StatelessWidget {

@@ -73,14 +73,15 @@ class _DashboardState extends State<Dashboard> {
                   /// Slider
                   SliderCarouselWidget(
                     data: dashboardProvider.sliderdata
-                        .map(
-                          (item) => {
-                        'key': item.key,
-                        'value': item.value.toString(),
-                      },
-                    )
+                        .map((item) => {
+                      'key': item.key,
+                      'value': item.value.toString(),
+                    })
                         .toList(),
                   ),
+
+
+
 
                   ///   Student Attendance Summary Pie Chart
                   CardContainer(
