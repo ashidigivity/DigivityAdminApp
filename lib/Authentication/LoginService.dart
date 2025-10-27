@@ -4,14 +4,14 @@ import 'package:digivity_admin_app/Helpers/getApiService.dart';
 import 'package:flutter/cupertino.dart';
 
 class LoginService {
-
-/// Get User Data For The Login Using UserName
+  /// Get User Data For The Login Using UserName
   Future<Map<String, dynamic>> loginWithUserName({
     required String username,
     required Map<String, dynamic> schoolData,
   }) async {
     try {
-      final url = '${schoolData['base_url']}/api/MobileApp/loginbyusernampassword/$username';
+      final url =
+          '${schoolData['base_url']}/api/MobileApp/loginbyusernampassword/$username';
 
       // Call your API service
       final data = await getApiService.getApiServiceForLogin(url);
@@ -42,15 +42,14 @@ class LoginService {
     }
   }
 
-
-
   /// Username/password login (call your API here)
   Future<Map<String, dynamic>> loginWithPassword({
     required String username,
     required String password,
     required Map<String, dynamic> schoolData,
   }) async {
-    final url = '${schoolData['base_url']}/api/MobileApp/login/$username/$password';
+    final url =
+        '${schoolData['base_url']}/api/MobileApp/login/$username/$password';
 
     final data = await getApiService.getApiServiceForLogin(url);
 
@@ -62,21 +61,64 @@ class LoginService {
     return data;
   }
 
-  /// Send OTP to phone using Firebase
-Future<Map<String, dynamic>> loginWithOtp({required Map<String, dynamic> schoolData,required String phone}) async{
-  final url = '${schoolData['base_url']}/api/MobileApp/sendOtp/$phone';
-  try {
-    final data = await getApiService.sendOtp(url);
-    return data;
-  }catch(e){
-    print("${e}");
-    return {
-      "result":0,
-      "message":"${e}",
-      "success":[]
-    };
+  Future<Map<String, dynamic>> sendOtp({
+    required String phone,
+    required Map<String, dynamic> schoolData,
+  }) async {
+    final url = '${schoolData['base_url']}/api/MobileApp/sendOtp/$phone';
+
+    try {
+      final data = await getApiService.getApiServiceForLogin(url);
+      if (data == null) {
+        return {
+          "result": 0,
+          "message": "No response from server.",
+          "two-fa": 1,
+          "success": [],
+        };
+      }
+
+      // Always return whatever message the API gives
+      if (data['result'] == 0 || data['success'] == null) {
+        return {
+          "result": data['result'] ?? 0,
+          "message": data['message'] ?? "Something went wrong.",
+          "two-fa": data['two-fa'] ?? 1,
+          "success": data['success'] ?? [],
+        };
+      }
+      return data;
+    } catch (e) {
+      return {
+        "result": 0,
+        "message": e.toString().trim(),
+        "two-fa": 1,
+        "success": [],
+      };
+    }
   }
 
-}
+  /// Username/password login (call your API here)
+  Future<Map<String, dynamic>> loginWithOTP({
+    required Map<String, dynamic> requestdata,
+    required String loginurl,
+  }) async {
+    final url = '$loginurl/api/MobileApp/verifyOtp';
 
+    final data = await getApiService.getApiServiceForLoginPost(
+      url,
+      requestdata,
+    );
+
+    // Validate response
+    if (data == null) {
+      throw Exception("No response from server");
+    }
+
+    if (data['result'] == 0) {
+      return data;
+    }
+
+    return data;
+  }
 }

@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefHelper {
   /// Store all key-value pairs from a Map into SharedPreferences
-  static Future<void> storeSuccessData(Map<String, dynamic> dataMap) async {
+  static Future<void> storeSuccessData(Map<dynamic, dynamic> dataMap) async {
     final prefs = await SharedPreferences.getInstance();
 
     for (final entry in dataMap.entries) {

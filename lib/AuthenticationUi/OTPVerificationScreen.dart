@@ -3,9 +3,13 @@ import 'package:digivity_admin_app/AdminPanel/Components/PopupNetworkImage.dart'
 import 'package:digivity_admin_app/Authentication/LoginService.dart';
 import 'package:digivity_admin_app/Authentication/SharedPrefHelper.dart';
 import 'package:digivity_admin_app/AuthenticationUi/Loader.dart';
+import 'package:digivity_admin_app/AuthenticationUi/PasswordInputField.dart';
+import 'package:digivity_admin_app/AuthenticationUi/ResponsiveUserCard.dart';
 import 'package:digivity_admin_app/Components/ApiMessageWidget.dart';
 import 'package:digivity_admin_app/Components/BouncingBubble.dart';
 import 'package:digivity_admin_app/Helpers/DeviceToken.dart';
+import 'package:digivity_admin_app/Helpers/getApiService.dart';
+import 'package:digivity_admin_app/Helpers/otphelperForLoginUi.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -32,8 +36,10 @@ class _OTPOrPasswordScreenState extends State<OTPOrPasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _otpController = TextEditingController();
   bool _isLoading = false;
-  bool _isPasswordVisible = false;
-  bool _isOtpVisible = false;
+  int? _lastExpireTime;
+  int? _lastResendTime;
+
+  late OtpHelperForLoginUi _otpHelper;
 
   // OTP Timer
   bool _isResendEnabled = false;
@@ -41,29 +47,73 @@ class _OTPOrPasswordScreenState extends State<OTPOrPasswordScreen> {
   Timer? _timer;
 
   @override
+  bool _timersInitialized = false;
+
+  @override
   void initState() {
     super.initState();
+    _otpHelper = OtpHelperForLoginUi();
     _isPasswordLogin = widget.loginMode == 'password';
-    if (!_isPasswordLogin) _startOTPTimer();
+
+    if (!_isPasswordLogin && !_timersInitialized) {
+      _timersInitialized = true;
+
+      _lastResendTime = widget.userInfomation["success"]["timetoresend"] ?? 60;
+      _lastExpireTime =
+          widget.userInfomation["success"]["otpExpireeTime"] ?? 300;
+
+      _otpHelper.startResendTimer(
+        totalSeconds: _lastResendTime!,
+        onTick: () => setState(() {}),
+        onComplete: () => setState(() {}),
+      );
+
+      _otpHelper.startExpireTimer(
+        totalSeconds: _lastExpireTime!,
+        onTick: () => setState(() {}),
+        onExpire: () => setState(() {}),
+      );
+    }
   }
 
-  void _startOTPTimer() {
-    _secondsRemaining = 60;
-    _isResendEnabled = false;
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_secondsRemaining <= 0) {
-        setState(() => _isResendEnabled = true);
-        timer.cancel();
+  Future<void> resendOtp(String ResendOtp) async {
+    showLoaderDialog(context, message: "Please Wait To ReSend OTP ");
+    try {
+      final url =
+          '${widget.schoolData['base_url']}/api/MobileApp/ResendOtp/$ResendOtp';
+      final data = await getApiService.sendOtp(url);
+
+      if (data["result"] == 1 && data["message"] is String) {
+        showBottomMessage(context, "${data["message"]}", false);
+        _otpHelper.cancelTimers();
+        _otpHelper = OtpHelperForLoginUi();
+
+        _lastResendTime = data["success"]["timetoresend"] ?? 60;
+        _lastExpireTime = data["success"]["otpExpireeTime"] ?? 300;
+        _otpHelper.startResendTimer(
+          totalSeconds: _lastResendTime!,
+          onTick: () => setState(() {}),
+          onComplete: () => setState(() {}),
+        );
+        _otpHelper.startExpireTimer(
+          totalSeconds: _lastExpireTime!,
+          onTick: () => setState(() {}),
+          onExpire: () => setState(() {}),
+        );
+        setState(() {});
       } else {
-        setState(() => _secondsRemaining--);
+        showBottomMessage(context, "${data["message"]}", true);
       }
-    });
+    } catch (e) {
+      showBottomMessage(context, "$e", true);
+    } finally {
+      hideLoaderDialog(context);
+    }
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _otpHelper.cancelTimers();
     _passwordController.dispose();
     _otpController.dispose();
     super.dispose();
@@ -77,65 +127,80 @@ class _OTPOrPasswordScreenState extends State<OTPOrPasswordScreen> {
     final height = MediaQuery.of(context).size.height;
 
     Future<void> _handleLogin() async {
-      if (_passwordController.text.length == 0) {
-        showBottomMessage(context, "Please Enter Password", true);
-        return;
-      }
-      setState(() => _isLoading = true);
       final service = LoginService();
 
-      try {
-        if (widget.loginMode == 'password') {
-          showLoaderDialog(context, message: "Fetching data...");
+      if (_passwordController.text.isEmpty && widget.loginMode == 'password') {
+        if (mounted) showBottomMessage(context, "Please Enter Password", true);
+        return;
+      } else if (_otpController.text.isEmpty && widget.loginMode == 'otp') {
+        if (mounted) showBottomMessage(context, "Please Enter OTP", true);
+        return;
+      }
 
-          final Map<String, dynamic> data = await service.loginWithPassword(
+      setState(() => _isLoading = true);
+      showLoaderDialog(context, message: "Fetching data...");
+
+      try {
+        Map<String, dynamic> data;
+
+        if (widget.loginMode == 'password') {
+          data = await service.loginWithPassword(
             username: widget.username!,
             password: _passwordController.text.trim(),
             schoolData: widget.schoolData,
           );
-
-          var successList = data['success'] as List? ?? [];
-
-          if (data['result'] == "1" && data['success'].isEmpty) {
-            hideLoaderDialog(context);
-            showBottomMessage(context, data['message'], true);
-            return;
-          }
-
-          Map<String, dynamic> userData = {};
-          for (var item in data['success']) {
-            userData[item['key']] = item['value'];
-          }
-
-          userData['base_url'] = widget.schoolData['base_url'];
-          userData['isLogin'] = true;
-
-          if (userData['role'] != 'master-admin' &&
-              userData['role'] != 'admin') {
-            hideLoaderDialog(context);
-            showBottomMessage(context, "Invalid User", true);
-            return;
-          }
-
-          if (!mounted) return;
-          hideLoaderDialog(context);
-
-          await SharedPrefHelper.storeSuccessData(userData);
-
-          try {
-            await DeviceToken().getDeviceToken();
-          } catch (e) {
-            debugPrint("Error generating device token: $e");
-          }
-
-          context.goNamed('dashboard');
+        } else {
+          data = await service.loginWithOTP(
+            requestdata: {
+              "otp": _otpController.text,
+              "token": widget.userInfomation["token"],
+            },
+            loginurl: widget.schoolData["base_url"],
+          );
         }
-      } catch (e) {
-        if (!mounted) return;
+
+        if (!mounted) return; // 👈 add here
+
+        if (widget.loginMode == "otp" && data["result"] == 0) {
+          showBottomMessage(context, "${data["message"]}", true);
+          hideLoaderDialog(context);
+          setState(() => _isLoading = false);
+          return;
+        }
+
+        final userData = {
+          for (var item in data['success']) item['key']: item['value'],
+          'base_url': widget.schoolData['base_url'],
+          'isLogin': true,
+        };
+
+        if (!['master-admin', 'admin'].contains(userData['role'])) {
+          showBottomMessage(context, "Invalid User", true);
+          hideLoaderDialog(context);
+          setState(() => _isLoading = false);
+          return;
+        }
+
+        await SharedPrefHelper.storeSuccessData(userData);
+
+        try {
+          await DeviceToken().getDeviceToken();
+        } catch (e) {
+          debugPrint("Error generating device token: $e");
+        }
+
+        if (!mounted) return; // 👈 again before navigation
         hideLoaderDialog(context);
-        showBottomMessage(context, e.toString(), true);
+        context.goNamed('dashboard');
+      } catch (e) {
+        if (mounted) {
+          hideLoaderDialog(context);
+          showBottomMessage(context, e.toString(), true);
+        }
       } finally {
-        if (mounted) setState(() => _isLoading = false);
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
       }
     }
 
@@ -188,162 +253,7 @@ class _OTPOrPasswordScreenState extends State<OTPOrPasswordScreen> {
               child: Column(
                 children: [
                   // ===== User Info Card =====
-                  if (user != null)
-                    IntrinsicHeight(
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 0,
-                          vertical: 12,
-                        ),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 15,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment
-                              .stretch, // Make children fill vertical space
-                          children: [
-                            // Left Accent Border
-                            Container(
-                              width: 4,
-                              decoration: BoxDecoration(
-                                color: Colors.purple.shade400,
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-
-                            // Profile Image
-                            PopupNetworkImage(
-                              imageUrl: user['profile_image'] ?? '',
-                              radius: 90,
-                            ),
-
-                            const SizedBox(width: 16),
-
-                            // User Info
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    user['full_name'] ?? '',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.purple.shade800,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.person_outline,
-                                        size: 16,
-                                        color: Colors.black54,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        user['role'] ?? '',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.phone_android,
-                                        size: 16,
-                                        color: Colors.black54,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        user['mobile_no'] ??
-                                            user['email_id'] ??
-                                            '',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.location_city,
-                                        size: 16,
-                                        color: Colors.black54,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Expanded(
-                                        child: Text(
-                                          'Branch: ${user['branchname'] ?? '-'}',
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.black87,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.event_note,
-                                        size: 16,
-                                        color: Colors.black54,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'Session: ${user['session'] ?? '-'}',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.access_time,
-                                        size: 16,
-                                        color: Colors.black54,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'Last Login: ${user['lastlogin'] ?? '-'}',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  if (user != null) ResponsiveUserCard(user: user),
 
                   // ===== Login Card =====
                   Container(
@@ -359,48 +269,98 @@ class _OTPOrPasswordScreenState extends State<OTPOrPasswordScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // Title
-                        Text(
-                          _isPasswordLogin
-                              ? "Login with Password"
-                              : "Login with OTP",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.purple.shade800,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
+                        Column(
+                          children: [
+                            Text(
+                              _isPasswordLogin
+                                  ? "Login with Password"
+                                  : "Login with OTP",
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.purple.shade800,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
 
+                            // Show OTP expiry timer only when login with OTP
+                            if (!_isPasswordLogin)
+                              Text(
+                                _otpHelper.isOtpExpired
+                                    ? "OTP expired"
+                                    : "OTP valid for ${_otpHelper.formatTime(_otpHelper.expireSecondsRemaining)}",
+                                style: const TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
                         // Choice Chips
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            // 🔹 Password Chip
                             ChoiceChip(
                               label: const Text("Password"),
                               selected: _isPasswordLogin,
-                              onSelected: (val) {
-                                if (!otpDisabled)
-                                  setState(() => _isPasswordLogin = true);
-                              },
+                              onSelected: widget.loginMode == 'otp'
+                                  ? null
+                                  : null, // fully disabled
+                              backgroundColor: widget.loginMode == 'otp'
+                                  ? Colors
+                                        .grey
+                                        .shade300 // disabled look
+                                  : (_isPasswordLogin
+                                        ? Colors
+                                              .purple
+                                              .shade100 // active look
+                                        : Colors.grey.shade200), // normal look
+                              labelStyle: TextStyle(
+                                color: widget.loginMode == 'otp'
+                                    ? Colors
+                                          .grey // disabled text
+                                    : (_isPasswordLogin
+                                          ? Colors
+                                                .purple
+                                                .shade900 // active text
+                                          : Colors.black54), // normal text
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
+
                             const SizedBox(width: 10),
+
+                            // 🔹 OTP Chip
                             ChoiceChip(
                               label: const Text("OTP"),
                               selected: !_isPasswordLogin,
-                              onSelected: otpDisabled
+                              onSelected: widget.loginMode == 'password'
                                   ? null
-                                  : (val) {
-                                      setState(() {
-                                        _isPasswordLogin = false;
-                                        _startOTPTimer();
-                                      });
-                                    },
-                              backgroundColor: otpDisabled
-                                  ? Colors.grey.shade300
-                                  : null,
+                                  : null, // fully disabled
+                              backgroundColor: widget.loginMode == 'password'
+                                  ? Colors
+                                        .grey
+                                        .shade300 // disabled look
+                                  : (!_isPasswordLogin
+                                        ? Colors
+                                              .purple
+                                              .shade100 // active look
+                                        : Colors.grey.shade200), // normal look
                               labelStyle: TextStyle(
-                                color: otpDisabled ? Colors.grey : null,
+                                color: widget.loginMode == 'password'
+                                    ? Colors
+                                          .grey // disabled text
+                                    : (!_isPasswordLogin
+                                          ? Colors
+                                                .purple
+                                                .shade900 // active text
+                                          : Colors.black54), // normal text
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
@@ -410,106 +370,64 @@ class _OTPOrPasswordScreenState extends State<OTPOrPasswordScreen> {
 
                         // Conditional Field
                         if (_isPasswordLogin)
-                          TextField(
+                          Passwordinputfield(
                             controller: _passwordController,
-                            obscureText: !_isPasswordVisible,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: Colors.purple.shade400, // Always visible
-                                  width: 2,
-                                ),
-                              ),
-                              prefixIcon: const Icon(Icons.lock),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _isPasswordVisible
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _isPasswordVisible = !_isPasswordVisible;
-                                  });
-                                },
-                              ),
-                              hintText: "Enter Password",
-                            ),
+                            hintText: "Enter Password",
+                            isPasswordField: true,
                           )
                         else
                           Column(
                             children: [
-                              TextField(
+                              Passwordinputfield(
                                 controller: _otpController,
-                                obscureText: !_isOtpVisible,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                    borderSide: BorderSide(
-                                      color: Colors.purple.shade400, // Always visible
-                                      width: 2,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                    borderSide: BorderSide(
-                                      color: Colors.purple.shade400, // Always visible
-                                      width: 2,
-                                    ),
-                                  ),
-                                  prefixIcon: const Icon(Icons.lock),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _isPasswordVisible
-                                          ? Icons.visibility
-                                          : Icons.visibility_off,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _isPasswordVisible =
-                                            !_isPasswordVisible;
-                                      });
-                                    },
-                                  ),
-                                  hintText: "Enter Password",
-                                ),
+                                hintText: "Enter OTP",
+                                isPasswordField: true,
+                                prefixIcon: Icons.sms_outlined,
+                                keyboardType: TextInputType.number,
                               ),
+
                               const SizedBox(height: 8),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    _isResendEnabled
-                                        ? "Didn't receive OTP?"
-                                        : "Resend in $_secondsRemaining sec",
-                                    style: const TextStyle(
-                                      color: Colors.black54,
+                                  if (_otpHelper.isOtpExpired)
+                                    const Text(
+                                      "OTP expired, please resend.",
+                                      style: TextStyle(color: Colors.red),
+                                    )
+                                  else
+                                    Text(
+                                      _otpHelper.isResendEnabled
+                                          ? "Didn't receive OTP?"
+                                          : "Resend in ${_otpHelper.formatTime(_otpHelper.resendSecondsRemaining)}",
+                                      style: const TextStyle(
+                                        color: Colors.black54,
+                                      ),
                                     ),
-                                  ),
                                   TextButton(
-                                    onPressed: _isResendEnabled
-                                        ? () {
-                                            _startOTPTimer();
-                                            // Call resend OTP API
+                                    onPressed: _otpHelper.isResendEnabled
+                                        ? () async {
+                                            final token =
+                                                widget.userInfomation["token"];
+
+                                            if (token == null ||
+                                                token.toString().isEmpty) {
+                                              showBottomMessage(
+                                                context,
+                                                "Token is not available or invalid",
+                                                true,
+                                              );
+                                              return;
+                                            }
+
+                                            // 🔹 Call your resend OTP API
+                                            await resendOtp(token);
                                           }
-                                        : null,
+                                        : null, // disabled while timer is running
                                     child: Text(
                                       "Resend",
                                       style: TextStyle(
-                                        color: _isResendEnabled
+                                        color: _otpHelper.isResendEnabled
                                             ? Colors.purple.shade400
                                             : Colors.grey,
                                         fontWeight: FontWeight.bold,

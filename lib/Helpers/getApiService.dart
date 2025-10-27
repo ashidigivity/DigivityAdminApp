@@ -18,6 +18,30 @@ class getApiService {
     }
   }
 
+  static Future<dynamic> getApiServiceForLoginPost(
+    String url,
+    Map<String, dynamic> requestData,
+  ) async {
+
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(requestData),
+      );
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return jsonDecode(response.body);
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
 
   /// Send Otp And Get User data
   static Future<Map<String, dynamic>> sendOtp(String url) async {
@@ -26,7 +50,6 @@ class getApiService {
       final response = await http.get(uri);
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       if (response.statusCode == 200) {
-
         return data;
       } else {
         // throw Exception('Server returned ${response.statusCode}');
@@ -40,7 +63,6 @@ class getApiService {
       throw Exception('Failed to send OTP: $e');
     }
   }
-
 
   /// Get Request Apis
   static Future<dynamic> getRequestData(String url, String token) async {

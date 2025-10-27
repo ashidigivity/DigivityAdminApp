@@ -23,7 +23,7 @@ class _LoginPageScreenState extends State<LoginPageScreen>
   bool _obscurePassword = true;
   bool _isLoading = false;
   String _loginMode = 'password';
-  Map<String,dynamic> passdata={};// default
+  Map<String, dynamic> passdata = {}; // default
 
   late AnimationController _formAnimationController;
   late Animation<double> _formAnimation;
@@ -60,86 +60,70 @@ class _LoginPageScreenState extends State<LoginPageScreen>
   }
 
   Future<void> _handleLogin() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_loginMode == "password") {
+      if (_usernameController.text.length == 0) {
+        showBottomMessage(context, "Please Enter Password First!", true);
+        return;
+      }
+    } else if (_loginMode == "otp") {
+      if (_phoneController.text.length == 0) {
+        showBottomMessage(context, "Please Enter Phone Number First!", true);
+        return;
+      }
+    }
 
     setState(() => _isLoading = true);
     final service = LoginService();
 
+    // Common variables
+    final username = _usernameController.text.trim();
+    final phone = _phoneController.text.trim();
+    final schoolData = widget.schoolData;
+
     try {
+      // Show loader based on mode
+      final loaderMessage = _loginMode == 'password'
+          ? "Fetching data..."
+          : "Sending OTP...";
+      showLoaderDialog(context, message: loaderMessage);
+
+      Map<String, dynamic> response = {};
+
+      // Make API call depending on login mode
       if (_loginMode == 'password') {
-        showLoaderDialog(context, message: "Fetching data...");
-        try {
-          final Map<String, dynamic> data = await service.loginWithUserName(
-            username: _usernameController.text.trim(),
-            schoolData: widget.schoolData,
-          );
-
-          if (data.isNotEmpty &&
-              data['success'] != null &&
-              (data['success'] as Map).isNotEmpty) {
-            if (!mounted) return;
-
-            // Prepare data to pass
-            final passdata = {
-              "userInfomation": data,
-              "schoolData": widget.schoolData,
-              "loginMode":_loginMode,
-              "username":_usernameController.text
-            };
-
-
-            hideLoaderDialog(context);
-
-            // Navigate using named route
-            context.pushNamed(
-              'otp_verification',
-              extra: passdata,
-            );
-
-          } else {
-            if (!mounted) return;
-            hideLoaderDialog(context);
-            showBottomMessage(context, "${data['message']}", true);
-          }
-        } catch (e) {
-          if (!mounted) return;
-          hideLoaderDialog(context);
-          showBottomMessage(context, "${e.toString()}", true);
-        }
+        response = await service.loginWithUserName(
+          username: username,
+          schoolData: schoolData,
+        );
+      } else {
+        response = await service.sendOtp(phone: phone, schoolData: schoolData);
       }
 
+      hideLoaderDialog(context);
 
-      // else if (_loginMode == "otp") {
-      //   showLoaderDialog(context, message: "Sending OTP...");
-      //   try {
-      //     final response = await service.loginWithOtp(
-      //       schoolData: widget.schoolData,
-      //       phone: _phoneController.text.trim(),
-      //     );
-      //     hideLoaderDialog(context);
-      //
-      //     if (response["result"] == 1 &&
-      //         (response["success"] as List).isNotEmpty) {
-      //       final verificationId = response["verification_id"] ?? "";
-      //       if (!mounted) return;
-      //       // context.push(MaterialPageRoute(
-      //       //   builder: (_) => OTPVerificationScreen(
-      //       //     verificationId: verificationId,
-      //       //     schoolData: widget.schoolData,
-      //       //   ),
-      //       // ));
-      //     } else {
-      //       showBottomMessage(
-      //         context,
-      //         response["message"] ?? "Failed to send OTP",
-      //         true,
-      //       );
-      //     }
-      //   } catch (e) {
-      //     hideLoaderDialog(context);
-      //     showBottomMessage(context, "${e}", true);
-      //   }
-      // }
+      // Handle successful response
+      final success = response["success"];
+      final isSuccess = _loginMode == "password"
+          ? success is Map && success.isNotEmpty
+          : (response["result"] == 1 && success is Map && success.isNotEmpty);
+
+      if (isSuccess) {
+        if (!mounted) return;
+        final passdata = {
+          "userInfomation": response,
+          "schoolData": schoolData,
+          "loginMode": _loginMode,
+          "username": _loginMode == "password" ? username : phone,
+        };
+
+        context.pushNamed('otp_verification', extra: passdata);
+      } else {
+        showBottomMessage(
+          context,
+          response["message"] ?? "Login failed. Please try again.",
+          true,
+        );
+      }
     } catch (e) {
       hideLoaderDialog(context);
       showBottomMessage(context, e.toString(), true);

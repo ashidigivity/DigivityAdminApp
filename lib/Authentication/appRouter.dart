@@ -144,7 +144,7 @@ final GoRouter appRouter = GoRouter(
           userInfomation: userInfo,
           schoolData: schoolData,
             loginMode:loginMode,
-            username:username
+            username:username,
         );
       },
     ),
