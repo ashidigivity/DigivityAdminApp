@@ -1,3 +1,4 @@
+import 'package:digivity_admin_app/AuthenticationUi/versionCheker.dart';
 import 'package:digivity_admin_app/Components/BouncingBubble.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -36,13 +37,19 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // Logo fade-in
-    _logoController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        AppUpdateChecker.checkForUpdate(context);
+      } catch (e) {
+        print("${e}");
+      }
+    });
+    _logoController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
     _fadeIn = CurvedAnimation(parent: _logoController, curve: Curves.easeIn);
     _logoController.forward();
-
-    // Progress animation
     _progressController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
@@ -73,16 +80,12 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
-  // Floating bubbles
-
-
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
     // Gradient colors same as SchoolCodeVerification
-
 
     return Scaffold(
       body: Stack(
@@ -150,7 +153,6 @@ class _SplashScreenState extends State<SplashScreen>
             color: Colors.blueAccent,
           ),
 
-
           // Center logo + progress
           Center(
             child: FadeTransition(
@@ -197,10 +199,7 @@ class _SplashScreenState extends State<SplashScreen>
                   const SizedBox(height: 8),
                   const Text(
                     "Empowering Education Through Innovation",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white70,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.white70),
                   ),
                   const SizedBox(height: 32),
 
@@ -215,8 +214,9 @@ class _SplashScreenState extends State<SplashScreen>
                           child: LinearProgressIndicator(
                             value: _progressController.value,
                             backgroundColor: Colors.white24,
-                            valueColor:
-                            const AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                             minHeight: 6,
                           ),
                         ),
